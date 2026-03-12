@@ -92,74 +92,154 @@ import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
 
 const EcoInsightLogo = ({ size = 24, className = "" }) => {
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const mouseXSpring = useSpring(x);
+    const mouseYSpring = useSpring(y);
+
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["20deg", "-20deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-20deg", "20deg"]);
+
+    const handleMouseMove = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+        x.set(xPct);
+        y.set(yPct);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
     return (
-        <motion.svg
-            width={size}
-            height={size}
-            viewBox="0 0 512 512"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className={className}
-            whileHover="hover"
-            initial="rest"
+        <motion.div
+            style={{
+                width: size,
+                height: size,
+                rotateX,
+                rotateY,
+                transformStyle: "preserve-3d",
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className={`logo-interactive-container ${className}`}
         >
-            <defs>
-                <linearGradient id="logoGradientMain" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--accent-primary)" />
-                    <stop offset="100%" stopColor="var(--accent-secondary)" />
-                </linearGradient>
-                <filter id="logoGlowEffect" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="15" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-            </defs>
+            <motion.svg
+                width={size}
+                height={size}
+                viewBox="0 0 512 512"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                whileHover="hover"
+                initial="rest"
+                style={{ translateZ: "50px" }}
+            >
+                <defs>
+                    <linearGradient id="logoGradientMain" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="var(--accent-primary)" />
+                        <stop offset="100%" stopColor="var(--accent-secondary)" />
+                    </linearGradient>
+                    <filter id="logoGlowEffect" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="15" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                </defs>
 
-            <motion.rect
-                x="40" y="40" width="432" height="432" rx="80"
-                fill="rgba(10, 10, 12, 0.4)"
-                stroke="url(#logoGradientMain)"
-                strokeWidth="8"
-                variants={{
-                    rest: { opacity: 0.8, strokeWidth: 8 },
-                    hover: { opacity: 1, strokeWidth: 12, scale: 1.02 }
-                }}
-                style={{ filter: 'url(#logoGlowEffect)' }}
-            />
+                <motion.rect
+                    x="40" y="40" width="432" height="432" rx="80"
+                    fill="rgba(10, 10, 12, 0.8)"
+                    stroke="url(#logoGradientMain)"
+                    strokeWidth="8"
+                    variants={{
+                        rest: { opacity: 0.8, strokeWidth: 8 },
+                        hover: { 
+                            opacity: 1, 
+                            strokeWidth: 12, 
+                            scale: 1.05,
+                            boxShadow: "0 0 30px var(--accent-glow)"
+                        }
+                    }}
+                    style={{ filter: 'url(#logoGlowEffect)' }}
+                />
 
-            <motion.rect x="120" y="300" width="30" height="120" rx="4" fill="url(#logoGradientMain)" opacity="0.4" 
-                variants={{ hover: { height: 140, y: 280 } }} />
-            <motion.rect x="170" y="260" width="30" height="160" rx="4" fill="url(#logoGradientMain)" opacity="0.6" 
-                variants={{ hover: { height: 180, y: 240 } }} />
-            <motion.rect x="220" y="220" width="30" height="200" rx="4" fill="url(#logoGradientMain)" opacity="0.8" 
-                variants={{ hover: { height: 220, y: 200 } }} />
-            <motion.rect x="270" y="180" width="30" height="240" rx="4" fill="url(#logoGradientMain)" 
-                variants={{ hover: { height: 260, y: 160 } }} />
+                {[
+                    { x: 120, y: 300, h: 120, op: 0.4 },
+                    { x: 170, y: 260, h: 160, op: 0.6 },
+                    { x: 220, y: 220, h: 200, op: 0.8 },
+                    { x: 270, y: 180, h: 240, op: 1.0 }
+                ].map((bar, i) => (
+                    <motion.rect
+                        key={`bar-${i}`}
+                        x={bar.x} y={bar.y} width="30" height={bar.h} rx="4"
+                        fill="url(#logoGradientMain)"
+                        opacity={bar.op}
+                        variants={{
+                            rest: { height: bar.h, y: bar.y },
+                            hover: { 
+                                height: bar.h + 30, 
+                                y: bar.y - 30,
+                                transition: { type: "spring", stiffness: 300, damping: 10, delay: i * 0.05 }
+                            }
+                        }}
+                        style={{ translateZ: "20px" }}
+                    />
+                ))}
 
-            <motion.path
-                d="M120 380 L220 280 L280 320 L400 150 M370 150 L400 150 L400 180"
-                stroke="#fff"
-                strokeWidth="20"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                variants={{
-                    rest: { pathLength: 1, opacity: 0.9 },
-                    hover: { pathLength: 1, opacity: 1, scale: 1.05, transformOrigin: 'center' }
-                }}
-            />
+                <motion.path
+                    d="M120 380 L220 280 L280 320 L400 150 M370 150 L400 150 L400 180"
+                    stroke="#fff"
+                    strokeWidth="24"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    variants={{
+                        rest: { pathLength: 1, opacity: 0.9 },
+                        hover: { 
+                            opacity: 1, 
+                            scale: 1.1, 
+                            transformOrigin: '200px 200px',
+                            transition: { type: "spring", stiffness: 400 }
+                        }
+                    }}
+                    style={{ translateZ: "40px" }}
+                />
 
-            <motion.circle cx="200" cy="180" r="15" fill="#fff" variants={{ hover: { scale: 1.2 } }} />
-            <motion.circle cx="260" cy="140" r="20" fill="#fff" variants={{ hover: { scale: 1.2 } }} />
-            <motion.circle cx="320" cy="200" r="15" fill="#fff" variants={{ hover: { scale: 1.2 } }} />
-            <motion.circle cx="240" cy="220" r="12" fill="#fff" variants={{ hover: { scale: 1.2 } }} />
+                {[
+                    { cx: 200, cy: 180, r: 15 },
+                    { cx: 260, cy: 140, r: 22 },
+                    { cx: 320, cy: 200, r: 15 },
+                    { cx: 240, cy: 220, r: 12 }
+                ].map((node, i) => (
+                    <motion.circle
+                        key={`node-${i}`}
+                        cx={node.cx} cy={node.cy} r={node.r}
+                        fill="#fff"
+                        variants={{
+                            hover: { 
+                                scale: [1, 1.4, 1],
+                                opacity: [0.8, 1, 0.8],
+                                transition: { repeat: Infinity, duration: 1.5, delay: i * 0.2 }
+                            }
+                        }}
+                        style={{ translateZ: "60px" }}
+                    />
+                ))}
 
-            <motion.g opacity="0.5" stroke="#fff" strokeWidth="4">
-                <line x1="200" y1="180" x2="260" y2="140" />
-                <line x1="260" y1="140" x2="320" y2="200" />
-                <line x1="200" y1="180" x2="240" y2="220" />
-                <line x1="260" y1="140" x2="240" y2="220" />
-                <line x1="320" y1="200" x2="240" y2="220" />
-            </motion.g>
-        </motion.svg>
+                <motion.g stroke="#fff" strokeWidth="4" variants={{ rest: { opacity: 0.3 }, hover: { opacity: 0.7 } }} style={{ translateZ: "30px" }}>
+                    <line x1="200" y1="180" x2="260" y2="140" />
+                    <line x1="260" y1="140" x2="320" y2="200" />
+                    <line x1="200" y1="180" x2="240" y2="220" />
+                    <line x1="260" y1="140" x2="240" y2="220" />
+                    <line x1="320" y1="200" x2="240" y2="220" />
+                </motion.g>
+            </motion.svg>
+        </motion.div>
     );
 };
 
@@ -751,11 +831,9 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
             <motion.div className="scroll-indicator" style={{ scaleX: scrollYProgress }} />
 
             <header className={`landing-header ${isHeaderVisible ? '' : 'header-hidden'}`}>
-                <Magnetic distance={0.2}>
-                    <div className="logo" onClick={() => setAppSection('landing')} style={{ cursor: 'pointer' }}>
-                        <EcoInsightLogo size={48} /> <span>EcoInsight</span>
-                    </div>
-                </Magnetic>
+                <div className="logo" onClick={() => setAppSection('landing')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <EcoInsightLogo size={48} /> <span>EcoInsight</span>
+                </div>
                 <div className="landing-nav">
                     <Magnetic distance={0.3}><button className="nav-link" onClick={() => scrollToSection('features')}>Features</button></Magnetic>
                     <Magnetic distance={0.3}><button className="nav-link" onClick={() => scrollToSection('solutions')}>Solutions</button></Magnetic>
@@ -980,7 +1058,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
 
             <footer className="landing-footer">
                 <div className="footer-content">
-                    <div className="footer-brand">
+                    <div className="footer-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <EcoInsightLogo size={42} /> <span>EcoInsight</span>
                     </div>
                     <div className="footer-links">
@@ -3980,7 +4058,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             <div className="app-container">
                 <aside className="sidebar">
                     <div className="sidebar-header">
-                        <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                        <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <EcoInsightLogo size={36} className="logo-icon" /> <span>EcoInsight</span>
                         </motion.div>
                     </div>
