@@ -28,6 +28,48 @@ import { fetchNewsTickerData } from './lib/MarketData'
 
 import './LandingAuth.css'
 import Threads from './components/Threads'
+const CustomCursor = () => {
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    const springConfig = { damping: 25, stiffness: 400 };
+    const cursorX = useSpring(mouseX, springConfig);
+    const cursorY = useSpring(mouseY, springConfig);
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            mouseX.set(e.clientX);
+            mouseY.set(e.clientY);
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
+    return (
+        <motion.div
+            className="custom-cursor-container"
+            style={{
+                x: cursorX,
+                y: cursorY,
+                translateX: '-15%',
+                translateY: '-15%'
+            }}
+        >
+            <div className="custom-cursor-inner">
+                <svg width="28" height="28" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M421.08 290.76C464.71 334.39 464.71 405.15 421.08 448.78C377.45 492.41 306.69 492.41 263.06 448.78L63.22 248.94C19.59 205.31 19.59 134.55 63.22 90.92C106.85 47.29 177.61 47.29 221.24 90.92L421.08 290.76Z" fill="url(#cursorGlow)" />
+                    <path d="M421.08 281.35C464.71 324.98 464.71 395.74 421.08 439.37C377.45 483 306.69 483 263.06 439.37L63.22 239.53C19.59 195.9 19.59 125.14 63.22 81.51C106.85 37.88 177.61 37.88 221.24 81.51L421.08 281.35Z" fill="#C084FC" />
+                    <defs>
+                        <radialGradient id="cursorGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(256)">
+                            <stop stopColor="#8B5CF6" stopOpacity="0.6" />
+                            <stop offset="1" stopColor="#8B5CF6" stopOpacity="0" />
+                        </radialGradient>
+                    </defs>
+                </svg>
+            </div>
+        </motion.div>
+    );
+};
+
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
 
@@ -259,71 +301,9 @@ const extractTextFromPDF = async (file) => {
     }
 };
 
-const useMousePosition = () => {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [hasMoved, setHasMoved] = useState(false);
 
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            // Ignore events at 0,0 as they are often browser-injected on load
-            if (e.clientX === 0 && e.clientY === 0 && !hasMoved) return;
+const InitialTerminalLine = ({ text, delay = 0, color = "var(--accent-primary)" }) => {
 
-            setMousePosition({ x: e.clientX, y: e.clientY });
-            setHasMoved(true);
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, [hasMoved]);
-
-    return { ...mousePosition, hasMoved };
-};
-const CustomCursor = () => {
-    const { x, y, hasMoved } = useMousePosition();
-    const [isHovering, setIsHovering] = useState(false);
-    const [cursorType, setCursorType] = useState('default');
-
-    useEffect(() => {
-        const handleMouseOver = (e) => {
-            const target = e.target;
-            if (target.closest('button, a, .magnetic-wrap')) {
-                setIsHovering(true);
-                setCursorType('pointer');
-            } else if (target.closest('.bento-item, .solution-card, .pricing-card')) {
-                setIsHovering(true);
-                setCursorType('card');
-            } else {
-                setIsHovering(false);
-                setCursorType('default');
-            }
-        };
-        window.addEventListener('mouseover', handleMouseOver);
-        return () => window.removeEventListener('mouseover', handleMouseOver);
-    }, []);
-
-    if (!hasMoved) return null;
-
-    return (
-        <>
-            <motion.div
-                className="cursor-dot"
-                style={{ x: x - 4, y: y - 4 }}
-                animate={{
-                    scale: isHovering ? 1.5 : 1,
-                    backgroundColor: cursorType === 'pointer' ? 'var(--accent-primary)' : '#fff'
-                }}
-            />
-            <motion.div
-                className={`cursor-ring ${isHovering ? 'hover' : ''}`}
-                style={{ x: x - 20, y: y - 20 }}
-                animate={{
-                    scale: isHovering ? 1.8 : 1,
-                    borderColor: cursorType === 'pointer' ? 'var(--accent-primary)' : 'rgba(255,255,255,0.5)'
-                }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200, mass: 0.5 }}
-            />
-        </>
-    );
-};
 
 const Magnetic = ({ children, distance = 0.5 }) => {
     const ref = useRef(null);
@@ -4181,9 +4161,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     return (
         <>
-            <CustomCursor />
+            {appSection === 'landing' && <CustomCursor />}
             {renderActiveSection()}
-            {/* Initialization Terminal Overlay */}
             <AnimatePresence>
                 {showInitialization && (
                     <InitializationTerminal
@@ -4194,6 +4173,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             </AnimatePresence>
         </>
     );
-}
+};
 
 export default App;

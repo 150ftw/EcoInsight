@@ -167,17 +167,17 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     let targetMouse = [0.5, 0.5];
 
     function handleMouseMove(e) {
-      const rect = container.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = 1.0 - (e.clientY - rect.top) / rect.height;
+      // Global tracking
+      const x = e.clientX / window.innerWidth;
+      const y = 1.0 - (e.clientY / window.innerHeight);
       targetMouse = [x, y];
     }
     function handleMouseLeave() {
       targetMouse = [0.5, 0.5];
     }
     if (enableMouseInteraction) {
-      container.addEventListener('mousemove', handleMouseMove);
-      container.addEventListener('mouseleave', handleMouseLeave);
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseleave', handleMouseLeave);
     }
 
     function update(t) {
@@ -203,8 +203,8 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
       window.removeEventListener('resize', resize);
 
       if (enableMouseInteraction) {
-        container.removeEventListener('mousemove', handleMouseMove);
-        container.removeEventListener('mouseleave', handleMouseLeave);
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseleave', handleMouseLeave);
       }
       if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();

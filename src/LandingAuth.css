@@ -34,33 +34,19 @@
     position: relative;
     font-family: var(--font-main);
     scroll-behavior: smooth;
-    cursor: auto;
-    /* cursor: none; Hidden during debugging */
+    cursor: none;
 }
 
-/* Custom Cursor Styles */
-.cursor-dot {
-    width: 8px;
-    height: 8px;
-    background: #fff;
-    border-radius: 50%;
+.custom-cursor-container {
     position: fixed;
     top: 0;
     left: 0;
     pointer-events: none;
-    z-index: 10000;
+    z-index: 100000;
 }
 
-.cursor-ring {
-    width: 40px;
-    height: 40px;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 9999;
+.custom-cursor-inner {
+    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
 }
 
 .magnetic-wrap {
