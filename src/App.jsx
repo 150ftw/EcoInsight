@@ -28,6 +28,7 @@ import { fetchNewsTickerData } from './lib/MarketData'
 
 import './LandingAuth.css'
 import Threads from './components/Threads'
+import { SUBPAGE_DATA } from './lib/SubpageContent'
 const CustomCursor = () => {
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -159,9 +160,9 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                     strokeWidth="8"
                     variants={{
                         rest: { opacity: 0.8, strokeWidth: 8 },
-                        hover: { 
-                            opacity: 1, 
-                            strokeWidth: 12, 
+                        hover: {
+                            opacity: 1,
+                            strokeWidth: 12,
                             scale: 1.05,
                             boxShadow: "0 0 30px var(--accent-glow)"
                         }
@@ -182,8 +183,8 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                         opacity={bar.op}
                         variants={{
                             rest: { height: bar.h, y: bar.y },
-                            hover: { 
-                                height: bar.h + 30, 
+                            hover: {
+                                height: bar.h + 30,
                                 y: bar.y - 30,
                                 transition: { type: "spring", stiffness: 300, damping: 10, delay: i * 0.05 }
                             }
@@ -200,9 +201,9 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                     strokeLinejoin="round"
                     variants={{
                         rest: { pathLength: 1, opacity: 0.9 },
-                        hover: { 
-                            opacity: 1, 
-                            scale: 1.1, 
+                        hover: {
+                            opacity: 1,
+                            scale: 1.1,
                             transformOrigin: '200px 200px',
                             transition: { type: "spring", stiffness: 400 }
                         }
@@ -221,7 +222,7 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                         cx={node.cx} cy={node.cy} r={node.r}
                         fill="#fff"
                         variants={{
-                            hover: { 
+                            hover: {
                                 scale: [1, 1.4, 1],
                                 opacity: [0.8, 1, 0.8],
                                 transition: { repeat: Infinity, duration: 1.5, delay: i * 0.2 }
@@ -244,12 +245,12 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
 };
 
 const BetaBadge = () => (
-    <span style={{ 
-        fontSize: '9px', 
-        padding: '2px 6px', 
-        background: 'rgba(139, 92, 246, 0.2)', 
-        color: '#a78bfa', 
-        borderRadius: '4px', 
+    <span style={{
+        fontSize: '9px',
+        padding: '2px 6px',
+        background: 'rgba(139, 92, 246, 0.2)',
+        color: '#a78bfa',
+        borderRadius: '4px',
         border: '1px solid rgba(139, 92, 246, 0.3)',
         marginLeft: 'auto',
         fontWeight: 'bold',
@@ -479,16 +480,26 @@ const PerspectiveSection = ({ children, id, className }) => {
         target: ref,
         offset: ["start end", "end start"]
     });
-    const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [10, 0, -10]);
-    const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.9, 1, 0.9]);
-    const opacity = 1; // Force full opacity for debugging
+
+    // Zoom in when coming into view, zoom "through" when leaving
+    const rotateX = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [15, 0, 0, -15]);
+    const scale = useTransform(scrollYProgress, [0, 0.4, 0.8, 1], [0.8, 1, 1.2, 2]);
+    const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+    const z = useTransform(scrollYProgress, [0, 0.5, 1], [-200, 0, 500]);
 
     return (
         <motion.section
             id={id}
             ref={ref}
             className={className}
-            style={{ rotateX, scale, opacity, perspective: "1500px" }}
+            style={{
+                rotateX,
+                scale,
+                opacity,
+                z,
+                perspective: "2000px",
+                transformStyle: "preserve-3d"
+            }}
         >
             {children}
         </motion.section>
@@ -819,8 +830,12 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-    const scale = useTransform(scrollYProgress, [0, 0.5], [1, 1.2]);
-    const opacity = 1; // Force full opacity for debugging
+
+    // Dramatic Hero Zoom
+    const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.5]);
+    const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
+    const heroZ = useTransform(scrollYProgress, [0, 0.2], [0, 300]);
+    const heroBlur = useTransform(scrollYProgress, [0, 0.2], [0, 10]);
 
     const splitText = (text) => {
         return text.split(" ").filter(w => w !== "").map((word, wordIndex) => (
@@ -893,9 +908,14 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                 </div>
             </header>
 
-            <main className="landing-hero">
+            <main className="landing-hero" style={{ perspective: '2000px' }}>
                 <motion.div
-                    style={{ scale, opacity }}
+                    style={{
+                        scale: heroScale,
+                        opacity: heroOpacity,
+                        z: heroZ,
+                        filter: `blur(${heroBlur}px)`
+                    }}
                     className="hero-content"
                 >
                     <motion.div
@@ -1047,7 +1067,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                     {[
                         { plan: "Observer", price: "Free", feat: ["Daily Market Pulse", "3 Simulations/day", "Standard Data Feed"], priceValue: 0 },
                         { plan: "Sentinel", price: "$19.99", feat: ["Full Simulation Suite", "Daily Insight Reports", "Priority Neural Compute"], featured: true, priceValue: 19.99 },
-                        { plan: "Strategist", price: "$29.99", feat: ["Quantum Trend Modeling", "Real-time Fiscal Alerts", "Unlimited Deep Analysis"], priceValue: 29.99 }
+                        { plan: "Strategist", price: "$24.99", feat: ["Quantum Trend Modeling", "Real-time Fiscal Alerts", "Unlimited Deep Analysis"], priceValue: 24.99 }
                     ].map((p, i) => (
                         <TiltCard
                             key={i}
@@ -1246,31 +1266,159 @@ const LiveSimulator = ({ lines, title }) => {
 };
 
 const PageWrapper = ({ title, description, children, onBack }) => (
-    <div className="subpage-view">
-        <div className="subpage-content">
-            <header className="subpage-header">
-                <Magnetic distance={0.2}>
-                    <button className="back-btn" onClick={onBack}>
-                        <ChevronDown className="rotate-90" size={16} /> Back
-                    </button>
-                </Magnetic>
-                <div className="logo-small"><EcoInsightLogo size={32} /></div>
-            </header>
-            <motion.div
-                className="content-body"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
-            >
-                <div className="view-header">
-                    <h1>{title}</h1>
-                    <p>{description}</p>
-                </div>
-                {children}
-            </motion.div>
+    <motion.div
+        className="page-wrapper-v2"
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
+        <div className="page-content-v2">
+            <div className="page-header-v2">
+                <button className="back-btn-v2" onClick={onBack}>
+                    <Monitor size={16} /> <span>Return to Central Command</span>
+                </button>
+                <div className="header-badge-v2">INTEL_NODE_{title?.slice(0, 4) || 'GEN'}</div>
+            </div>
+            {children}
         </div>
-    </div>
+    </motion.div>
 );
+
+const SubpageRenderer = ({ view, onBack }) => {
+    const data = SUBPAGE_DATA[view];
+    const [formSubmitted, setFormSubmitted] = useState(false);
+
+    if (!data) return null;
+
+    return (
+        <div className="view-content" key={view} style={{ height: '100%', overflow: 'auto' }}>
+            <PageWrapper
+                title={data.title}
+                onBack={onBack}
+            >
+                <div className="subpage-view rich-content">
+                    <section className="view-header">
+                        <div className="subpage-icon-box">
+                            {data.icon}
+                        </div>
+                        <h1 style={{ fontSize: '3.5rem', fontWeight: 800, letterSpacing: '-2px', marginBottom: '1rem', color: 'white' }}>
+                            {data.title.toUpperCase()}
+                        </h1>
+                        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', lineHeight: 1.6 }}>
+                            {data.description}
+                        </p>
+                    </section>
+
+                    <div className="subpage-body-grid">
+                        <div className="subpage-main-content">
+                            {data.sections && data.sections.filter(s => s.type !== 'leadership').map((section, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    className="content-section"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                >
+                                    <h3>{section.heading}</h3>
+                                    <p>{section.content}</p>
+                                </motion.div>
+                            ))}
+
+                            {data.isInteractive && data.type === 'form' && (
+                                <div className="interactive-portal">
+                                    {formSubmitted ? (
+                                        <motion.div className="success-message" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                            <Sparkles size={24} color="var(--accent-primary)" />
+                                            <h3>Message Encrypted & Routed</h3>
+                                            <p>Our senior analysts will review your protocol and respond shortly.</p>
+                                            <button className="btn-primary" onClick={() => setFormSubmitted(false)}>Send Another Message</button>
+                                        </motion.div>
+                                    ) : (
+                                        <form className="elite-form" onSubmit={(e) => { e.preventDefault(); setFormSubmitted(true); }}>
+                                            <div className="field-group">
+                                                <div className="form-field">
+                                                    <label>Subject Protocol</label>
+                                                    <input type="text" placeholder="Institutional Inquiry" required />
+                                                </div>
+                                                <div className="form-field">
+                                                    <label>Return Vector (Email)</label>
+                                                    <input type="email" placeholder="analyst@firm.com" required />
+                                                </div>
+                                            </div>
+                                            <div className="form-field">
+                                                <label>Intelligence Payload</label>
+                                                <textarea placeholder="Specify your inquiry details..." required></textarea>
+                                            </div>
+                                            <button type="submit" className="btn-primary">Transmit Signal</button>
+                                        </form>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        <aside className="subpage-sidebar-info">
+                            <div className="sidebar-card-elite">
+                                <h4>Resource Quick-Link</h4>
+                                <div className="link-list-tiny">
+                                    <div className="tiny-item"><span>Last Sync:</span> <strong>Today, 14:02</strong></div>
+                                    <div className="tiny-item"><span>Classification:</span> <strong>Public</strong></div>
+                                    <div className="tiny-item"><span>Protocol:</span> <strong>Secure</strong></div>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                    {/* Standalone Leadership Section */}
+                    {data.sections && data.sections.find(s => s.type === 'leadership') && (
+                        <div className="leadership-standalone-section">
+                            {data.sections.filter(s => s.type === 'leadership').map((section, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    className="leadership-portal"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                >
+                                    <div className="leadership-header">
+                                        <h3>{section.heading}</h3>
+                                        <p className="leadership-subtext">Meet the vision behind EcoInsight</p>
+                                    </div>
+                                    <motion.div
+                                        className="founder-card-elite"
+                                        whileHover={{ y: -10, borderColor: 'rgba(139, 92, 246, 0.3)' }}
+                                    >
+                                        <div className="founder-avatar-wrap">
+                                            <div className="founder-avatar">
+                                                {section.founder.avatarImg ? (
+                                                    <img
+                                                        src={section.founder.avatarImg}
+                                                        alt={section.founder.name}
+                                                        className="founder-img"
+                                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                                    />
+                                                ) : section.founder.avatarText}
+                                            </div>
+                                        </div>
+                                        <div className="founder-info">
+                                            <h2>{section.founder.name}</h2>
+                                            <p className="founder-title">{section.founder.title}</p>
+                                        </div>
+                                        <div className="founder-entity-box">
+                                            <div className="founder-entity-tag">
+                                                <Monitor size={14} />
+                                                <span>{section.founder.entity}</span>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </PageWrapper>
+        </div>
+    );
+};
 
 const DataVisualizer = ({ type }) => {
     return (
@@ -3265,7 +3413,7 @@ function App() {
 
     const deleteChat = (e, id) => {
         e.stopPropagation();
-        
+
         // Permanent deletion from Supabase
         if (user?.id) {
             supaDeleteChat(user.id, id);
@@ -3690,6 +3838,10 @@ IMPORTANT OVERRIDE RULES FOR PDF:
     }
 
     const renderView = () => {
+        if (SUBPAGE_DATA[view]) {
+            return <SubpageRenderer view={view} onBack={() => setAppSection('landing')} />;
+        }
+
         switch (view) {
             case 'trends':
                 return (
@@ -4006,58 +4158,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </section>
                     </div>
                 )
-            case 'help-center':
-            case 'knowledge-base':
-            case 'network-status':
-            case 'security-advisories':
-            case 'about-us':
-            case 'careers':
-            case 'partners':
-            case 'referral':
-            case 'contact':
-            case 'privacy-policy':
-            case 'terms-of-service':
-            case 'acceptable-use':
-            case 'payment-refund':
-            case 'report-abuse':
-                return (
-                    <div className="view-content" key={view} style={{ height: '100%', overflow: 'hidden' }}>
-                        <PageWrapper
-                            title={view.replace(/-/g, ' ').toUpperCase()}
-                            onBack={() => setAppSection('landing')}
-                        >
-                            <div className="subpage-view">
-                                <section className="view-header">
-                                    <h1 style={{ fontSize: '3.5rem', fontWeight: 800, letterSpacing: '-2px', marginBottom: '1rem' }}>
-                                        {view.replace(/-/g, ' ').toUpperCase()}
-                                    </h1>
-                                    <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', lineHeight: 1.6 }}>
-                                        This section is currently being provisioned with eco-centric intelligence. Check back shortly for deep protocol insights.
-                                    </p>
-                                </section>
-
-                                <div style={{ 
-                                    marginTop: '4rem', 
-                                    padding: '3rem', 
-                                    background: 'rgba(255,255,255,0.02)', 
-                                    border: '1px solid rgba(255,255,255,0.05)', 
-                                    borderRadius: '24px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '1.5rem',
-                                    alignItems: 'center',
-                                    textAlign: 'center'
-                                }}>
-                                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Sparkles size={30} style={{ color: 'var(--accent-primary)' }} />
-                                    </div>
-                                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>Under Intelligence Expansion</h2>
-                                    <p style={{ color: '#a1a1aa' }}>Our neural nodes are currently synthesizing documentation for this segment.</p>
-                                </div>
-                            </div>
-                        </PageWrapper>
-                    </div>
-                )
             default:
                 return (
                     <div key={view} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
@@ -4174,6 +4274,11 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         if (appSection === 'support') return <SupportPage onBack={() => setAppSection('landing')} onInit={onInit} />;
         if (appSection === 'api') return <APIPage onBack={() => setAppSection('landing')} onInit={onInit} />;
 
+        // Handle Subpage Content from Footer Hub
+        if (SUBPAGE_DATA[appSection]) {
+            return <SubpageRenderer view={appSection} onBack={() => setAppSection('landing')} />;
+        }
+
         return (
             <div className="app-container">
                 <aside className="sidebar">
@@ -4220,8 +4325,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
                         <div className="sidebar-section">
                             <span className="section-label">Analysis</span>
-                            <button 
-                                className={`nav-item beta-lab-toggle ${isBetaExpanded ? 'expanded' : ''}`} 
+                            <button
+                                className={`nav-item beta-lab-toggle ${isBetaExpanded ? 'expanded' : ''}`}
                                 onClick={() => setIsBetaExpanded(!isBetaExpanded)}
                                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                             >

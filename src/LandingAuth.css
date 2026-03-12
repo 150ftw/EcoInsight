@@ -234,7 +234,9 @@ select,
     text-align: center;
     position: relative;
     z-index: 20;
-    /* Higher than noise */
+    min-height: 100vh;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .hero-badge {
@@ -298,6 +300,7 @@ select,
     width: 100%;
     position: relative;
     z-index: 30;
+    will-change: transform, opacity, filter;
 }
 
 .hero-content p {
@@ -2083,4 +2086,23 @@ select,
 
 .link-btn:hover {
     color: var(--accent-secondary);
+}
+/* Spatial Perspective Helper */
+.features-section,
+.solutions-section,
+.pricing-section {
+    position: relative;
+    z-index: 25;
+    will-change: transform, opacity;
+    padding: 120px 8%;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.landing-container {
+    background: #000;
+    overflow-x: hidden;
+    perspective: 2000px;
 }

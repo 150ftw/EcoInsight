@@ -1194,6 +1194,7 @@ input[type="range"] {
     margin-bottom: 1.5rem;
     background: linear-gradient(to right, #fff, #8b5cf6);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -1496,4 +1497,388 @@ input[type="range"] {
 
 .inline-icon {
     vertical-align: middle;
+}
+
+/* --- RICH SUBPAGE CONTENT --- */
+.page-wrapper-v2 {
+    width: 100%;
+    min-height: 100vh;
+    background: #000;
+    color: #fff;
+    padding-top: 2rem;
+    overflow-y: auto;
+    position: relative;
+    z-index: 10;
+}
+
+.page-content-v2 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 4rem;
+}
+
+.page-header-v2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 2rem;
+}
+
+.back-btn-v2 {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    color: #a1a1aa;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.back-btn-v2:hover {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: var(--accent-primary);
+    color: #fff;
+    transform: translateX(-5px);
+}
+
+.header-badge-v2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent-primary);
+    background: rgba(139, 92, 246, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 2000px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    letter-spacing: 2px;
+}
+
+.rich-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-bottom: 5rem;
+}
+
+.subpage-icon-box {
+    width: 64px;
+    height: 64px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.1);
+}
+
+.subpage-body-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 4rem;
+    margin-top: 4rem;
+}
+
+@media (max-width: 900px) {
+    .subpage-body-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.content-section {
+    margin-bottom: 3.5rem;
+}
+
+.content-section h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    color: white !important;
+}
+
+.content-section p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-size: 1.05rem;
+}
+
+/* Leadership Portal styles */
+.leadership-standalone-section {
+    width: 100%;
+    margin-top: 6rem;
+    padding-top: 6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leadership-portal {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.leadership-header {
+    margin-bottom: 3rem;
+}
+
+.leadership-header h3 {
+    font-size: 2.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.leadership-subtext {
+    color: #71717a !important;
+    font-size: 1rem !important;
+}
+
+.founder-card-elite {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 40px;
+    padding: 5rem 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.founder-avatar-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.founder-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+.founder-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.founder-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.founder-info h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.founder-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem !important;
+    letter-spacing: 2px;
+    color: #71717a !important;
+    text-transform: uppercase;
+}
+
+.founder-entity-box {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+}
+
+.founder-entity-tag {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 2000px;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #a1a1aa;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.founder-entity-tag:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.sidebar-card-elite {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 2rem;
+    position: sticky;
+    top: 2rem;
+}
+
+.sidebar-card-elite h4 {
+    margin: 0 0 1.5rem 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a1a1aa;
+}
+
+.link-list-tiny {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tiny-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+.tiny-item span {
+    color: #71717a;
+}
+
+.tiny-item strong {
+    color: white;
+}
+
+/* --- ELITE FORM STYLES --- */
+.interactive-portal {
+    background: rgba(139, 92, 246, 0.03);
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    border-radius: 24px;
+    padding: 3rem;
+    margin-top: 2rem;
+}
+
+.elite-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.field-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-field label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a1a1aa;
+    font-weight: 600;
+}
+
+.form-field input, .form-field textarea {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1rem;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-field input:focus, .form-field textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: rgba(139, 92, 246, 0.05);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+}
+
+.form-field textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.success-message {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.success-message h3 {
+    font-size: 1.8rem;
+    margin: 0;
+    color: white !important;
+}
+
+.success-message p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+/* --- CLERK UI CUSTOMIZATION OVERRIDES --- */
+.cl-rootBox {
+    font-family: var(--font-body) !important;
+}
+
+.cl-card {
+    background: rgba(10, 10, 12, 0.9) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.cl-headerTitle {
+    background: linear-gradient(to right, #fff, #8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800 !important;
+}
+
+.cl-socialButtonsIconButton {
+    border-radius: 12px !important;
+}
+
+.cl-formButtonPrimary {
+    background: var(--accent-primary) !important;
+    box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2) !important;
+    font-weight: 700 !important;
+}
+
+.cl-userButtonPopoverCard {
+    background: rgba(10, 10, 12, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Hide Clerk Development Watermark (Targeted strictly to avoid breaking UI) */
+.cl-internal-ph729v, 
+.cl-internal-1au6n8q,
+.cl-dev-watermark,
+.cl-userButtonPopoverFooter {
+    display: none !important;
 }

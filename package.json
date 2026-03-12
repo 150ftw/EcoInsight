@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.2",
+    "@clerk/themes": "^2.4.57",
     "@react-three/fiber": "^8.18.0",
     "@supabase/supabase-js": "^2.99.0",
     "framer-motion": "^11.5.4",
