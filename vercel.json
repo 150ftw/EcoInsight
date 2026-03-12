@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/v1/(.*)",
+      "destination": "https://integrate.api.nvidia.com/v1/$1"
+    },
+    {
+      "source": "/yahoo-finance/(.*)",
+      "destination": "https://query1.finance.yahoo.com/$1"
+    },
+    {
+      "source": "/google-finance/(.*)",
+      "destination": "https://www.google.com/$1"
+    },
+    {
+      "source": "/exchange-rates/(.*)",
+      "destination": "https://api.exchangerate-api.com/$1"
+    }
+  ]
+}
