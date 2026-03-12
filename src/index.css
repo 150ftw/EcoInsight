@@ -492,6 +492,21 @@ body {
     color: var(--text-primary);
 }
 
+.action-btn.danger-hover:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
+}
+
+.active-chat-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.active-chat-item:hover .delete-chat-btn {
+    opacity: 1;
+}
+
 /* Input Styles */
 .input-container {
     padding: 0 var(--container-padding) 2rem;

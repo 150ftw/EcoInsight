@@ -3420,13 +3420,12 @@ function App() {
         }
 
         if (chats.length <= 1) {
-            // Reset the only chat instead of deleting
             setChats([{
-                id: 'default',
+                id: Date.now().toString(), // Use Date.now() for a unique ID for the new default chat
                 title: 'New Session',
                 messages: [{ role: 'assistant', content: 'Welcome to EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }]
             }]);
-            setActiveChatId('default');
+            setActiveChatId(chats[0].id); // Set active to the new default chat
             return;
         }
 
@@ -3436,6 +3435,14 @@ function App() {
         if (activeChatId === id) {
             setActiveChatId(remainingChats[0].id);
         }
+    };
+
+    const deleteMessage = (index) => {
+        if (!activeChatId) return;
+        setChats(prev => prev.map(c => c.id === activeChatId ? {
+            ...c,
+            messages: c.messages.filter((_, i) => i !== index)
+        } : c));
     };
 
     const clearAllChats = async () => {
@@ -4184,12 +4191,17 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                                         : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
                                                 ))}
                                             </div>
-                                            {msg.role === 'assistant' && msg.content && (
-                                                <div className="message-actions">
-                                                    <button className="action-btn" title="Copy"><Copy size={14} /></button>
-                                                    <button className="action-btn" title="Regenerate"><RefreshCw size={14} /></button>
-                                                </div>
-                                            )}
+                                            <div className="message-actions">
+                                                {msg.role === 'assistant' && msg.content && (
+                                                    <>
+                                                        <button className="action-btn" title="Copy"><Copy size={14} /></button>
+                                                        <button className="action-btn" title="Regenerate"><RefreshCw size={14} /></button>
+                                                    </>
+                                                )}
+                                                <button className="action-btn danger-hover" title="Delete Message" onClick={() => deleteMessage(i)}>
+                                                    <Trash2 size={12} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </motion.div>
                                 ))}
@@ -4293,12 +4305,17 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <button className="nav-item new-chat" onClick={createNewChat}>
                                 <EcoNewChatIcon size={18} /> <span>New Chat</span>
                             </button>
-                            <button
-                                className={`nav-item ${view === 'chat' ? 'active' : ''}`}
-                                onClick={() => setView('chat')}
-                            >
-                                <EcoHistoryIcon size={18} /> <span className="truncate">{activeChat.title}</span>
-                            </button>
+                            <div className="history-item-wrapper active-chat-item">
+                                <button
+                                    className={`nav-item ${view === 'chat' ? 'active' : ''}`}
+                                    onClick={() => setView('chat')}
+                                >
+                                    <EcoHistoryIcon size={18} /> <span className="truncate">{activeChat.title}</span>
+                                </button>
+                                <button className="delete-chat-btn" onClick={(e) => deleteChat(e, activeChat.id)} title="Delete Session">
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="sidebar-section history-section">
