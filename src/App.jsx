@@ -27,6 +27,7 @@ import { fetchNewsTickerData } from './lib/MarketData'
 
 
 import './LandingAuth.css'
+import Threads from './components/Threads'
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
 
@@ -4180,6 +4181,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
     return (
         <>
             <CustomCursor />
+            <div className="global-bg" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: -2, pointerEvents: 'none' }}>
+                <Threads amplitude={1.5} distance={0.2} enableMouseInteraction={true} color={[0.5, 0.4, 1.0]} />
+            </div>
             {renderActiveSection()}
             {/* Initialization Terminal Overlay */}
             <AnimatePresence>
