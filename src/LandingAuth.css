@@ -1378,8 +1378,9 @@ select,
     -webkit-text-fill-color: transparent;
 }
 
-.footer-links {
-    display: flex;
+.footer-links-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 6rem;
 }
 
@@ -1389,23 +1390,28 @@ select,
     gap: 1.25rem;
 }
 
-.link-group span {
-    font-size: 0.8rem;
+.link-group h4 {
+    font-size: 0.9rem;
     font-weight: 700;
     color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
 }
 
-.link-group a {
+.footer-link-btn {
+    background: transparent;
+    border: none;
     color: var(--text-secondary);
-    text-decoration: none;
+    text-align: left;
+    padding: 0;
     font-size: 0.95rem;
-    transition: color 0.3s;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: fit-content;
 }
 
-.link-group a:hover {
+.footer-link-btn:hover {
     color: #fff;
+    transform: translateX(4px);
 }
 
 .footer-bottom {

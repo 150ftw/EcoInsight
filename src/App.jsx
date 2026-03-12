@@ -1092,18 +1092,29 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                     <div className="footer-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <EcoInsightLogo size={42} /> <span>EcoInsight</span>
                     </div>
-                    <div className="footer-links">
+                    <div className="footer-links-grid">
                         <div className="link-group">
-                            <span>Product</span>
-                            <button className="footer-link-btn" onClick={() => setAppSection('capabilities')}>Capabilities</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('security')}>Security</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('enterprise')}>Enterprise</button>
+                            <h4>Resources</h4>
+                            <button className="footer-link-btn" onClick={() => setAppSection('help-center')}>Help Center</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('knowledge-base')}>Knowledge Base</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('network-status')}>Network Status</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('security-advisories')}>Security Advisories</button>
                         </div>
                         <div className="link-group">
-                            <span>Resources</span>
-                            <button className="footer-link-btn" onClick={() => setAppSection('documentation')}>Documentation</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('support')}>Support</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('api')}>API</button>
+                            <h4>Company</h4>
+                            <button className="footer-link-btn" onClick={() => setAppSection('about-us')}>About Us</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('careers')}>Careers</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('partners')}>Partners</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('referral')}>Referral Program</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('contact')}>Contact</button>
+                        </div>
+                        <div className="link-group">
+                            <h4>Legal</h4>
+                            <button className="footer-link-btn" onClick={() => setAppSection('privacy-policy')}>Privacy Policy</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('terms-of-service')}>Terms of Service</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('acceptable-use')}>Acceptable Use Policy</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('payment-refund')}>Payment & Refund</button>
+                            <button className="footer-link-btn" onClick={() => setAppSection('report-abuse')}>Report Abuse</button>
                         </div>
                     </div>
                 </div>
@@ -3993,6 +4004,58 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 </div>
                             </div>
                         </section>
+                    </div>
+                )
+            case 'help-center':
+            case 'knowledge-base':
+            case 'network-status':
+            case 'security-advisories':
+            case 'about-us':
+            case 'careers':
+            case 'partners':
+            case 'referral':
+            case 'contact':
+            case 'privacy-policy':
+            case 'terms-of-service':
+            case 'acceptable-use':
+            case 'payment-refund':
+            case 'report-abuse':
+                return (
+                    <div className="view-content" key={view} style={{ height: '100%', overflow: 'hidden' }}>
+                        <PageWrapper
+                            title={view.replace(/-/g, ' ').toUpperCase()}
+                            onBack={() => setAppSection('landing')}
+                        >
+                            <div className="subpage-view">
+                                <section className="view-header">
+                                    <h1 style={{ fontSize: '3.5rem', fontWeight: 800, letterSpacing: '-2px', marginBottom: '1rem' }}>
+                                        {view.replace(/-/g, ' ').toUpperCase()}
+                                    </h1>
+                                    <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', lineHeight: 1.6 }}>
+                                        This section is currently being provisioned with eco-centric intelligence. Check back shortly for deep protocol insights.
+                                    </p>
+                                </section>
+
+                                <div style={{ 
+                                    marginTop: '4rem', 
+                                    padding: '3rem', 
+                                    background: 'rgba(255,255,255,0.02)', 
+                                    border: '1px solid rgba(255,255,255,0.05)', 
+                                    borderRadius: '24px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '1.5rem',
+                                    alignItems: 'center',
+                                    textAlign: 'center'
+                                }}>
+                                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Sparkles size={30} style={{ color: 'var(--accent-primary)' }} />
+                                    </div>
+                                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>Under Intelligence Expansion</h2>
+                                    <p style={{ color: '#a1a1aa' }}>Our neural nodes are currently synthesizing documentation for this segment.</p>
+                                </div>
+                            </div>
+                        </PageWrapper>
                     </div>
                 )
             default:
