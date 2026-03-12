@@ -4,7 +4,7 @@ import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, Re
 import ReactMarkdown from 'react-markdown'
 import { streamMessage } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
-import { loadChats, saveChats, deleteChat as supaDeleteChat, loadSettings, saveSettings } from './lib/SupabaseStorage'
+import { loadChats, saveChats, deleteChat as supaDeleteChat, deleteAllChats, loadSettings, saveSettings } from './lib/SupabaseStorage'
 import { parseChartBlocks, EcoChartRenderer } from './components/EcoCharts'
 import {
     SignedIn,
@@ -3220,6 +3220,12 @@ function App() {
 
     const deleteChat = (e, id) => {
         e.stopPropagation();
+        
+        // Permanent deletion from Supabase
+        if (user?.id) {
+            supaDeleteChat(user.id, id);
+        }
+
         if (chats.length <= 1) {
             // Reset the only chat instead of deleting
             setChats([{
@@ -3236,6 +3242,23 @@ function App() {
 
         if (activeChatId === id) {
             setActiveChatId(remainingChats[0].id);
+        }
+    };
+
+    const clearAllChats = async () => {
+        if (!user?.id) return;
+        if (!window.confirm('Are you sure you want to permanently delete all chat history? This cannot be undone.')) return;
+
+        try {
+            await deleteAllChats(user.id);
+            setChats([{
+                id: 'default',
+                title: 'New Session',
+                messages: [{ role: 'assistant', content: 'Welcome to EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }]
+            }]);
+            setActiveChatId('default');
+        } catch (err) {
+            console.error('Failed to clear all chats:', err);
         }
     };
 
@@ -3861,7 +3884,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 </div>
                             </div>
                             <div className="action-row">
-                                <button className="secondary-btn danger-text"><Trash2 size={14} /> Clear all chats</button>
+                                <button className="secondary-btn danger-text" onClick={clearAllChats}><Trash2 size={14} /> Clear all chats</button>
                                 <button className="secondary-btn"><Send size={14} /> Export chats</button>
                             </div>
                         </section>

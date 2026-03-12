@@ -86,6 +86,22 @@ export const deleteChat = async (userId, chatId) => {
     }
 };
 
+/**
+ * Delete all chats for a user.
+ */
+export const deleteAllChats = async (userId) => {
+    try {
+        const { error } = await supabase
+            .from('chats')
+            .delete()
+            .eq('user_id', userId);
+
+        if (error) throw error;
+    } catch (err) {
+        console.error('Failed to clear all chats from Supabase:', err);
+    }
+};
+
 // ============================================================
 // USER SETTINGS
 // ============================================================
