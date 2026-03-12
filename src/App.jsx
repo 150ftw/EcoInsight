@@ -31,7 +31,9 @@ import Threads from './components/Threads'
 const CustomCursor = () => {
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
-    const springConfig = { damping: 25, stiffness: 400 };
+    const [isHovered, setIsHovered] = useState(false);
+    
+    const springConfig = { damping: 20, stiffness: 600, mass: 0.5 };
     const cursorX = useSpring(mouseX, springConfig);
     const cursorY = useSpring(mouseY, springConfig);
 
@@ -40,32 +42,48 @@ const CustomCursor = () => {
             mouseX.set(e.clientX);
             mouseY.set(e.clientY);
         };
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+        
+        const handleOver = (e) => {
+            if (e.target.closest('button, a, .nav-link, .magnetic-wrap, [role="button"], .interactive')) {
+                setIsHovered(true);
+            }
+        };
+        const handleOut = () => setIsHovered(false);
+
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        window.addEventListener('mouseover', handleOver);
+        window.addEventListener('mouseout', handleOut);
+        
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseover', handleOver);
+            window.removeEventListener('mouseout', handleOut);
+        };
     }, []);
 
     return (
         <motion.div
-            className="custom-cursor-container"
+            className={`vanguard-cursor ${isHovered ? 'hovered' : ''}`}
             style={{
-                x: cursorX,
-                y: cursorY,
-                translateX: '-15%',
-                translateY: '-15%'
+                left: cursorX,
+                top: cursorY,
             }}
         >
-            <div className="custom-cursor-inner">
-                <svg width="28" height="28" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M421.08 290.76C464.71 334.39 464.71 405.15 421.08 448.78C377.45 492.41 306.69 492.41 263.06 448.78L63.22 248.94C19.59 205.31 19.59 134.55 63.22 90.92C106.85 47.29 177.61 47.29 221.24 90.92L421.08 290.76Z" fill="url(#cursorGlow)" />
-                    <path d="M421.08 281.35C464.71 324.98 464.71 395.74 421.08 439.37C377.45 483 306.69 483 263.06 439.37L63.22 239.53C19.59 195.9 19.59 125.14 63.22 81.51C106.85 37.88 177.61 37.88 221.24 81.51L421.08 281.35Z" fill="#C084FC" />
-                    <defs>
-                        <radialGradient id="cursorGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(256)">
-                            <stop stopColor="#8B5CF6" stopOpacity="0.6" />
-                            <stop offset="1" stopColor="#8B5CF6" stopOpacity="0" />
-                        </radialGradient>
-                    </defs>
-                </svg>
-            </div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path 
+                    d="M5.5 3.5L18.5 12L5.5 20.5V3.5Z" 
+                    fill="white" 
+                    className="arrow-main"
+                />
+                <path 
+                    d="M5.5 3.5L18.5 12L5.5 20.5V3.5Z" 
+                    stroke="#8B5CF6" 
+                    strokeWidth="1.5" 
+                    strokeLinejoin="round"
+                    className="arrow-border"
+                />
+            </svg>
+            <div className="cursor-glow-v3" />
         </motion.div>
     );
 };
@@ -301,8 +319,6 @@ const extractTextFromPDF = async (file) => {
     }
 };
 
-
-const InitialTerminalLine = ({ text, delay = 0, color = "var(--accent-primary)" }) => {
 
 
 const Magnetic = ({ children, distance = 0.5 }) => {
@@ -826,10 +842,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
     };
 
     return (
-        <div className="landing-container">
-            <div className="landing-bg-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 1, pointerEvents: 'none', opacity: 0.8 }}>
-                <Threads amplitude={2.0} distance={0.4} enableMouseInteraction={true} color={[0.7, 0.6, 1.0]} />
-            </div>
+        <div className="landing-container" style={{ isolation: 'isolate' }}>
             <FloatingAssets />
             <motion.div className="scroll-indicator" style={{ scaleX: scrollYProgress }} />
 
@@ -859,7 +872,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                             </Magnetic>
                             <Magnetic distance={0.3}>
                                 <SignUpButton mode="modal">
-                                    <button className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>Get Started</button>
+                                    <button className="btn-header">Get Started</button>
                                 </SignUpButton>
                             </Magnetic>
                         </div>
@@ -1020,11 +1033,8 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                 >
                     {[
                         { plan: "Observer", price: "Free", feat: ["Daily Market Pulse", "3 Simulations/day", "Standard Data Feed"], priceValue: 0 },
-                        { plan: "Sentinel", price: "$25", feat: ["Full Simulation Suite", "Daily Insight Reports", "Historical Data Export"], priceValue: 25 },
-                        { plan: "Strategist", price: "$65", feat: ["Quantum Trend Modeling", "Real-time Fiscal Alerts", "Priority Neural Compute"], priceValue: 65 },
-                        { plan: "Vanguard", price: "$125", feat: ["Unlimited Deep Analysis", "Elite Data Export (JSON)", "Custom Neural Pipelines"], featured: true, priceValue: 125 },
-                        { plan: "Sovereign", price: "$185", feat: ["Full Terminal API Access", "Direct Liquidity Pipes", "Apex Neural Modeling"], priceValue: 185 },
-                        { plan: "Apex", price: "$245", feat: ["White-label Solutions", "Dedicated Node Instance", "24/7 Concierge Support"], priceValue: 245 }
+                        { plan: "Sentinel", price: "$19.99", feat: ["Full Simulation Suite", "Daily Insight Reports", "Priority Neural Compute"], featured: true, priceValue: 19.99 },
+                        { plan: "Strategist", price: "$29.99", feat: ["Quantum Trend Modeling", "Real-time Fiscal Alerts", "Unlimited Deep Analysis"], priceValue: 29.99 }
                     ].map((p, i) => (
                         <TiltCard
                             key={i}
@@ -1213,7 +1223,6 @@ const LiveSimulator = ({ lines, title }) => {
 
 const PageWrapper = ({ title, description, children, onBack }) => (
     <div className="subpage-view">
-        <MeshBackground />
         <div className="noise-overlay"></div>
         <div className="subpage-content">
             <header className="subpage-header">
@@ -4161,7 +4170,10 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     return (
         <>
-            {appSection === 'landing' && <CustomCursor />}
+            <div className="landing-bg-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 0, pointerEvents: 'none', opacity: 0.8 }}>
+                <Threads amplitude={2.0} distance={0.4} enableMouseInteraction={true} color={[0.7, 0.6, 1.0]} />
+            </div>
+            {appSection !== 'chat' && appSection !== 'checkout' && <CustomCursor />}
             {renderActiveSection()}
             <AnimatePresence>
                 {showInitialization && (

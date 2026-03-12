@@ -1128,7 +1128,7 @@ input[type="range"] {
 /* --- Professional Subpage System --- */
 .subpage-view {
     min-height: 100vh;
-    background: #000;
+    background: transparent;
     color: var(--text-primary);
     position: relative;
     overflow-x: hidden;
