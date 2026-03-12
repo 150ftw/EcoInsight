@@ -243,6 +243,21 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
     );
 };
 
+const BetaBadge = () => (
+    <span style={{ 
+        fontSize: '9px', 
+        padding: '2px 6px', 
+        background: 'rgba(139, 92, 246, 0.2)', 
+        color: '#a78bfa', 
+        borderRadius: '4px', 
+        border: '1px solid rgba(139, 92, 246, 0.3)',
+        marginLeft: 'auto',
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px'
+    }}>Beta</span>
+);
+
 // Custom EcoInsight sidebar icons — unique to this product
 const EcoNewChatIcon = ({ size = 18 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -4123,12 +4138,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
                         <div className="sidebar-section">
                             <span className="section-label">Analysis</span>
-                            <button className={`nav-item ${view === 'trends' ? 'active' : ''}`} onClick={() => setView('trends')}><EcoTrendsIcon size={18} /> Market Trends</button>
-                            <button className={`nav-item ${view === 'pulse' ? 'active' : ''}`} onClick={() => setView('pulse')}><EcoPulseIcon size={18} /> Economic Pulse</button>
-                            <button className={`nav-item ${view === 'eli5' ? 'active' : ''}`} onClick={() => setView('eli5')}><EcoSimplifyIcon size={18} /> ELI5 Economics</button>
-                            <button className={`nav-item ${view === 'simulator' ? 'active' : ''}`} onClick={() => setView('simulator')}><EcoSimulatorIcon size={18} /> What-If Simulator</button>
-                            <button className={`nav-item ${view === 'news' ? 'active' : ''}`} onClick={() => setView('news')}><EcoNewsIcon size={18} /> News Analyzer</button>
-                            <button className={`nav-item ${view === 'predictor' ? 'active' : ''}`} onClick={() => setView('predictor')}><EcoPredictorIcon size={18} /> Event Predictor</button>
+                            <button className={`nav-item ${view === 'trends' ? 'active' : ''}`} onClick={() => setView('trends')}><EcoTrendsIcon size={18} /> Market Trends <BetaBadge /></button>
+                            <button className={`nav-item ${view === 'pulse' ? 'active' : ''}`} onClick={() => setView('pulse')}><EcoPulseIcon size={18} /> Economic Pulse <BetaBadge /></button>
+                            <button className={`nav-item ${view === 'eli5' ? 'active' : ''}`} onClick={() => setView('eli5')}><EcoSimplifyIcon size={18} /> ELI5 Economics <BetaBadge /></button>
+                            <button className={`nav-item ${view === 'simulator' ? 'active' : ''}`} onClick={() => setView('simulator')}><EcoSimulatorIcon size={18} /> What-If Simulator <BetaBadge /></button>
+                            <button className={`nav-item ${view === 'news' ? 'active' : ''}`} onClick={() => setView('news')}><EcoNewsIcon size={18} /> News Analyzer <BetaBadge /></button>
+                            <button className={`nav-item ${view === 'predictor' ? 'active' : ''}`} onClick={() => setView('predictor')}><EcoPredictorIcon size={18} /> Event Predictor <BetaBadge /></button>
                             <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')}><Settings size={18} /> Settings</button>
                         </div>
                     </nav>
@@ -4171,7 +4186,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             <div className="landing-bg-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 1, pointerEvents: 'none' }}>
                 <Threads amplitude={2.5} distance={0.3} enableMouseInteraction={true} color={[0.8, 0.7, 1.0]} />
             </div>
-            {appSection !== 'chat' && appSection !== 'checkout' && <CustomCursor />}
+            <CustomCursor />
             {renderActiveSection()}
             <AnimatePresence>
                 {showInitialization && (
