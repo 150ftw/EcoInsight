@@ -4087,9 +4087,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     return (
         <>
-            <div className="landing-bg-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 0, pointerEvents: 'none', opacity: 0.8 }}>
-                <Threads amplitude={2.0} distance={0.4} enableMouseInteraction={true} color={[0.7, 0.6, 1.0]} />
-            </div>
+            <div className="landing-bg-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 0, pointerEvents: 'none' }}>
+    <Threads amplitude={2.0} distance={0.4} enableMouseInteraction={true} color={[0.7, 0.6, 1.0]} />
+</div>
             {appSection !== 'chat' && appSection !== 'checkout' && <CustomCursor />}
             {renderActiveSection()}
             <AnimatePresence>
