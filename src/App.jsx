@@ -3122,6 +3122,7 @@ function App() {
 
     // Premium Feature State
     const [pdfText, setPdfText] = useState('');
+    const [isBetaExpanded, setIsBetaExpanded] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
@@ -4138,13 +4139,40 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
                         <div className="sidebar-section">
                             <span className="section-label">Analysis</span>
-                            <button className={`nav-item ${view === 'trends' ? 'active' : ''}`} onClick={() => setView('trends')}><EcoTrendsIcon size={18} /> Market Trends <BetaBadge /></button>
-                            <button className={`nav-item ${view === 'pulse' ? 'active' : ''}`} onClick={() => setView('pulse')}><EcoPulseIcon size={18} /> Economic Pulse <BetaBadge /></button>
-                            <button className={`nav-item ${view === 'eli5' ? 'active' : ''}`} onClick={() => setView('eli5')}><EcoSimplifyIcon size={18} /> ELI5 Economics <BetaBadge /></button>
-                            <button className={`nav-item ${view === 'simulator' ? 'active' : ''}`} onClick={() => setView('simulator')}><EcoSimulatorIcon size={18} /> What-If Simulator <BetaBadge /></button>
-                            <button className={`nav-item ${view === 'news' ? 'active' : ''}`} onClick={() => setView('news')}><EcoNewsIcon size={18} /> News Analyzer <BetaBadge /></button>
-                            <button className={`nav-item ${view === 'predictor' ? 'active' : ''}`} onClick={() => setView('predictor')}><EcoPredictorIcon size={18} /> Event Predictor <BetaBadge /></button>
-                            <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')}><Settings size={18} /> Settings</button>
+                            <button 
+                                className={`nav-item beta-lab-toggle ${isBetaExpanded ? 'expanded' : ''}`} 
+                                onClick={() => setIsBetaExpanded(!isBetaExpanded)}
+                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    <Sparkles size={18} /> Beta Lab
+                                </div>
+                                <motion.div animate={{ rotate: isBetaExpanded ? 180 : 0 }}>
+                                    <ChevronDown size={14} />
+                                </motion.div>
+                            </button>
+
+                            <AnimatePresence>
+                                {isBetaExpanded && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        style={{ overflow: 'hidden' }}
+                                    >
+                                        <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
+                                            <button className={`nav-item sub-nav-item ${view === 'trends' ? 'active' : ''}`} onClick={() => setView('trends')}><EcoTrendsIcon size={16} /> Market Trends</button>
+                                            <button className={`nav-item sub-nav-item ${view === 'pulse' ? 'active' : ''}`} onClick={() => setView('pulse')}><EcoPulseIcon size={16} /> Economic Pulse</button>
+                                            <button className={`nav-item sub-nav-item ${view === 'eli5' ? 'active' : ''}`} onClick={() => setView('eli5')}><EcoSimplifyIcon size={16} /> ELI5 Economics</button>
+                                            <button className={`nav-item sub-nav-item ${view === 'simulator' ? 'active' : ''}`} onClick={() => setView('simulator')}><EcoSimulatorIcon size={16} /> What-If Simulator</button>
+                                            <button className={`nav-item sub-nav-item ${view === 'news' ? 'active' : ''}`} onClick={() => setView('news')}><EcoNewsIcon size={16} /> News Analyzer</button>
+                                            <button className={`nav-item sub-nav-item ${view === 'predictor' ? 'active' : ''}`} onClick={() => setView('predictor')}><EcoPredictorIcon size={16} /> Event Predictor</button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')} style={{ marginTop: '0.5rem' }}><Settings size={18} /> Settings</button>
                         </div>
                     </nav>
                     <div className="sidebar-footer">
