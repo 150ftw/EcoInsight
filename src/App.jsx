@@ -394,84 +394,7 @@ const useInView = (ref, options) => {
 };
 
 
-const MeshBackground = () => {
-    const { x, y } = useMousePosition();
-    const moveX = (x / window.innerWidth - 0.5) * 40;
-    const moveY = (y / window.innerHeight - 0.5) * 40;
 
-    return (
-        <div className="mesh-gradient-container">
-            <motion.div
-                className="mesh-sphere mesh-1"
-                animate={{
-                    x: [0, 100, 0],
-                    y: [0, -50, 0],
-                    scale: [1, 1.2, 1],
-                    translateX: moveX,
-                    translateY: moveY
-                }}
-                transition={{
-                    x: { duration: 20, repeat: Infinity, ease: "linear" },
-                    y: { duration: 20, repeat: Infinity, ease: "linear" },
-                    scale: { duration: 20, repeat: Infinity, ease: "linear" },
-                    translateX: { type: 'spring', damping: 40, stiffness: 200 },
-                    translateY: { type: 'spring', damping: 40, stiffness: 200 }
-                }}
-            />
-            <motion.div
-                className="mesh-sphere mesh-2"
-                animate={{
-                    x: [0, -80, 0],
-                    y: [0, 120, 0],
-                    scale: [1, 1.3, 1],
-                    translateX: moveX * -1.5,
-                    translateY: moveY * -1.5
-                }}
-                transition={{
-                    x: { duration: 25, repeat: Infinity, ease: "linear" },
-                    y: { duration: 25, repeat: Infinity, ease: "linear" },
-                    scale: { duration: 25, repeat: Infinity, ease: "linear" },
-                    translateX: { type: 'spring', damping: 50, stiffness: 150 },
-                    translateY: { type: 'spring', damping: 50, stiffness: 150 }
-                }}
-            />
-            <motion.div
-                className="mesh-sphere mesh-3"
-                animate={{
-                    x: [0, 50, 0],
-                    y: [0, 150, 0],
-                    scale: [1, 1.1, 1],
-                    translateX: moveX * 2,
-                    translateY: moveY * 2
-                }}
-                transition={{
-                    x: { duration: 18, repeat: Infinity, ease: "linear" },
-                    y: { duration: 18, repeat: Infinity, ease: "linear" },
-                    scale: { duration: 18, repeat: Infinity, ease: "linear" },
-                    translateX: { type: 'spring', damping: 30, stiffness: 250 },
-                    translateY: { type: 'spring', damping: 30, stiffness: 250 }
-                }}
-            />
-        </div>
-    );
-};
-
-const FloatingAssets = () => (
-    <div className="floating-assets-layer">
-        <motion.img
-            src={neuralNode}
-            className="floating-asset asset-1"
-            animate={{ y: [-20, 20, -20], rotate: [0, 10, 0] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.img
-            src={iridescentOrb}
-            className="floating-asset asset-2"
-            animate={{ y: [30, -30, 30], rotate: [0, -15, 0] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-    </div>
-);
 
 const PerspectiveSection = ({ children, id, className }) => {
     const ref = useRef(null);
@@ -843,7 +766,6 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
 
     return (
         <div className="landing-container" style={{ isolation: 'isolate' }}>
-            <FloatingAssets />
             <motion.div className="scroll-indicator" style={{ scaleX: scrollYProgress }} />
 
             <header className={`landing-header ${isHeaderVisible ? '' : 'header-hidden'}`}>
@@ -2049,11 +1971,6 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                 )}
             </AnimatePresence>
 
-            {/* Visual background elements */}
-            <div className="auth-bg-visual">
-                <div className="glow-1"></div>
-                <div className="glow-2"></div>
-            </div>
         </div>
     );
 };

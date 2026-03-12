@@ -124,86 +124,6 @@ select,
     cursor: auto !important;
 }
 
-/* Moving Mesh Background */
-.mesh-gradient-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-    background: #000;
-}
-
-.mesh-sphere {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.4;
-}
-
-.mesh-1 {
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
-    top: -10%;
-    left: -10%;
-}
-
-.mesh-2 {
-    width: 800px;
-    height: 800px;
-    background: radial-gradient(circle, rgba(217, 70, 239, 0.3) 0%, transparent 70%);
-    bottom: -20%;
-    right: -10%;
-}
-
-.mesh-3 {
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
-    top: 40%;
-    left: 30%;
-}
-
-.noise-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: var(--noise-url);
-    opacity: 0.1;
-    /* Slightly increased for visibility */
-    z-index: 10;
-    /* Noise should be above backgrounds but below content */
-    pointer-events: none;
-    animation: noiseShift 0.2s steps(4) infinite;
-}
-
-@keyframes noiseShift {
-    0% {
-        transform: translate(0, 0);
-    }
-
-    10% {
-        transform: translate(-1%, -1%);
-    }
-
-    20% {
-        transform: translate(1%, 1%);
-    }
-
-    30% {
-        transform: translate(-2%, 1%);
-    }
-
-    40% {
-        transform: translate(2%, -1%);
-    }
-}
 
 /* Floating Assets */
 .floating-assets-layer {
@@ -1405,25 +1325,6 @@ select,
     z-index: 1;
 }
 
-.glow-1 {
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
-    top: -200px;
-    right: -100px;
-    filter: blur(100px);
-}
-
-.glow-2 {
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(217, 70, 239, 0.1) 0%, transparent 70%);
-    bottom: -200px;
-    left: -100px;
-    filter: blur(100px);
-}
 
 /* UI Scroll Indicator */
 .scroll-indicator {
@@ -2026,17 +1927,6 @@ select,
     letter-spacing: 2px;
 }
 
-.loader-bg-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40vw;
-    height: 40vw;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 1;
-}
 
 .skip-auth-btn {
     margin-top: 2rem;
