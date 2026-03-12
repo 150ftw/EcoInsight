@@ -32,7 +32,7 @@ const CustomCursor = () => {
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     const [isHovered, setIsHovered] = useState(false);
-    
+
     const springConfig = { damping: 20, stiffness: 600, mass: 0.5 };
     const cursorX = useSpring(mouseX, springConfig);
     const cursorY = useSpring(mouseY, springConfig);
@@ -42,7 +42,7 @@ const CustomCursor = () => {
             mouseX.set(e.clientX);
             mouseY.set(e.clientY);
         };
-        
+
         const handleOver = (e) => {
             if (e.target.closest('button, a, .nav-link, .magnetic-wrap, [role="button"], .interactive')) {
                 setIsHovered(true);
@@ -53,7 +53,7 @@ const CustomCursor = () => {
         window.addEventListener('mousemove', handleMouseMove, { passive: true });
         window.addEventListener('mouseover', handleOver);
         window.addEventListener('mouseout', handleOut);
-        
+
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseover', handleOver);
@@ -70,15 +70,15 @@ const CustomCursor = () => {
             }}
         >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path 
-                    d="M5.5 3.5L18.5 12L5.5 20.5V3.5Z" 
-                    fill="white" 
+                <path
+                    d="M5.5 3.5L18.5 12L5.5 20.5V3.5Z"
+                    fill="white"
                     className="arrow-main"
                 />
-                <path 
-                    d="M5.5 3.5L18.5 12L5.5 20.5V3.5Z" 
-                    stroke="#8B5CF6" 
-                    strokeWidth="1.5" 
+                <path
+                    d="M5.5 3.5L18.5 12L5.5 20.5V3.5Z"
+                    stroke="#8B5CF6"
+                    strokeWidth="1.5"
                     strokeLinejoin="round"
                     className="arrow-border"
                 />
