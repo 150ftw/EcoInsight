@@ -55,7 +55,7 @@
 }
 
 body {
-    background-color: var(--bg-dark);
+    background-color: #000000 !important;
     color: var(--text-primary);
     font-family: var(--font-main);
     font-size: var(--base-font-size);
@@ -66,6 +66,11 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
     cursor: none;
     overflow-anchor: none;
+}
+
+#root, .app-container, .landing-container, .subpage-view {
+    background-color: #000000 !important;
+    background-image: none !important;
 }
 
 /* Hide native cursor on our own elements, but NOT on third-party iframes/inputs */

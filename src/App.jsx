@@ -1145,7 +1145,6 @@ const LiveSimulator = ({ lines, title }) => {
 
 const PageWrapper = ({ title, description, children, onBack }) => (
     <div className="subpage-view">
-        <div className="noise-overlay"></div>
         <div className="subpage-content">
             <header className="subpage-header">
                 <Magnetic distance={0.2}>
@@ -3997,7 +3996,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         return (
             <div className="app-container">
-                <div className="bg-glow"></div>
                 <aside className="sidebar">
                     <div className="sidebar-header">
                         <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>

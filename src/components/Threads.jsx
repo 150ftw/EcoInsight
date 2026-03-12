@@ -112,6 +112,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     }
 
     float colorVal = 1.0 - line_strength;
+    if (colorVal < 0.005) discard;
     fragColor = vec4(uColor * colorVal, colorVal);
 }
 
