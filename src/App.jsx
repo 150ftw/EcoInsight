@@ -91,92 +91,74 @@ const CustomCursor = () => {
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
 
-const HyperPrismLogo = ({ size = 24, className = "" }) => {
-    const shardVariants = {
-        rest: (i) => ({
-            x: 0,
-            y: 0,
-            rotate: 0,
-            opacity: 0.6,
-            scale: 1
-        }),
-        hover: (i) => ({
-            x: Math.cos((i * 60) * Math.PI / 180) * 6,
-            y: Math.sin((i * 60) * Math.PI / 180) * 6,
-            rotate: i * 20,
-            opacity: 1,
-            scale: 1.15
-        })
-    };
-
+const EcoInsightLogo = ({ size = 24, className = "" }) => {
     return (
         <motion.svg
             width={size}
             height={size}
-            viewBox="0 0 24 24"
+            viewBox="0 0 512 512"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className={className}
-            initial="rest"
             whileHover="hover"
-            animate="rest"
+            initial="rest"
         >
             <defs>
-                <linearGradient id="prismGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient id="logoGradientMain" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="var(--accent-primary)" />
                     <stop offset="100%" stopColor="var(--accent-secondary)" />
                 </linearGradient>
-                <filter id="prismGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="1.2" result="blur" />
+                <filter id="logoGlowEffect" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="15" result="blur" />
                     <feComposite in="SourceGraphic" in2="blur" operator="over" />
                 </filter>
             </defs>
 
-            {/* Central glowing core */}
-            <motion.circle
-                cx="12" cy="12" r="3"
-                fill="var(--accent-primary)"
-                filter="url(#prismGlow)"
+            <motion.rect
+                x="40" y="40" width="432" height="432" rx="80"
+                fill="rgba(10, 10, 12, 0.4)"
+                stroke="url(#logoGradientMain)"
+                strokeWidth="8"
                 variants={{
-                    rest: { scale: 0.8, opacity: 0.2 },
-                    hover: { scale: 1.6, opacity: 1 }
+                    rest: { opacity: 0.8, strokeWidth: 8 },
+                    hover: { opacity: 1, strokeWidth: 12, scale: 1.02 }
                 }}
-                transition={{ duration: 0.6, ease: "anticipate" }}
+                style={{ filter: 'url(#logoGlowEffect)' }}
             />
 
-            {/* 6 Triangular Shards forming a hexagon */}
-            {[0, 1, 2, 3, 4, 5].map(i => (
-                <motion.path
-                    key={i}
-                    d={`M12 12 
-                       L${12 + 10 * Math.cos((i * 60 - 30) * Math.PI / 180)} ${12 + 10 * Math.sin((i * 60 - 30) * Math.PI / 180)} 
-                       L${12 + 10 * Math.cos((i * 60 + 30) * Math.PI / 180)} ${12 + 10 * Math.sin((i * 60 + 30) * Math.PI / 180)} Z`}
-                    fill="url(#prismGradient)"
-                    stroke="rgba(255,255,255,0.1)"
-                    strokeWidth="0.5"
-                    custom={i}
-                    variants={shardVariants}
-                    transition={{
-                        type: "spring",
-                        stiffness: 250,
-                        damping: 15,
-                        delay: i * 0.05
-                    }}
-                />
-            ))}
+            <motion.rect x="120" y="300" width="30" height="120" rx="4" fill="url(#logoGradientMain)" opacity="0.4" 
+                variants={{ hover: { height: 140, y: 280 } }} />
+            <motion.rect x="170" y="260" width="30" height="160" rx="4" fill="url(#logoGradientMain)" opacity="0.6" 
+                variants={{ hover: { height: 180, y: 240 } }} />
+            <motion.rect x="220" y="220" width="30" height="200" rx="4" fill="url(#logoGradientMain)" opacity="0.8" 
+                variants={{ hover: { height: 220, y: 200 } }} />
+            <motion.rect x="270" y="180" width="30" height="240" rx="4" fill="url(#logoGradientMain)" 
+                variants={{ hover: { height: 260, y: 160 } }} />
 
-            {/* Micro-sparkle nodes */}
-            {[0, 120, 240].map((angle, i) => (
-                <motion.circle
-                    key={`sparkle-${i}`}
-                    cx={12 + 8 * Math.cos(angle * Math.PI / 180)}
-                    cy={12 + 8 * Math.sin(angle * Math.PI / 180)}
-                    r="0.5"
-                    fill="#fff"
-                    animate={{ opacity: [0, 1, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.6 }}
-                />
-            ))}
+            <motion.path
+                d="M120 380 L220 280 L280 320 L400 150 M370 150 L400 150 L400 180"
+                stroke="#fff"
+                strokeWidth="20"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                variants={{
+                    rest: { pathLength: 1, opacity: 0.9 },
+                    hover: { pathLength: 1, opacity: 1, scale: 1.05, transformOrigin: 'center' }
+                }}
+            />
+
+            <motion.circle cx="200" cy="180" r="15" fill="#fff" variants={{ hover: { scale: 1.2 } }} />
+            <motion.circle cx="260" cy="140" r="20" fill="#fff" variants={{ hover: { scale: 1.2 } }} />
+            <motion.circle cx="320" cy="200" r="15" fill="#fff" variants={{ hover: { scale: 1.2 } }} />
+            <motion.circle cx="240" cy="220" r="12" fill="#fff" variants={{ hover: { scale: 1.2 } }} />
+
+            <motion.g opacity="0.5" stroke="#fff" strokeWidth="4">
+                <line x1="200" y1="180" x2="260" y2="140" />
+                <line x1="260" y1="140" x2="320" y2="200" />
+                <line x1="200" y1="180" x2="240" y2="220" />
+                <line x1="260" y1="140" x2="240" y2="220" />
+                <line x1="320" y1="200" x2="240" y2="220" />
+            </motion.g>
         </motion.svg>
     );
 };
@@ -771,7 +753,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
             <header className={`landing-header ${isHeaderVisible ? '' : 'header-hidden'}`}>
                 <Magnetic distance={0.2}>
                     <div className="logo" onClick={() => setAppSection('landing')} style={{ cursor: 'pointer' }}>
-                        <HyperPrismLogo size={48} /> <span>EcoInsight</span>
+                        <EcoInsightLogo size={48} /> <span>EcoInsight</span>
                     </div>
                 </Magnetic>
                 <div className="landing-nav">
@@ -999,7 +981,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
             <footer className="landing-footer">
                 <div className="footer-content">
                     <div className="footer-brand">
-                        <HyperPrismLogo size={42} /> <span>EcoInsight</span>
+                        <EcoInsightLogo size={42} /> <span>EcoInsight</span>
                     </div>
                     <div className="footer-links">
                         <div className="link-group">
@@ -1152,7 +1134,7 @@ const PageWrapper = ({ title, description, children, onBack }) => (
                         <ChevronDown className="rotate-90" size={16} /> Back
                     </button>
                 </Magnetic>
-                <div className="logo-small"><HyperPrismLogo size={32} /></div>
+                <div className="logo-small"><EcoInsightLogo size={32} /></div>
             </header>
             <motion.div
                 className="content-body"
@@ -1876,7 +1858,7 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                     <button className="back-btn" onClick={() => setAppSection('landing')}>
                         <ChevronDown className="rotate-90" size={16} /> Cancel
                     </button>
-                    <div className="logo-small"><HyperPrismLogo size={42} /></div>
+                    <div className="logo-small"><EcoInsightLogo size={42} /></div>
                 </div>
 
                 <div className="order-summary-box">
@@ -1938,7 +1920,7 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                             </div>
                             <div className="stripe-body">
                                 <div className="merchant-info">
-                                    <HyperPrismLogo size={32} />
+                                    <EcoInsightLogo size={32} />
                                     <div>
                                         <h3>EcoInsight Elite</h3>
                                         <p>{plan.price} for {plan.plan} Plan</p>
@@ -3894,7 +3876,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         transition={{ duration: 0.3 }}
                                     >
                                         <div className="message-icon">
-                                            {msg.role === 'assistant' ? <HyperPrismLogo size={18} /> : <User size={18} />}
+                                            {msg.role === 'assistant' ? <EcoInsightLogo size={18} /> : <User size={18} />}
                                         </div>
                                         <div className="message-container">
                                             <div className="message-content">
@@ -3999,7 +3981,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 <aside className="sidebar">
                     <div className="sidebar-header">
                         <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                            <HyperPrismLogo size={36} className="logo-icon" /> <span>EcoInsight</span>
+                            <EcoInsightLogo size={36} className="logo-icon" /> <span>EcoInsight</span>
                         </motion.div>
                     </div>
                     <nav className="sidebar-nav">
@@ -4065,7 +4047,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 <main className="chat-area">
                     <header className="chat-header">
                         <div className="header-content">
-                            <HyperPrismLogo size={28} />
+                            <EcoInsightLogo size={28} />
                             <h2>{view === 'chat' ? 'Indian Market Analyst' : view === 'trends' ? 'Market Intelligence' : 'Account Settings'}</h2>
                             <div className="badge">{view === 'chat' ? 'Expert Mode' : 'Beta'}</div>
                             <div className="header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
@@ -4085,9 +4067,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     return (
         <>
-            <div className="landing-bg-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 0, pointerEvents: 'none' }}>
-    <Threads amplitude={2.0} distance={0.4} enableMouseInteraction={true} color={[0.7, 0.6, 1.0]} />
-</div>
+            <div className="landing-bg-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 1, pointerEvents: 'none' }}>
+                <Threads amplitude={2.5} distance={0.3} enableMouseInteraction={true} color={[0.8, 0.7, 1.0]} />
+            </div>
             {appSection !== 'chat' && appSection !== 'checkout' && <CustomCursor />}
             {renderActiveSection()}
             <AnimatePresence>
