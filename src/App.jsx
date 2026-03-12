@@ -11,6 +11,8 @@ import {
     SignedOut,
     SignIn,
     SignUp,
+    SignInButton,
+    SignUpButton,
     UserButton,
     useUser,
     useAuth
@@ -869,10 +871,14 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                     <SignedOut>
                         <div className="signed-out-nav" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                             <Magnetic distance={0.3}>
-                                <button className="nav-link" onClick={() => { setAppSection('auth'); setAuthType('login'); }}>Sign In</button>
+                                <SignInButton mode="modal">
+                                    <button className="nav-link">Sign In</button>
+                                </SignInButton>
                             </Magnetic>
                             <Magnetic distance={0.3}>
-                                <button className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }} onClick={() => { setAppSection('auth'); setAuthType('signup'); }}>Get Started</button>
+                                <SignUpButton mode="modal">
+                                    <button className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>Get Started</button>
+                                </SignUpButton>
                             </Magnetic>
                         </div>
                     </SignedOut>
@@ -911,12 +917,17 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                         transition={{ duration: 0.8, delay: 0.6 }}
                     >
                         <Magnetic distance={0.2}>
-                            <button className="btn-primary" onClick={() => {
-                                if (isSignedIn) onLaunchEngine();
-                                else { setAppSection('auth'); setAuthType('signup'); }
-                            }}>
-                                Launch Engine <Maximize2 size={18} />
-                            </button>
+                            {isSignedIn ? (
+                                <button className="btn-primary" onClick={onLaunchEngine}>
+                                    Launch Engine <Maximize2 size={18} />
+                                </button>
+                            ) : (
+                                <SignUpButton mode="modal">
+                                    <button className="btn-primary">
+                                        Launch Engine <Maximize2 size={18} />
+                                    </button>
+                                </SignUpButton>
+                            )}
                         </Magnetic>
                         <Magnetic distance={0.2}>
                             <button className="btn-secondary" onClick={() => scrollToSection('features')}>Explorer Capabilities</button>
@@ -1061,10 +1072,13 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                 >
                     <h2>Ready to lead the curve?</h2>
                     <p>Join the 10,000+ analysts using EcoInsight to master the markets.</p>
-                    <button className="btn-primary" onClick={() => {
-                        if (isSignedIn) onLaunchEngine();
-                        else { setAppSection('auth'); setAuthType('signup'); }
-                    }}>Get Started Now</button>
+                    {isSignedIn ? (
+                        <button className="btn-primary" onClick={onLaunchEngine}>Launch Engine Now</button>
+                    ) : (
+                        <SignUpButton mode="modal">
+                            <button className="btn-primary">Get Started Now</button>
+                        </SignUpButton>
+                    )}
                 </motion.div>
             </section>
 
@@ -3330,6 +3344,14 @@ function App() {
         return () => clearTimeout(timer);
     }, [aiSettings, chatSettings, personalization, appearance, profile, user?.id, supaLoaded]);
 
+    // Automatic redirection to chat once signed in
+    useEffect(() => {
+        if (isSignedIn && appSection === 'landing') {
+            createNewChat();
+            setAppSection('chat');
+        }
+    }, [isSignedIn, appSection]);
+
 
     const scrollToBottom = () => {
         if (view === 'chat') {
@@ -4025,58 +4047,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     </div>
                 )
         }
-    }
-
-    if (appSection === 'auth') return (
-        <div className="auth-clerk-container">
-            <div className="auth-clerk-card" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
-                <button className="back-btn-clerk" onClick={() => setAppSection('landing')} style={{ marginBottom: '2rem' }}>
-                    <ChevronDown className="rotate-90" size={16} style={{ transform: 'rotate(90deg)' }} /> Back
-                </button>
-                {authType === 'login' ? (
-                    <SignIn
-                        routing="hash"
-                        signUpUrl="/#sign-up"
-                        fallbackRedirectUrl="/#chat"
-                    />
-                ) : (
-                    <SignUp
-                        routing="hash"
-                        signInUrl="/#sign-in"
-                        fallbackRedirectUrl="/#chat"
-                    />
-                )}
-            </div>
-        </div>
-    );
+    };
     const onInit = (name) => {
         setInitializingModule(name);
         setShowInitialization(true);
     };
 
     const renderActiveSection = () => {
-        if (appSection === 'auth') return (
-            <div className="auth-clerk-container">
-                <div className="auth-clerk-card" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
-                    <button className="back-btn-clerk" onClick={() => setAppSection('landing')} style={{ marginBottom: '2rem' }}>
-                        <ChevronDown className="rotate-90" size={16} style={{ transform: 'rotate(90deg)' }} /> Back
-                    </button>
-                    {authType === 'login' ? (
-                        <SignIn
-                            routing="hash"
-                            signUpUrl="/#sign-up"
-                            fallbackRedirectUrl="/#chat"
-                        />
-                    ) : (
-                        <SignUp
-                            routing="hash"
-                            signInUrl="/#sign-in"
-                            fallbackRedirectUrl="/#chat"
-                        />
-                    )}
-                </div>
-            </div>
-        );
         if (appSection === 'landing') return (
             <LandingPage
                 setAppSection={setAppSection}
