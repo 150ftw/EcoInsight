@@ -564,6 +564,22 @@ const scrollToSection = (id) => {
 // Premium Compute Component for Landing Page Grid
 const PremiumComputeCard = () => {
     const [isHovered, setIsHovered] = useState(false);
+    const [nodes, setNodes] = useState(340);
+
+    useEffect(() => {
+        if (!isHovered) {
+            setNodes(340);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            // Fluctuate around 4,096
+            const variance = Math.floor(Math.random() * 21) - 10; // -10 to +10
+            setNodes(4096 + variance);
+        }, 150);
+
+        return () => clearInterval(interval);
+    }, [isHovered]);
 
     return (
         <TiltCard className="bento-item bento-1" style={{ padding: 0 }}>
@@ -595,7 +611,7 @@ const PremiumComputeCard = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 style={{ fontSize: '3.5rem', fontWeight: 800, color: isHovered ? '#f97316' : '#e2e8f0', letterSpacing: '-2px' }}
                             >
-                                {isHovered ? '4,096' : '340'}
+                                {nodes.toLocaleString()}
                             </motion.span>
                             <span style={{ fontSize: '1.2rem', color: '#71717a', fontWeight: 600 }}>NODES</span>
                         </div>
@@ -2061,7 +2077,9 @@ const InitializationTerminal = ({ moduleName, onClose }) => {
         const name = moduleName.toLowerCase();
         const baseLogs = [
             `> Establishing secure connection to node_${name.replace(/\s+/g, '_')}...`,
-            `> Authenticating HSM credentials... [OK]`
+            `> Authenticating HSM credentials... [OK]`,
+            `> ACCESSING NEURAL OVERDRIVE STATE...`,
+            `> NODES ONLINE: 4,096 / 4,096 [STABLE]`
         ];
 
         let specificLogs = [];
