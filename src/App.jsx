@@ -847,6 +847,9 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
 
     return (
         <div className="landing-container">
+            <div className="landing-bg-overlay" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 0, pointerEvents: 'none' }}>
+                <Threads amplitude={1.2} distance={0.1} enableMouseInteraction={true} color={[0.5, 0.4, 1.0]} />
+            </div>
             <MeshBackground />
             <FloatingAssets />
             <motion.div className="scroll-indicator" style={{ scaleX: scrollYProgress }} />
@@ -4181,9 +4184,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
     return (
         <>
             <CustomCursor />
-            <div className="global-bg" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: -2, pointerEvents: 'none' }}>
-                <Threads amplitude={1.5} distance={0.2} enableMouseInteraction={true} color={[0.5, 0.4, 1.0]} />
-            </div>
             {renderActiveSection()}
             {/* Initialization Terminal Overlay */}
             <AnimatePresence>

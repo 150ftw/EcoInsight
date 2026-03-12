@@ -93,7 +93,6 @@ body {
         radial-gradient(circle at 20% 80%, rgba(217, 70, 239, 0.08) 0%, transparent 40%);
     z-index: -1;
     pointer-events: none;
-    opacity: 0.5; /* Subtler glow to let Threads shine */
 }
 
 .app-container {
