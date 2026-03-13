@@ -3408,10 +3408,9 @@ function App() {
     })
 
     const [chatSettings, setChatSettings] = useState({
-        history: true,
-        autoSave: true,
         autoTitles: true,
-        showTimestamps: false
+        showTimestamps: false,
+        performanceMode: false
     })
 
     const [personalization, setPersonalization] = useState({
@@ -3443,6 +3442,15 @@ function App() {
         console.log("Terminal Diagnostic:", diagnosticInfo);
         window.eco_diagnostic = diagnosticInfo; // Make it accessible in console
     }, [isLoaded, isSignedIn, user, appSection, forceEntry]);
+
+    // Apply Performance Mode to Body
+    useEffect(() => {
+        if (chatSettings.performanceMode) {
+            document.body.classList.add('performance-low');
+        } else {
+            document.body.classList.remove('performance-low');
+        }
+    }, [chatSettings.performanceMode]);
 
     // --- State Operations ---
 
@@ -4273,6 +4281,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         <p>Reduce padding and spacing.</p>
                                     </div>
                                     <button className={`toggle-switch ${appearance.compactMode ? 'on' : ''}`} onClick={() => setAppearance({ ...appearance, compactMode: !appearance.compactMode })}>
+                                        <div className="thumb"></div>
+                                    </button>
+                                </div>
+                                <div className="toggle-item">
+                                    <div className="toggle-text">
+                                        <label>Efficiency mode (Low Lag)</label>
+                                        <p>Reduces visual effects for smoother performance.</p>
+                                    </div>
+                                    <button className={`toggle-switch ${chatSettings.performanceMode ? 'on' : ''}`} onClick={() => setChatSettings({ ...chatSettings, performanceMode: !chatSettings.performanceMode })}>
                                         <div className="thumb"></div>
                                     </button>
                                 </div>
