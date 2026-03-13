@@ -818,7 +818,7 @@ const NeuralAnalystCard = () => {
 };
 
 const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine }) => {
-    const { isSignedIn } = useAuth();
+    const { isSignedIn, isLoaded } = useAuth();
     const [hoveredPlanIndex, setHoveredPlanIndex] = useState(null);
     const { scrollYProgress } = useScroll();
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -888,26 +888,34 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                     <Magnetic distance={0.3}><button className="nav-link" onClick={() => scrollToSection('solutions')}>Solutions</button></Magnetic>
 
                     <Magnetic distance={0.3}><button className="nav-link" onClick={() => scrollToSection('pricing')}>Pricing</button></Magnetic>
-                    <SignedIn>
-                        <div className="signed-in-nav" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            <button className="btn-signin" onClick={onLaunchEngine}>Open Engine</button>
-                            <UserButton afterSignOutUrl="/" />
+                    {!isLoaded ? (
+                        <div className="auth-loading-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6, fontSize: '0.9rem' }}>
+                            <Loader2 size={14} className="animate-spin" /> initializing security...
                         </div>
-                    </SignedIn>
-                    <SignedOut>
-                        <div className="signed-out-nav" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            <Magnetic distance={0.3}>
-                                <SignInButton mode="modal">
-                                    <button className="nav-link">Sign In</button>
-                                </SignInButton>
-                            </Magnetic>
-                            <Magnetic distance={0.3}>
-                                <SignUpButton mode="modal">
-                                    <button className="btn-header">Get Started</button>
-                                </SignUpButton>
-                            </Magnetic>
-                        </div>
-                    </SignedOut>
+                    ) : (
+                        <>
+                            <SignedIn>
+                                <div className="signed-in-nav" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                    <button className="btn-signin" onClick={onLaunchEngine}>Open Engine</button>
+                                    <UserButton afterSignOutUrl="/" />
+                                </div>
+                            </SignedIn>
+                            <SignedOut>
+                                <div className="signed-out-nav" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                    <Magnetic distance={0.3}>
+                                        <SignInButton mode="modal">
+                                            <button className="nav-link">Sign In</button>
+                                        </SignInButton>
+                                    </Magnetic>
+                                    <Magnetic distance={0.3}>
+                                        <SignUpButton mode="modal">
+                                            <button className="btn-header">Get Started</button>
+                                        </SignUpButton>
+                                    </Magnetic>
+                                </div>
+                            </SignedOut>
+                        </>
+                    )}
                 </div>
             </header>
 
@@ -3409,6 +3417,7 @@ function App() {
             isLoaded,
             isSignedIn,
             hasUser: !!user,
+            hasKey: !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
             section: appSection,
             forceEntry
         };
