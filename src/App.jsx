@@ -482,10 +482,10 @@ const PerspectiveSection = ({ children, id, className }) => {
     });
 
     // Zoom in when coming into view, zoom "through" when leaving
-    const rotateX = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [15, 0, 0, -15]);
-    const scale = useTransform(scrollYProgress, [0, 0.4, 0.8, 1], [0.8, 1, 1.2, 2]);
+    const rotateX = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [10, 0, 0, -10]);
+    const scale = useTransform(scrollYProgress, [0, 0.4, 0.8, 1], [0.95, 1, 1.05, 1.15]);
     const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-    const z = useTransform(scrollYProgress, [0, 0.5, 1], [-200, 0, 500]);
+    const z = useTransform(scrollYProgress, [0, 0.5, 1], [-100, 0, 200]);
 
     return (
         <motion.section
@@ -832,10 +832,10 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
     }, []);
 
     // Dramatic Hero Zoom
-    const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.5]);
+    const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.2]);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-    const heroZ = useTransform(scrollYProgress, [0, 0.2], [0, 300]);
-    const heroBlur = useTransform(scrollYProgress, [0, 0.2], [0, 10]);
+    const heroZ = useTransform(scrollYProgress, [0, 0.2], [0, 150]);
+    const heroBlur = useTransform(scrollYProgress, [0, 0.2], [0, 5]);
 
     const splitText = (text) => {
         return text.split(" ").filter(w => w !== "").map((word, wordIndex) => (
@@ -3534,13 +3534,7 @@ function App() {
         return () => clearTimeout(timer);
     }, [aiSettings, chatSettings, personalization, appearance, profile, user?.id, supaLoaded]);
 
-    // Automatic redirection to chat once signed in
-    useEffect(() => {
-        if (isSignedIn && appSection === 'landing') {
-            createNewChat();
-            setAppSection('chat');
-        }
-    }, [isSignedIn, appSection]);
+
 
 
     const scrollToBottom = () => {
