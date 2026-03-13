@@ -3358,9 +3358,9 @@ function App() {
 
 
     const [profile, setProfile] = useState({
-        name: 'Professional Analyst',
-        username: '@eco_expert',
-        email: 'analyst@ecoinsight.ai',
+        name: 'Guest User',
+        username: '@guest',
+        email: 'guest@ecoinsight.ai',
         avatar: null,
         tier: 'Free',
         credits: 5,
@@ -3547,6 +3547,24 @@ function App() {
         }, 1000);
         return () => clearTimeout(timer);
     }, [aiSettings, chatSettings, personalization, appearance, profile, user?.id, supaLoaded]);
+
+    // Dynamic Profile Sync (Clerk -> Profile State)
+    useEffect(() => {
+        if (!user || !supaLoaded) return;
+
+        // Automatically update profile if it's currently at default state or missing real data
+        const isDefault = profile.name === 'Professional Analyst' || profile.name === 'Guest User' || profile.email === 'analyst@ecoinsight.ai';
+        
+        if (isDefault) {
+            setProfile(prev => ({
+                ...prev,
+                name: user.fullName || prev.name,
+                email: user.primaryEmailAddress?.emailAddress || prev.email,
+                avatar: user.imageUrl || prev.avatar,
+                username: user.username ? `@${user.username}` : (user.firstName ? `@${user.firstName.toLowerCase()}` : prev.username)
+            }));
+        }
+    }, [user, supaLoaded]);
 
     // Weekly Credit Recharge Logic
     useEffect(() => {
