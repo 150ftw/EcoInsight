@@ -19,6 +19,7 @@ import {
 } from '@clerk/clerk-react'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
+import CreditModal from './components/CreditModal'
 import * as pdfjs from 'pdfjs-dist'
 // Set worker for pdfjs (using a static file from the public directory to bypass Vite bundler issues)
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
@@ -3302,6 +3303,7 @@ function App() {
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [authLoadingTimeout, setAuthLoadingTimeout] = useState(false)
+    const [showCreditModal, setShowCreditModal] = useState(false);
 
     // Premium Feature State
     const [pdfText, setPdfText] = useState('');
@@ -3356,7 +3358,10 @@ function App() {
         name: 'Professional Analyst',
         username: '@eco_expert',
         email: 'analyst@ecoinsight.ai',
-        avatar: null
+        avatar: null,
+        tier: 'Free',
+        credits: 5,
+        lastRechargeDate: new Date().toISOString()
     })
 
     const [aiSettings, setAiSettings] = useState({
@@ -3532,13 +3537,31 @@ function App() {
             saveSettings(user.id, {
                 ai_settings: aiSettings,
                 chat_settings: chatSettings,
-                personalization,
-                appearance,
-                profile,
+                personalization: personalization,
+                appearance: appearance,
+                profile: profile
             });
-        }, 1000); // 1s debounce
+        }, 1000);
         return () => clearTimeout(timer);
     }, [aiSettings, chatSettings, personalization, appearance, profile, user?.id, supaLoaded]);
+
+    // Weekly Credit Recharge Logic
+    useEffect(() => {
+        if (!isSignedIn || !supaLoaded || profile.tier !== 'Free') return;
+
+        const lastRecharge = new Date(profile.lastRechargeDate);
+        const now = new Date();
+        const diffInDays = (now - lastRecharge) / (1000 * 60 * 60 * 24);
+
+        if (diffInDays >= 7) {
+            console.log("Recharging weekly credits...");
+            setProfile(prev => ({
+                ...prev,
+                credits: 5,
+                lastRechargeDate: now.toISOString()
+            }));
+        }
+    }, [isSignedIn, supaLoaded, profile.tier, profile.lastRechargeDate]);
 
 
 
@@ -3687,6 +3710,17 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         } : c));
 
         if (!customText) setInput('')
+
+        // Credit Enforcement
+        if (profile.tier === 'Free') {
+            if (profile.credits <= 0) {
+                setShowCreditModal(true);
+                return;
+            }
+            // Decrement credits
+            setProfile(prev => ({ ...prev, credits: Math.max(0, prev.credits - 1) }));
+        }
+
         setIsLoading(true)
 
         try {
@@ -4273,6 +4307,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 plan={selectedPlan}
                 setAppSection={setAppSection}
                 onPaymentSuccess={() => {
+                    const newTier = selectedPlan?.plan || 'Sentinel';
+                    setProfile(prev => ({
+                        ...prev,
+                        tier: newTier,
+                        credits: newTier === 'Free' ? 5 : 999999 // Effectively unlimited for paid
+                    }));
                     setSelectedPlan(null);
                     setAppSection('chat');
                 }}
@@ -4384,7 +4424,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 <UserButton afterSignOutUrl="/" />
                                 <div className="user-info">
                                     <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.fullName || user?.primaryEmailAddress?.emailAddress}</span>
-                                    <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Enterprise Access</span>
+                                    <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                        {profile.tier} Access {profile.tier === 'Free' && `• ${profile.credits} Credits`}
+                                    </span>
                                 </div>
                             </div>
                         </SignedIn>
@@ -4424,6 +4466,20 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     />
                 )}
             </AnimatePresence>
+
+            <CreditModal
+                isOpen={showCreditModal}
+                onClose={() => setShowCreditModal(false)}
+                lastRechargeDate={profile.lastRechargeDate}
+                onUpgrade={() => {
+                    setShowCreditModal(false);
+                    setAppSection('landing');
+                    setTimeout(() => {
+                        const pricingSection = document.getElementById('pricing');
+                        if (pricingSection) pricingSection.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }}
+            />
         </>
     );
 };

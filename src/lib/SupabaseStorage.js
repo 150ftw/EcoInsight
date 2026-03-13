@@ -136,7 +136,10 @@ const DEFAULT_SETTINGS = {
         name: 'Professional Analyst',
         username: '@eco_expert',
         email: 'analyst@ecoinsight.ai',
-        avatar: null
+        avatar: null,
+        tier: 'Free',
+        credits: 5,
+        lastRechargeDate: new Date().toISOString()
     }
 };
 
@@ -160,7 +163,7 @@ export const loadSettings = async (userId) => {
             chat_settings: data.chat_settings || DEFAULT_SETTINGS.chat_settings,
             personalization: data.personalization || DEFAULT_SETTINGS.personalization,
             appearance: data.appearance || DEFAULT_SETTINGS.appearance,
-            profile: data.profile || DEFAULT_SETTINGS.profile,
+            profile: { ...DEFAULT_SETTINGS.profile, ...(data.profile || {}) },
         };
     } catch (err) {
         console.error('Failed to load settings from Supabase:', err);
