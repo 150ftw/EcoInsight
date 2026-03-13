@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://eco-insight.vercel.app/sitemap.xml
+Sitemap: https://www.ecoinsight.online/sitemap.xml
