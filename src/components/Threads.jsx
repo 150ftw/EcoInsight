@@ -189,8 +189,9 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
         program.uniforms.uMouse.value[0] = currentMouse[0];
         program.uniforms.uMouse.value[1] = currentMouse[1];
       } else {
-        program.uniforms.uMouse.value[0] = 0.5;
-        program.uniforms.uMouse.value[1] = 0.5;
+        // Autonomous drift when no mouse interaction
+        program.uniforms.uMouse.value[0] = 0.5 + Math.sin(t * 0.0007) * 0.1;
+        program.uniforms.uMouse.value[1] = 0.5 + Math.cos(t * 0.0005) * 0.1;
       }
       program.uniforms.iTime.value = t * 0.001;
 

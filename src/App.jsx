@@ -908,7 +908,10 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                 </div>
             </header>
 
-            <main className="landing-hero" style={{ perspective: '2000px' }}>
+            <main className="landing-hero" style={{ perspective: '2000px', position: 'relative' }}>
+                <div className="hero-threads-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 0.6 }}>
+                    <Threads amplitude={2.5} distance={0.3} enableMouseInteraction={false} color={[0.8, 0.7, 1.0]} />
+                </div>
                 <motion.div
                     style={{
                         scale: heroScale,
@@ -1107,7 +1110,10 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                 </motion.div>
             </section>
 
-            <footer className="landing-footer">
+            <footer className="landing-footer" style={{ position: 'relative', overflow: 'hidden' }}>
+                <div className="footer-threads-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 0.4 }}>
+                    <Threads amplitude={2.5} distance={0.3} enableMouseInteraction={false} color={[0.8, 0.7, 1.0]} />
+                </div>
                 <div className="footer-content">
                     <div className="footer-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <EcoInsightLogo size={42} /> <span>EcoInsight</span>
@@ -4408,9 +4414,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     return (
         <>
-            <div className="landing-bg-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 1, pointerEvents: 'none' }}>
-                <Threads amplitude={2.5} distance={0.3} enableMouseInteraction={true} color={[0.8, 0.7, 1.0]} />
-            </div>
             <CustomCursor />
             {renderActiveSection()}
             <AnimatePresence>
