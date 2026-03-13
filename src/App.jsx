@@ -19,7 +19,9 @@ import {
 } from '@clerk/clerk-react'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
-import CreditModal from './components/CreditModal'
+import CheckoutView from './components/CheckoutView';
+import CreditModal from './components/CreditModal';
+import OnboardingView from './components/OnboardingView';
 import * as pdfjs from 'pdfjs-dist'
 // Set worker for pdfjs (using a static file from the public directory to bypass Vite bundler issues)
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
@@ -1153,7 +1155,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
     );
 };
 
-const InteractiveActionCard = ({ icon: Icon, title, description, details, expandedDetails, onInit, isActive, onToggle, delay = 0 }) => {
+const InteractiveActionCard = ({ children, icon: Icon, title, description, details, expandedDetails, onInit, isActive, onToggle, delay = 0 }) => {
     const handleInitClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -2318,7 +2320,7 @@ const InitializationTerminal = ({ moduleName, onClose }) => {
             }
         }, 600);
         return () => clearInterval(interval);
-    }, []);
+    }, [terminalLines]);
 
     return (
         <motion.div
@@ -2807,6 +2809,7 @@ const WhatIfSimulator = () => {
                             </div>
                             <input
                                 type="range"
+                                className="interactive-slider"
                                 min={slider.min}
                                 max={slider.max}
                                 step={slider.step}
@@ -3364,7 +3367,8 @@ function App() {
         avatar: null,
         tier: 'Free',
         credits: 5,
-        lastRechargeDate: new Date().toISOString()
+        lastRechargeDate: new Date().toISOString(),
+        onboarded: false // New state for onboarding status
     })
 
     const [aiSettings, setAiSettings] = useState({
@@ -3555,7 +3559,7 @@ function App() {
         // Automatically update profile if it's currently at default state or missing real data
         const isDefault = profile.name === 'Professional Analyst' || profile.name === 'Guest User' || profile.email === 'analyst@ecoinsight.ai';
         
-        if (isDefault) {
+        if (isDefault || !profile.onboarded) { // Also update if not onboarded yet
             setProfile(prev => ({
                 ...prev,
                 name: user.fullName || prev.name,
@@ -3564,7 +3568,7 @@ function App() {
                 username: user.username ? `@${user.username}` : (user.firstName ? `@${user.firstName.toLowerCase()}` : prev.username)
             }));
         }
-    }, [user, supaLoaded]);
+    }, [user, supaLoaded, profile.onboarded]);
 
     // Weekly Credit Recharge Logic
     useEffect(() => {
@@ -3898,7 +3902,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     // Modified handleSend call inside try to seed assistant message
     useEffect(() => {
-        if (isLoading && activeChat.messages[activeChat.messages.length - 1].role !== 'assistant') {
+        if (isLoading && activeChat.messages[activeChat.messages.length - 1].content === '') {
             // This is handled inside handleSend now to avoid separate seeds
         }
     }, [isLoading]);
@@ -3912,6 +3916,20 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             </div>
         );
     }
+
+    const onInit = (name) => {
+        setInitializingModule(name);
+        setShowInitialization(true);
+    };
+
+    const handleOnboardingComplete = (onboardingData) => {
+        setProfile(prev => ({
+            ...prev,
+            ...onboardingData,
+            onboarded: true // Mark as onboarded
+        }));
+        // Note: The profile sync effect will automatically save this to Supabase
+    };
 
     const renderView = () => {
         if (SUBPAGE_DATA[view]) {
@@ -4316,10 +4334,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 )
         }
     };
-    const onInit = (name) => {
-        setInitializingModule(name);
-        setShowInitialization(true);
-    };
 
     const renderActiveSection = () => {
         if (appSection === 'landing') return (
@@ -4327,13 +4341,29 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 setAppSection={setAppSection}
                 setAuthType={setAuthType}
                 onLaunchEngine={() => {
-                    createNewChat();
-                    setAppSection('chat');
+                    // Check if onboarding is needed
+                    if (isSignedIn && !profile.onboarded) {
+                        setAppSection('onboarding');
+                    } else {
+                        createNewChat();
+                        setAppSection('chat');
+                    }
                 }}
                 onSelectPlan={(plan) => {
                     setSelectedPlan(plan);
                     setAppSection('checkout');
                 }}
+            />
+        );
+
+        if (appSection === 'onboarding' || (isSignedIn && !profile.onboarded && appSection !== 'landing' && appSection !== 'checkout')) return (
+            <OnboardingView 
+                user={user} 
+                onComplete={(data) => {
+                    handleOnboardingComplete(data);
+                    setAppSection('chat');
+                    createNewChat();
+                }} 
             />
         );
 

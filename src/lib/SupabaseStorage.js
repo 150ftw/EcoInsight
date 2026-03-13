@@ -139,7 +139,8 @@ const DEFAULT_SETTINGS = {
         avatar: null,
         tier: 'Free',
         credits: 5,
-        lastRechargeDate: new Date().toISOString()
+        lastRechargeDate: new Date().toISOString(),
+        onboarded: false
     }
 };
 
