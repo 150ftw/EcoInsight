@@ -828,8 +828,11 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (!isLoaded) setAuthTimeout(true);
-        }, 10000);
+            if (!isLoaded) {
+                console.log("LandingPage Auth Timeout Reached (25s)");
+                setAuthTimeout(true);
+            }
+        }, 25000);
 
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
@@ -901,8 +904,12 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                         <div className="auth-loading-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6, fontSize: '0.9rem' }}>
                             <Loader2 size={14} className="animate-spin" /> 
                             {authTimeout ? (
-                                <span style={{ color: '#f87171' }}>Network issue? <button onClick={() => window.location.reload()} style={{ background: 'none', border: 'none', color: '#60a5fa', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>Reload</button></span>
-                            ) : "initializing security..."}
+                                <span style={{ color: '#f87171' }}>
+                                    Network issue? 
+                                    <button onClick={() => window.location.reload()} style={{ background: 'none', border: 'none', color: '#60a5fa', textDecoration: 'underline', cursor: 'pointer', padding: '0 4px' }}>Reload</button>
+                                    <span style={{ opacity: 0.5, fontSize: '0.7rem' }}>[Key: {!!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? 'OK' : 'MISSING'}]</span>
+                                </span>
+                            ) : "initializing security protocol..."}
                         </div>
                     ) : (
                         <>
@@ -3368,13 +3375,13 @@ function App() {
 
     // Auth Timeout Fallback
     useEffect(() => {
-        console.log("Starting Auth Timeout Timer (8s)...");
+        console.log("Starting Global Auth Timeout Timer (25s)...");
         const timer = setTimeout(() => {
             if (!isLoaded) {
-                console.log("Auth Timeout Reached!");
+                console.log("Global Auth Timeout Reached!");
                 setAuthLoadingTimeout(true);
             }
-        }, 8000);
+        }, 25000);
         return () => clearTimeout(timer);
     }, [isLoaded]);
 
