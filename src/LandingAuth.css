@@ -1720,26 +1720,28 @@ select,
 .stripe-modal {
     width: 100%;
     max-width: 480px;
-    background: #fff;
-    color: #32325d;
-    border-radius: 12px;
+    background: #0a0a0c;
+    color: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
     overflow: hidden;
-    box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+    position: relative;
 }
 
 .stripe-header {
-    background: #f6f9fc;
+    background: rgba(139, 92, 246, 0.05);
     padding: 20px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e6ebf1;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
 }
 
 .stripe-logo {
     font-size: 24px;
     font-weight: 800;
-    color: #635bff;
+    color: var(--accent-primary);
     letter-spacing: -0.5px;
 }
 
@@ -1747,13 +1749,13 @@ select,
     background: none;
     border: none;
     font-size: 24px;
-    color: #8898aa;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .close-stripe:hover {
-    color: #32325d;
+    color: #fff;
 }
 
 .stripe-body {
@@ -1771,12 +1773,13 @@ select,
     margin: 0;
     font-size: 18px;
     font-weight: 700;
+    color: #fff;
 }
 
 .merchant-info p {
     margin: 0;
     font-size: 14px;
-    color: #6b7c93;
+    color: var(--text-secondary);
 }
 
 .stripe-form-mock {
@@ -1794,66 +1797,66 @@ select,
 .mock-field label {
     font-size: 14px;
     font-weight: 600;
-    color: #32325d;
+    color: var(--text-secondary);
 }
 
 .mock-field input {
     padding: 12px 15px;
-    border: 1px solid #e6ebf1;
-    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
     font-size: 16px;
-    color: #32325d;
-    background: #f6f9fc;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.03);
     cursor: not-allowed;
 }
 
 .mock-card-input {
     padding: 12px 15px;
-    border: 1px solid #e6ebf1;
-    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fbfbfc;
+    background: rgba(255, 255, 255, 0.02);
     font-family: 'Courier New', Courier, monospace;
 }
 
 .mock-card-details {
     display: flex;
     gap: 15px;
-    color: #8898aa;
+    color: var(--text-secondary);
 }
 
 .stripe-submit-btn {
-    background: #635bff;
+    background: var(--accent-primary);
     color: #fff;
     border: none;
     padding: 15px;
-    border-radius: 4px;
+    border-radius: 12px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: all 0.2s;
     margin-top: 10px;
-    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2);
 }
 
 .stripe-submit-btn:hover {
-    background: #5851ff;
-    transform: translateY(-1px);
-    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+    background: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(139, 92, 246, 0.3);
 }
 
 .stripe-submit-btn:active {
-    background: #4b45e5;
-    transform: translateY(1px);
+    transform: translateY(0px);
 }
 
 .stripe-footer {
     text-align: center;
     font-size: 12px;
-    color: #8898aa;
+    color: var(--text-secondary);
     margin-top: 30px;
+    opacity: 0.6;
 }
 
 /* Global Loader */

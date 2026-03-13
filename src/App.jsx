@@ -2124,6 +2124,7 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
             >
+                <div className="card-glow" />
                 <div className="checkout-header">
                     <button className="back-btn" onClick={() => setAppSection('landing')}>
                         <ChevronDown className="rotate-90" size={16} /> Cancel
@@ -2156,7 +2157,7 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                         className="btn-pay"
                         onClick={handleEasebuzzPayment}
                         disabled={isProcessing}
-                        style={{ background: '#242a3a', border: '1px solid #14ebae' }}
+                        style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)' }}
                     >
                         {isProcessing ? (
                             <><Loader2 className="animate-spin" size={18} /> Securing Transaction...</>
@@ -2167,8 +2168,9 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                             </div>
                         )}
                     </button>
-                    <p className="secure-note" style={{ color: '#14ebae' }}>
-                        <ShieldCheck size={12} /> Encrypted via Easebuzz India
+                    <p className="secure-note">
+                        <ShieldCheck size={12} style={{ color: 'var(--accent-primary)' }} /> 
+                        <span style={{ opacity: 0.8 }}>Encrypted via Easebuzz India</span>
                     </p>
                 </div>
             </motion.div>
@@ -2184,7 +2186,6 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                     >
                         <motion.div
                             className="stripe-modal"
-                            style={{ borderTop: '4px solid #14ebae' }}
                             initial={{ y: 50, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 50, opacity: 0 }}
@@ -2195,27 +2196,29 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                             </div>
                             <div className="stripe-body">
                                 <div className="merchant-info">
-                                    <EcoInsightLogo size={32} />
+                                    <div className="alert-icon" style={{ width: '40px', height: '40px', margin: 0 }}>
+                                        <EcoInsightLogo size={24} />
+                                    </div>
                                     <div>
                                         <h3>EcoInsight Core</h3>
-                                        <p>Transaction ID: EBZ_{Math.random().toString(36).substring(7).toUpperCase()}</p>
+                                        <p style={{ opacity: 0.6 }}>Transaction ID: EBZ_{Math.random().toString(36).substring(7).toUpperCase()}</p>
                                     </div>
                                 </div>
                                 
                                 <div className="payment-options-mock">
-                                    <div style={{ padding: '20px', background: 'rgba(20, 235, 174, 0.05)', borderRadius: '12px', border: '1px dashed rgba(20, 235, 174, 0.3)', marginBottom: '20px' }}>
-                                        <h4 style={{ color: '#14ebae', marginTop: 0 }}>Payment Amount: {plan.price}</h4>
-                                        <p style={{ fontSize: '0.85rem', color: '#8b8ba0' }}>Choose your preferred payment method in the Easebuzz gateway.</p>
+                                    <div style={{ padding: '20px', background: 'rgba(139, 92, 246, 0.05)', borderRadius: '12px', border: '1px solid rgba(139, 92, 246, 0.2)', marginBottom: '20px' }}>
+                                        <h4 style={{ color: 'var(--accent-primary)', marginTop: 0 }}>Payment Amount: {plan.price}</h4>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>Choose your preferred payment method in the Easebuzz gateway.</p>
                                     </div>
 
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
-                                        <div style={{ padding: '15px', border: '1px solid #2d2d3d', borderRadius: '8px', textAlign: 'center', opacity: 0.6 }}>UPI / QR</div>
-                                        <div style={{ padding: '15px', border: '1px solid #2d2d3d', borderRadius: '8px', textAlign: 'center', opacity: 0.6 }}>Net Banking</div>
-                                        <div style={{ padding: '15px', border: '1px solid #2d2d3d', borderRadius: '8px', textAlign: 'center', opacity: 0.6 }}>Cards</div>
-                                        <div style={{ padding: '15px', border: '1px solid #14ebae', borderRadius: '8px', textAlign: 'center', background: 'rgba(20, 235, 174, 0.1)' }}>Simulation Mode</div>
+                                        <div style={{ padding: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', textAlign: 'center', opacity: 0.5, fontSize: '0.9rem' }}>UPI / QR</div>
+                                        <div style={{ padding: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', textAlign: 'center', opacity: 0.5, fontSize: '0.9rem' }}>Net Banking</div>
+                                        <div style={{ padding: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', textAlign: 'center', opacity: 0.5, fontSize: '0.9rem' }}>Cards</div>
+                                        <div style={{ padding: '12px', border: '1px solid var(--accent-primary)', borderRadius: '8px', textAlign: 'center', background: 'rgba(139, 92, 246, 0.1)', fontSize: '0.9rem', color: 'var(--accent-primary)', fontWeight: '600' }}>Simulation Mode</div>
                                     </div>
 
-                                    <button className="stripe-submit-btn" style={{ background: '#14ebae', color: '#0a0a0c' }} onClick={handleEasebuzzSuccessSimulation}>
+                                    <button className="stripe-submit-btn" onClick={handleEasebuzzSuccessSimulation}>
                                         Complete Simulation
                                     </button>
                                 </div>
