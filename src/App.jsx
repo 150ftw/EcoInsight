@@ -824,15 +824,24 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
     const lastScrollY = useRef(0);
 
+    const [authTimeout, setAuthTimeout] = useState(false);
+
     useEffect(() => {
+        const timer = setTimeout(() => {
+            if (!isLoaded) setAuthTimeout(true);
+        }, 10000);
+
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
             setIsHeaderVisible(currentScrollY < lastScrollY.current || currentScrollY < 100);
             lastScrollY.current = currentScrollY;
         };
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            clearTimeout(timer);
+        };
+    }, [isLoaded]);
 
     // Dramatic Hero Zoom
     const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.2]);
@@ -890,7 +899,10 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                     <Magnetic distance={0.3}><button className="nav-link" onClick={() => scrollToSection('pricing')}>Pricing</button></Magnetic>
                     {!isLoaded ? (
                         <div className="auth-loading-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6, fontSize: '0.9rem' }}>
-                            <Loader2 size={14} className="animate-spin" /> initializing security...
+                            <Loader2 size={14} className="animate-spin" /> 
+                            {authTimeout ? (
+                                <span style={{ color: '#f87171' }}>Network issue? <button onClick={() => window.location.reload()} style={{ background: 'none', border: 'none', color: '#60a5fa', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>Reload</button></span>
+                            ) : "initializing security..."}
                         </div>
                     ) : (
                         <>
