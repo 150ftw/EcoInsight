@@ -19,7 +19,7 @@ import {
 } from '@clerk/clerk-react'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
-import CheckoutView from './components/CheckoutView';
+
 import CreditModal from './components/CreditModal';
 import OnboardingView from './components/OnboardingView';
 import * as pdfjs from 'pdfjs-dist'
