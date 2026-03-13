@@ -2088,39 +2088,34 @@ const FAQS = [
 
 const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
     const [isProcessing, setIsProcessing] = useState(false);
-    const [showStripeSimulation, setShowStripeSimulation] = useState(false);
+    const [paymentStep, setPaymentStep] = useState('summary'); // 'summary', 'processing', 'easebuzz'
 
     if (!plan) return null;
 
-    const handlePayment = () => {
+    const handleEasebuzzPayment = () => {
         if (plan.priceValue === 0) {
-            alert("This plan is free! Activating instantly...");
             onPaymentSuccess();
             return;
         }
 
-        // --- STRIPE CONFIGURATION ---
-        // For production, you would use:
-        // const stripe = window.Stripe('pk_test_YOUR_PUBLIC_KEY');
-        // ----------------------------
-
         setIsProcessing(true);
-        // Simulate a small delay for premium feel
+        setPaymentStep('processing');
+        
+        // Simulating Backend Hash Generation (Required by Easebuzz)
         setTimeout(() => {
-            setShowStripeSimulation(true);
+            setPaymentStep('easebuzz');
             setIsProcessing(false);
-        }, 800);
-    };
-
-    const handleStripeSuccess = () => {
-        setIsProcessing(true);
-        setShowStripeSimulation(false);
-        setTimeout(() => {
-            setIsProcessing(false);
-            onPaymentSuccess();
         }, 1500);
     };
 
+    const handleEasebuzzSuccessSimulation = () => {
+        setIsProcessing(true);
+        setTimeout(() => {
+            setIsProcessing(false);
+            onPaymentSuccess();
+        }, 1000);
+    };
+    
     return (
         <div className="checkout-container">
             <motion.div
@@ -2159,24 +2154,28 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                 <div className="checkout-actions">
                     <button
                         className="btn-pay"
-                        onClick={handlePayment}
+                        onClick={handleEasebuzzPayment}
                         disabled={isProcessing}
+                        style={{ background: '#242a3a', border: '1px solid #14ebae' }}
                     >
                         {isProcessing ? (
-                            <><Loader2 className="animate-spin" size={18} /> Processing...</>
+                            <><Loader2 className="animate-spin" size={18} /> Securing Transaction...</>
                         ) : (
-                            <>Pay with Stripe <Maximize2 size={18} /></>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <img src="https://easebuzz.in/static/base/assets/images/Easebuzz_logo_header.png" alt="Easebuzz" style={{ height: '20px', filter: 'brightness(0) invert(1)' }} />
+                                <span>Pay Securely</span>
+                            </div>
                         )}
                     </button>
-                    <p className="secure-note">
-                        <Key size={12} /> Encrypted transaction powered by Stripe
+                    <p className="secure-note" style={{ color: '#14ebae' }}>
+                        <ShieldCheck size={12} /> Encrypted via Easebuzz India
                     </p>
                 </div>
             </motion.div>
 
-            {/* Stripe Simulation Modal */}
+            {/* Easebuzz Simulation Modal */}
             <AnimatePresence>
-                {showStripeSimulation && (
+                {paymentStep === 'easebuzz' && (
                     <motion.div
                         className="stripe-simulation-overlay"
                         initial={{ opacity: 0 }}
@@ -2185,48 +2184,47 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                     >
                         <motion.div
                             className="stripe-modal"
+                            style={{ borderTop: '4px solid #14ebae' }}
                             initial={{ y: 50, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 50, opacity: 0 }}
                         >
                             <div className="stripe-header">
-                                <div className="stripe-logo">Stripe</div>
-                                <button className="close-stripe" onClick={() => setShowStripeSimulation(false)}>×</button>
+                                <div className="stripe-logo" style={{ color: '#14ebae' }}>Easebuzz</div>
+                                <button className="close-stripe" onClick={() => setPaymentStep('summary')}>×</button>
                             </div>
                             <div className="stripe-body">
                                 <div className="merchant-info">
                                     <EcoInsightLogo size={32} />
                                     <div>
-                                        <h3>EcoInsight Elite</h3>
-                                        <p>{plan.price} for {plan.plan} Plan</p>
+                                        <h3>EcoInsight Core</h3>
+                                        <p>Transaction ID: EBZ_{Math.random().toString(36).substring(7).toUpperCase()}</p>
                                     </div>
                                 </div>
-                                <div className="stripe-form-mock">
-                                    <div className="mock-field">
-                                        <label>Email</label>
-                                        <input type="text" defaultValue="user@ecoinsight.ai" readOnly />
+                                
+                                <div className="payment-options-mock">
+                                    <div style={{ padding: '20px', background: 'rgba(20, 235, 174, 0.05)', borderRadius: '12px', border: '1px dashed rgba(20, 235, 174, 0.3)', marginBottom: '20px' }}>
+                                        <h4 style={{ color: '#14ebae', marginTop: 0 }}>Payment Amount: {plan.price}</h4>
+                                        <p style={{ fontSize: '0.85rem', color: '#8b8ba0' }}>Choose your preferred payment method in the Easebuzz gateway.</p>
                                     </div>
-                                    <div className="mock-field">
-                                        <label>Card Information</label>
-                                        <div className="mock-card-input">
-                                            <span>4242 4242 4242 4242</span>
-                                            <div className="mock-card-details">
-                                                <span>12/26</span>
-                                                <span>123</span>
-                                            </div>
-                                        </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
+                                        <div style={{ padding: '15px', border: '1px solid #2d2d3d', borderRadius: '8px', textAlign: 'center', opacity: 0.6 }}>UPI / QR</div>
+                                        <div style={{ padding: '15px', border: '1px solid #2d2d3d', borderRadius: '8px', textAlign: 'center', opacity: 0.6 }}>Net Banking</div>
+                                        <div style={{ padding: '15px', border: '1px solid #2d2d3d', borderRadius: '8px', textAlign: 'center', opacity: 0.6 }}>Cards</div>
+                                        <div style={{ padding: '15px', border: '1px solid #14ebae', borderRadius: '8px', textAlign: 'center', background: 'rgba(20, 235, 174, 0.1)' }}>Simulation Mode</div>
                                     </div>
-                                    <button className="stripe-submit-btn" onClick={handleStripeSuccess}>
-                                        Pay {plan.price}
+
+                                    <button className="stripe-submit-btn" style={{ background: '#14ebae', color: '#0a0a0c' }} onClick={handleEasebuzzSuccessSimulation}>
+                                        Complete Simulation
                                     </button>
                                 </div>
-                                <p className="stripe-footer">Test Mode: You can use any card numbers provided by Stripe.</p>
+                                <p className="stripe-footer">Integrating Easebuzz India for secure ₹ (INR) transactions.</p>
                             </div>
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
         </div>
     );
 };
@@ -3304,6 +3302,8 @@ function App() {
     const [isLoading, setIsLoading] = useState(false)
     const [authLoadingTimeout, setAuthLoadingTimeout] = useState(false)
     const [showCreditModal, setShowCreditModal] = useState(false);
+    const [pendingScrollToPricing, setPendingScrollToPricing] = useState(false);
+
 
     // Premium Feature State
     const [pdfText, setPdfText] = useState('');
@@ -3565,6 +3565,20 @@ function App() {
 
 
 
+
+    // Handle pending scroll to pricing
+    useEffect(() => {
+        if (appSection === 'landing' && pendingScrollToPricing) {
+            const timer = setTimeout(() => {
+                const pricingSection = document.getElementById('pricing');
+                if (pricingSection) {
+                    pricingSection.scrollIntoView({ behavior: 'smooth' });
+                    setPendingScrollToPricing(false);
+                }
+            }, 500); // Give enough time for content to mount
+            return () => clearTimeout(timer);
+        }
+    }, [appSection, pendingScrollToPricing]);
 
     const scrollToBottom = () => {
         if (view === 'chat') {
@@ -4297,7 +4311,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 }}
                 onSelectPlan={(plan) => {
                     setSelectedPlan(plan);
-                    setAppSection('chat');
+                    setAppSection('checkout');
                 }}
             />
         );
@@ -4474,10 +4488,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 onUpgrade={() => {
                     setShowCreditModal(false);
                     setAppSection('landing');
-                    setTimeout(() => {
-                        const pricingSection = document.getElementById('pricing');
-                        if (pricingSection) pricingSection.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
+                    setPendingScrollToPricing(true);
                 }}
             />
         </>
