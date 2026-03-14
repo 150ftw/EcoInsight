@@ -1356,11 +1356,11 @@ const SubpageRenderer = ({ view, onBack }) => {
                 setFormSubmitted(true);
                 setFormData({ subject: '', email: '', message: '' });
             } else {
-                alert("Form submission failed. Please check the access key.");
+                alert(`Protocol Error: ${result.message || "Unknown anomaly detected"}. Key used: ${accessKey.slice(0, 4)}...`);
             }
         } catch (error) {
-            console.error("Submission Error:", error);
-            alert("An error occurred. Please try again later.");
+            console.error("Transmission Failure:", error);
+            alert(`Signal Lost: ${error.message || "Connection to neural network failed"}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -1452,6 +1452,10 @@ const SubpageRenderer = ({ view, onBack }) => {
                                                     </div>
                                                 ) : "Transmit Signal"}
                                             </button>
+
+                                            <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.8rem', opacity: 0.6 }}>
+                                                Alternative: <a href="mailto:ss18244646@gmail.com" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>Standard Email Protocol</a>
+                                            </div>
                                         </form>
                                     )}
                                 </div>
