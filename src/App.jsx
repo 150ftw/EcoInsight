@@ -3633,20 +3633,24 @@ function App() {
         if (!user?.id || supaLoaded) return;
         const loadData = async () => {
             try {
-                // Load chats
-                const { chats: loadedChats, activeChatId: loadedActiveId } = await loadChats(user.id);
-                if (loadedChats.length > 0) {
-                    setChats(loadedChats);
-                    setActiveChatId(loadedActiveId);
+                // Parallel load both chats and settings for maximum speed
+                const [chatsResult, settingsResult] = await Promise.all([
+                    loadChats(user.id),
+                    loadSettings(user.id)
+                ]);
+
+                // Update chats
+                if (chatsResult.chats.length > 0) {
+                    setChats(chatsResult.chats);
+                    setActiveChatId(chatsResult.activeChatId);
                 }
 
-                // Load settings
-                const settings = await loadSettings(user.id);
-                setAiSettings(prev => ({ ...prev, ...settings.ai_settings }));
-                setChatSettings(prev => ({ ...prev, ...settings.chat_settings }));
-                setPersonalization(prev => ({ ...prev, ...settings.personalization }));
-                setAppearance(prev => ({ ...prev, ...settings.appearance }));
-                setProfile(prev => ({ ...prev, ...settings.profile }));
+                // Update settings
+                setAiSettings(prev => ({ ...prev, ...settingsResult.ai_settings }));
+                setChatSettings(prev => ({ ...prev, ...settingsResult.chat_settings }));
+                setPersonalization(prev => ({ ...prev, ...settingsResult.personalization }));
+                setAppearance(prev => ({ ...prev, ...settingsResult.appearance }));
+                setProfile(prev => ({ ...prev, ...settingsResult.profile }));
 
                 setSupaLoaded(true);
             } catch (err) {
