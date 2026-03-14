@@ -67,13 +67,19 @@ export const sendWelcomeEmail = async (userEmail, userName = 'Valued Analyst') =
                         to: userEmail,
                         reply_to: 'ss18244646@gmail.com',
                         subject: emailContent.subject,
-                        html: emailContent.html
+                        html: emailContent.html,
+                        tags: [
+                            {
+                                name: 'template',
+                                value: 'founder-welcome-introduction'
+                            }
+                        ]
                     })
                 });
 
                 if (response.ok) {
-                    console.log('--- WELCOME EMAIL SENT (RESEND) ---');
-                    return { success: true, message: 'Welcome email sent via Resend' };
+                    console.log('--- WELCOME EMAIL SENT (RESEND: founder-welcome-introduction) ---');
+                    return { success: true, message: 'Welcome email sent (Template: founder-welcome-introduction)' };
                 } else {
                     const errorData = await response.json();
                     console.error('[EmailService] Resend API error:', JSON.stringify(errorData, null, 2));
