@@ -1,9 +1,7 @@
-import React from 'react';
-import { 
-    LifeBuoy, BookOpen, Activity, ShieldAlert, 
-    Info, Briefcase, Users, Gift, Mail, 
     ShieldCheck, ScrollText, Scale, CreditCard, AlertTriangle 
 } from 'lucide-react';
+
+import shivamAvatar from '../assets/founder/shivam.jpg';
 
 export const SUBPAGE_DATA = {
     // Resources
@@ -118,7 +116,7 @@ export const SUBPAGE_DATA = {
                     title: "DIRECTOR & FOUNDER",
                     entity: "ECOINSIGHT AI (OPC) PRIVATE LIMITED",
                     avatarText: "S",
-                    avatarImg: "/src/assets/founder/shivam.jpg"
+                    avatarImg: shivamAvatar
                 }
             },
             {
