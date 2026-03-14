@@ -819,110 +819,62 @@ const NeuralAnalystCard = () => {
 };
 
 const REVIEWS = [
-    {
-        id: 1,
-        name: "Arjun Mehta",
-        role: "Senior Portfolio Manager",
-        rating: 5,
-        content: "EcoInsight has become my primary tool for macroeconomic synthesis. The ELI5 feature is surprisingly robust for quick mental models, and the News Analyzer sentiment scores are spookily accurate.",
-        verified: true
-    },
-    {
-        id: 2,
-        name: "Sarah Jenkins",
-        role: "Financial Analyst, UBS",
-        rating: 5,
-        content: "The level of depth in the predictive simulations is unlike anything I've seen at this price point. It saves me about 4 hours of manual data scrap drafting every week.",
-        verified: true
-    },
-    {
-        id: 3,
-        name: "Vikram Singh",
-        role: "Hedge Fund Consultant",
-        rating: 3,
-        content: "Initially had some issues with the real-time data latency in the Pulse dashboard during high-volatility hours. It made it difficult to rely on for intra-day snapshots.",
-        response: "We have resolved this issue by upgrading our data ingestion pipelines to 50ms polling. Thank you for letting us know! — shivam@ecoinsight.online",
-        verified: true
-    },
-    {
-        id: 4,
-        name: "Priyanka Sharma",
-        role: "Economic Academic",
-        rating: 5,
-        content: "Extremely intuitive interface. The glassmorphism design isn't just eye candy; it actually helps in focusing on the data hierarchies without cognitive overload.",
-        verified: true
-    },
-    {
-        id: 5,
-        name: "David Chen",
-        role: "Private Equity Associate",
-        rating: 4,
-        content: "Great tool overall. The Simulator is powerful, though I'd love to see more granular fiscal policy levers for emerging markets in future updates.",
-        verified: true
-    },
-    {
-        id: 6,
-        name: "Anita Desai",
-        role: "Market Strategist",
-        rating: 3,
-        content: "Found a bug where the PDF export was cropping certain long charts in the Sentinel report. Very annoying when preparing for client presentations.",
-        response: "This formatting bug has been fixed in the latest build. PDF exports now use dynamic scaling for all charts. Thank you for your feedback! — shivam@ecoinsight.online",
-        verified: true
-    },
-    {
-        id: 7,
-        name: "Marcus Thorne",
-        role: "Independent Trader",
-        rating: 5,
-        content: "Finally, an AI that doesn't just hallucinate economic theory. EcoInsight's grounding in real-time PCE and GDP data is exceptional.",
-        verified: true
-    },
-    {
-        id: 8,
-        name: "Elena Rodriguez",
-        role: "Asset Allocation Advisor",
-        rating: 5,
-        content: "The 'What-If' simulator is my favorite feature. It's like having a portable Bloomberg Terminal with an AI personality that actually understands context.",
-        verified: true
-    },
-    {
-        id: 9,
-        name: "Kenji Sato",
-        role: "Global Macro Researcher",
-        rating: 5,
-        content: "The cross-border correlation matrices in the Pulse dashboard are invaluable. It has significantly streamlined our risk assessment for emerging markets.",
-        verified: true
-    },
-    {
-        id: 10,
-        name: "James Wilson",
-        role: "Crypto Fund Manager",
-        rating: 4,
-        content: "Excellent synthesis of traditional finance data with crypto market sentiment. Would love to see more on-chain metrics integrated.",
-        verified: true
-    },
-    {
-        id: 11,
-        name: "Sanjay Gupta",
-        role: "Wealth Manager",
-        rating: 5,
-        content: "My clients love the reports I generate with EcoInsight. The clarity of the ELI5 summaries makes complex market shifts understandable for everyone.",
-        verified: true
-    },
-    {
-        id: 12,
-        name: "Li Wei",
-        role: "Sovereign Wealth Analyst",
-        rating: 3,
-        content: "The mobile interface for the simulator was a bit cramped on my smaller device. Made it hard to adjust sliders accurately on the go.",
-        response: "We have optimized the mobile layout for better touch precision and responsive slider controls. Thank you for your feedback! — shivam@ecoinsight.online",
-        verified: true
-    }
+    { id: 1, name: "Arjun Mehta", role: "Senior Portfolio Manager", rating: 5, content: "EcoInsight has become my primary tool for macroeconomic synthesis. The ELI5 feature is surprisingly robust for quick mental models.", verified: true },
+    { id: 2, name: "Sarah Jenkins", role: "Financial Analyst, UBS", rating: 5, content: "The level of depth in the predictive simulations is unlike anything I've seen at this price point. It saves me about 4 hours every week.", verified: true },
+    { id: 3, name: "Vikram Singh", role: "Hedge Fund Consultant", rating: 3, content: "Initially had some issues with the real-time data latency in the Pulse dashboard during high-volatility hours. It made it difficult to rely on for intra-day snapshots.", response: "We have resolved this issue by upgrading our data ingestion pipelines to 50ms polling. Thank you for letting us know! — shivam@ecoinsight.online", verified: true },
+    { id: 4, name: "Priyanka Sharma", role: "Economic Academic", rating: 5, content: "Extremely intuitive interface. The glassmorphism design isn't just eye candy; it actually helps in focusing on the data hierarchies.", verified: true },
+    { id: 5, name: "David Chen", role: "Private Equity Associate", rating: 4, content: "Great tool overall. The Simulator is powerful, though I'd love to see more granular fiscal policy levers for emerging markets.", verified: true },
+    { id: 6, name: "Anita Desai", role: "Market Strategist", rating: 3, content: "Found a bug where the PDF export was cropping certain long charts in the Sentinel report. Very annoying when preparing for presentations.", response: "This formatting bug has been fixed in the latest build. PDF exports now use dynamic scaling. Thank you for your feedback! — shivam@ecoinsight.online", verified: true },
+    { id: 7, name: "Marcus Thorne", role: "Independent Trader", rating: 5, content: "Finally, an AI that doesn't just hallucinate economic theory. EcoInsight's grounding in real-time PCE and GDP data is exceptional.", verified: true },
+    { id: 8, name: "Elena Rodriguez", role: "Asset Allocation Advisor", rating: 5, content: "The 'What-If' simulator is my favorite feature. It's like having a portable Bloomberg Terminal with an AI personality that understands context.", verified: true },
+    { id: 9, name: "Kenji Sato", role: "Global Macro Researcher", rating: 5, content: "The cross-border correlation matrices in the Pulse dashboard are invaluable. It has significantly streamlined our risk assessment.", verified: true },
+    { id: 10, name: "James Wilson", role: "Crypto Fund Manager", rating: 4, content: "Excellent synthesis of traditional finance data with crypto market sentiment. Would love to see more on-chain metrics integrated.", verified: true },
+    { id: 11, name: "Sanjay Gupta", role: "Wealth Manager", rating: 5, content: "My clients love the reports I generate with EcoInsight. The clarity of the ELI5 summaries makes complex market shifts understandable.", verified: true },
+    { id: 12, name: "Li Wei", role: "Sovereign Wealth Analyst", rating: 3, content: "The mobile interface for the simulator was a bit cramped on my smaller device. Made it hard to adjust sliders accurately.", response: "We have optimized the mobile layout for better touch precision and responsive slider controls. Thank you! — shivam@ecoinsight.online", verified: true },
+    { id: 13, name: "Hassan Al-Sayed", role: "Oil & Gas Analyst", rating: 5, content: "The supply chain disruption modeling is top-tier. It accurately signaled the Red Sea latency impact weeks before the major papers.", verified: true },
+    { id: 14, name: "Chloe Dupont", role: "ESG Compliance Officer", rating: 5, content: "EcoInsight's climate risk modeling is surprisingly detailed. It bridges the gap between environmental data and fiscal impact brilliantly.", verified: true },
+    { id: 15, name: "Robert Miller", role: "Fixed Income Strategist", rating: 4, content: "Brilliant bond yield curve predictions. I'd like to see more historical data for the 1970s stagflation period specifically.", verified: true },
+    { id: 16, name: "Sofia Rossi", role: "Central Bank Consultant", rating: 5, content: "The policy impact simulator is a game changer for stress testing. The neural engine handles non-linear variables with ease.", verified: true },
+    { id: 17, name: "Alex Kwok", role: "Tech Equity Researcher", rating: 3, content: "Had a sync issue where my saved simulations weren't loading correctly on a second device. Very frustrating during a live briefing.", response: "We've implemented robust cross-device state synchronization. Your simulations are now backed up to our secure cloud instantly. — shivam@ecoinsight.online", verified: true },
+    { id: 18, name: "Amara Okoro", role: "Emerging Markets VC", rating: 5, content: "EcoInsight's coverage of African tech ecosystems is the best I've found. It captures nuances that global aggregators often miss.", verified: true },
+    { id: 19, name: "Thomas Bergman", role: "Quantitative Resident", rating: 5, content: "The API integration is clean and the documentation is surprisingly helpful for a tool this visually polished.", verified: true },
+    { id: 20, name: "Isabella Martinez", role: "Venture Capitalist", rating: 4, content: "The pulse-check feature is my morning routine. A quick 3-minute read and I'm ready for the day's pitches. Highly recommend.", verified: true },
+    { id: 21, name: "Lucas Wagner", role: "Hedge Fund Analyst", rating: 5, content: "Our alpha generation has seen a measurable uptick since we integrated EcoInsight into our macro-research stack.", verified: true },
+    { id: 22, name: "Yara Haddad", role: "Foreign Exchange Trader", rating: 5, content: "The sentiment analysis on global central bank speeches is uncannily accurate. It catches hawkish/dovish shifts by the millisecond.", verified: true },
+    { id: 23, name: "Finn O'Connor", role: "Institutional Sales", rating: 5, content: "EcoInsight helps me explain complex market movements to clients without needing a PhD in economics. It's an essential comms tool.", verified: true },
+    { id: 24, name: "Mina Sun", role: "Consumer Goods Researcher", rating: 4, content: "The PCE data breakdown by category is great. I'd love more granular data on luxury spending trends specifically.", verified: true },
+    { id: 25, name: "Daniel Smith", role: "Retail Investor", rating: 5, content: "As someone who isn't a professional analyst, EcoInsight makes me feel like I have a superpower. The ELI5 mode is incredible.", verified: true },
+    { id: 26, name: "Zara Khan", role: "Policy Advisor", rating: 5, content: "The geopolitical risk factor modeling is best-in-class. It’s helping us draft more resilient long-term fiscal strategies.", verified: true },
+    { id: 27, name: "Noah Jensen", role: "Commodities Broker", rating: 3, content: "The silver price feed had a minor outage last Tuesday for about 10 minutes. In this industry, 10 minutes is a lifetime.", response: "We've added redundant data streams to prevent any single-point outages. Silver feeds are now 99.99% multi-origin stable. — shivam@ecoinsight.online", verified: true },
+    { id: 28, name: "Emma Larsson", role: "Sustainability Lead", rating: 5, content: "The integration of carbon tax impact modeling into business simulations is exactly what we needed for our Q3 planning.", verified: true },
+    { id: 29, name: "Oliver Brown", role: "Real Estate Analyst", rating: 5, content: "The correlation between interest rates and commercial property values in EcoInsight is very well calibrated. Outstanding work.", verified: true },
+    { id: 30, name: "Aarav Gupta", role: "Fintech Founder", rating: 4, content: "Beautiful UI and powerful backend. I'm taking notes for our own design systems. The speed of the neural engine is impressive.", verified: true },
+    { id: 31, name: "Sophie Mueller", role: "Quant Developer", rating: 5, content: "The data normalization protocols used here are clearly top-tier. No jitter in the historical time-series data at all.", verified: true },
+    { id: 32, name: "Leo Kim", role: "Derivatives Trader", rating: 5, content: "The Gamma-squeeze probability indicator in the Sentinel dashboard is scarily accurate. Use it with caution, but use it.", verified: true },
+    { id: 33, name: "Fatima Zahra", role: "Economic Journalist", rating: 5, content: "EcoInsight turns weeks of research into minutes of interaction. It’s my secret weapon for writing deep-dive financial op-eds.", verified: true },
+    { id: 34, name: "John Davis", role: "Junior Analyst", rating: 5, content: "This tool taught me more about macro correlations in 3 days than my entire first semester of University. Simply brilliant.", verified: true },
+    { id: 35, name: "Maria Garcia", role: "Family Office Manager", rating: 5, content: "EcoInsight has become our primary decision-support engine for long-term wealth preservation. The level of trust is very high.", verified: true },
+    { id: 36, name: "Liam O'Brien", role: "Fixed Income PM", rating: 4, content: "Great for visualizing yield curve inversions. I'd like more focus on corporate high-yield debt in the next update.", verified: true },
+    { id: 37, name: "Chen Bo", role: "Algorithm Architect", rating: 5, content: "The neural network architecture used for the News Analyzer is noticeably more context-aware than generic models. Very impressive.", verified: true },
+    { id: 38, name: "Rachel Adams", role: "Venture Principal", rating: 5, content: "EcoInsight helps us spot macro tailwinds for our portfolio companies before they hit the mainstream news cycle. Absolute edge.", verified: true }
 ];
 
 const ReviewsSection = () => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const reviewsPerPage = 6;
     const totalRatings = 211;
     const averageRating = 4.8;
+    
+    const indexOfLastReview = currentPage * reviewsPerPage;
+    const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
+    const currentReviews = REVIEWS.slice(indexOfFirstReview, indexOfLastReview);
+    const totalPages = Math.ceil(REVIEWS.length / reviewsPerPage);
+
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        const element = document.getElementById('reviews');
+        if (element) element.scrollIntoView({ behavior: 'smooth' });
+    };
     
     return (
         <section id="reviews" className="reviews-section">
@@ -975,52 +927,82 @@ const ReviewsSection = () => {
                 </div>
             </div>
 
-            <div className="reviews-grid">
-                {REVIEWS.map((review, i) => (
-                    <motion.div 
-                        key={review.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.1 }}
-                        className="review-card"
-                    >
-                        <div className="review-header">
-                            <div className="stars-row">
-                                {[...Array(5)].map((_, idx) => (
-                                    <Star 
-                                        key={idx} 
-                                        size={14} 
-                                        fill={idx < review.rating ? "#f59e0b" : "transparent"} 
-                                        color={idx < review.rating ? "#f59e0b" : "#3f3f46"} 
-                                    />
-                                ))}
-                            </div>
-                            {review.verified && <span className="verified-badge"><Check size={10} /> Verified Analyst</span>}
-                        </div>
-                        <p className="review-content">"{review.content}"</p>
-                        <div className="review-footer">
-                            <div className="reviewer-info">
-                                <span className="reviewer-name">{review.name}</span>
-                                <span className="reviewer-role">{review.role}</span>
-                            </div>
-                        </div>
-
-                        {review.response && (
-                            <div className="review-response">
-                                <div className="response-header">
-                                    <EcoInsightLogo size={12} />
-                                    <span>Official Response</span>
+            <AnimatePresence mode="wait">
+                <motion.div 
+                    key={currentPage}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="reviews-grid"
+                >
+                    {currentReviews.map((review, i) => (
+                        <motion.div 
+                            key={review.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05 }}
+                            className="review-card"
+                        >
+                            <div className="review-header">
+                                <div className="stars-row">
+                                    {[...Array(5)].map((_, idx) => (
+                                        <Star 
+                                            key={idx} 
+                                            size={14} 
+                                            fill={idx < review.rating ? "#f59e0b" : "transparent"} 
+                                            color={idx < review.rating ? "#f59e0b" : "#3f3f46"} 
+                                        />
+                                    ))}
                                 </div>
-                                <p>{review.response}</p>
+                                {review.verified && <span className="verified-badge"><Check size={10} /> Verified Analyst</span>}
                             </div>
-                        )}
-                    </motion.div>
-                ))}
-            </div>
+                            <p className="review-content">"{review.content}"</p>
+                            <div className="review-footer">
+                                <div className="reviewer-info">
+                                    <span className="reviewer-name">{review.name}</span>
+                                    <span className="reviewer-role">{review.role}</span>
+                                </div>
+                            </div>
+
+                            {review.response && (
+                                <div className="review-response">
+                                    <div className="response-header">
+                                        <EcoInsightLogo size={12} />
+                                        <span>Official Response</span>
+                                    </div>
+                                    <p>{review.response}</p>
+                                </div>
+                            )}
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </AnimatePresence>
             
-            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-                <button className="btn-secondary" style={{ opacity: 0.6 }}>View all 38 written reviews on GitHub</button>
+            <div className="pagination-controls">
+                <button 
+                    className="page-btn" 
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    Prev
+                </button>
+                {[...Array(totalPages)].map((_, i) => (
+                    <button 
+                        key={i} 
+                        className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                        onClick={() => paginate(i + 1)}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+                <button 
+                    className="page-btn" 
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                >
+                    Next
+                </button>
             </div>
         </section>
     );
