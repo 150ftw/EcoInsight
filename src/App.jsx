@@ -1322,6 +1322,49 @@ const PageWrapper = ({ title, description, children, onBack }) => (
 const SubpageRenderer = ({ view, onBack }) => {
     const data = SUBPAGE_DATA[view];
     const [formSubmitted, setFormSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        subject: '',
+        email: '',
+        message: ''
+    });
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || "YOUR_ACCESS_KEY_HERE";
+        
+        try {
+            const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    access_key: accessKey,
+                    subject: `[EcoInsight Contact] ${formData.subject}`,
+                    from_name: "EcoInsight Intelligence Portal",
+                    email: formData.email,
+                    message: formData.message,
+                }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                setFormSubmitted(true);
+                setFormData({ subject: '', email: '', message: '' });
+            } else {
+                alert("Form submission failed. Please check the access key.");
+            }
+        } catch (error) {
+            console.error("Submission Error:", error);
+            alert("An error occurred. Please try again later.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     if (!data) return null;
 
@@ -1369,22 +1412,46 @@ const SubpageRenderer = ({ view, onBack }) => {
                                             <button className="btn-primary" onClick={() => setFormSubmitted(false)}>Send Another Message</button>
                                         </motion.div>
                                     ) : (
-                                        <form className="elite-form" onSubmit={(e) => { e.preventDefault(); setFormSubmitted(true); }}>
+                                        <form className="elite-form" onSubmit={handleFormSubmit}>
                                             <div className="field-group">
                                                 <div className="form-field">
                                                     <label>Subject Protocol</label>
-                                                    <input type="text" placeholder="Institutional Inquiry" required />
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Institutional Inquiry" 
+                                                        required 
+                                                        value={formData.subject}
+                                                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                                                    />
                                                 </div>
                                                 <div className="form-field">
                                                     <label>Return Vector (Email)</label>
-                                                    <input type="email" placeholder="analyst@firm.com" required />
+                                                    <input 
+                                                        type="email" 
+                                                        placeholder="analyst@firm.com" 
+                                                        required 
+                                                        value={formData.email}
+                                                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="form-field">
                                                 <label>Intelligence Payload</label>
-                                                <textarea placeholder="Specify your inquiry details..." required></textarea>
+                                                <textarea 
+                                                    placeholder="Specify your inquiry details..." 
+                                                    required
+                                                    value={formData.message}
+                                                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                                                ></textarea>
                                             </div>
-                                            <button type="submit" className="btn-primary">Transmit Signal</button>
+                                            <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                                                {isSubmitting ? (
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <Loader2 className="animate-spin" size={18} />
+                                                        <span>Transmitting...</span>
+                                                    </div>
+                                                ) : "Transmit Signal"}
+                                            </button>
                                         </form>
                                     )}
                                 </div>
