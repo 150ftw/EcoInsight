@@ -817,7 +817,7 @@ const NeuralAnalystCard = () => {
     );
 };
 
-const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine }) => {
+const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine, supaLoaded }) => {
     const { isSignedIn, isLoaded } = useAuth();
     const [hoveredPlanIndex, setHoveredPlanIndex] = useState(null);
     const { scrollYProgress } = useScroll();
@@ -915,7 +915,13 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                         <>
                             <SignedIn>
                                 <div className="signed-in-nav">
-                                    <button className="btn-signin" onClick={onLaunchEngine}>Open Engine</button>
+                                    <button className="btn-signin" onClick={onLaunchEngine} disabled={!supaLoaded && isSignedIn}>
+                                        {!supaLoaded ? (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <Loader2 size={14} className="animate-spin" /> Syncing...
+                                            </div>
+                                        ) : "Open Engine"}
+                                    </button>
                                     <UserButton afterSignOutUrl="/" />
                                 </div>
                             </SignedIn>
@@ -978,8 +984,12 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                     >
                         <Magnetic distance={0.2}>
                             {isSignedIn ? (
-                                <button className="btn-primary" onClick={onLaunchEngine}>
-                                    Launch Engine <Maximize2 size={18} />
+                                <button className="btn-primary" onClick={onLaunchEngine} disabled={!supaLoaded}>
+                                    {!supaLoaded ? (
+                                        <>Synchronizing Profile <Loader2 size={18} className="animate-spin" /></>
+                                    ) : (
+                                        <>Launch Engine <Maximize2 size={18} /></>
+                                    )}
                                 </button>
                             ) : (
                                 <SignUpButton mode="modal">
@@ -4483,6 +4493,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
     const renderActiveSection = () => {
         if (appSection === 'landing') return (
             <LandingPage
+                supaLoaded={supaLoaded}
                 setAppSection={setAppSection}
                 setAuthType={setAuthType}
                 onLaunchEngine={() => {
