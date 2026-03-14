@@ -120,10 +120,63 @@ const fetchCrudePrice = async () => {
     return null;
 };
 
+// Fetch live gold/silver rates from Angel One (authoritative India source)
+// Scrapes from public rate pages via /angel-one proxy
+const fetchAngelOnePrices = async () => {
+    const commodityData = { gold: null, silver: null };
+    const targets = [
+        { type: 'gold', url: '/angel-one/commodity/gold-rate-today-in-india/' },
+        { type: 'silver', url: '/angel-one/commodity/silver-rate-today-in-india/' }
+    ];
+
+    for (const target of targets) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            
+            const res = await fetch(target.url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (!res.ok) continue;
+            const html = await res.text();
+
+            // Extract price and change percentage using regex based on observed HTML structure
+            // Look for the "Today's Gold Rate" or "Today's Silver Rate" section
+            // Based on screenshots, prices are in ₹X,XXX.XX format often inside a span or div
+            
+            // Selector research showed price is likely in a span with price class or near a 10g/1kg label
+            // More robust regex for Angel One's specific format: ₹[digits,commas].digits
+            const priceMatches = html.match(/₹\s?([0-9,]+\.[0-9]{2})/);
+            
+            // Percentage change follows a similar pattern: [+-]X.XX%
+            const percentMatches = html.match(/([+-]\s?[0-9]+\.[0-9]{2})%/);
+
+            if (priceMatches) {
+                const rawPrice = priceMatches[1].replace(/,/g, '');
+                const price = parseFloat(rawPrice);
+                const changePercent = percentMatches ? parseFloat(percentMatches[1].replace(/\s/g, '')) : 0;
+                
+                commodityData[target.type] = {
+                    price,
+                    changePercent,
+                    unit: target.type === 'gold' ? 'per 10g' : 'per 1kg',
+                    source: 'Angel One (Live India)'
+                };
+            }
+        } catch (e) {
+            console.warn(`Angel One fetch failed for ${target.type}:`, e);
+        }
+    }
+    return commodityData.gold || commodityData.silver ? commodityData : null;
+};
+
 // Main function: fetch all data with caching and Supabase-backed Alpha Vantage Prices
 export const fetchMarketContext = async () => {
     // Fetch exchange rates (free API)
     const exchangeRates = await fetchExchangeRates();
+
+    // Fetch Angel One Prices (India Specialized)
+    const angelOneData = await fetchAngelOnePrices();
 
     // Extract real-time stock prices that the Ticker already fetched via Google Finance to save network calls
     const topStocksKeys = ["RELIANCE", "HDFCBANK", "INFY", "TCS", "ICICIBANK", "SBIN"];
@@ -161,16 +214,28 @@ export const fetchMarketContext = async () => {
         }
     }
 
-    // Commodity Context (Direct MCX Indian Rates)
-    const goldData = await fetchGoogleFinancePrice('GOLD:MCX');
-    const silverData = await fetchGoogleFinancePrice('SILVER:MCX');
+    // Commodity Context (Authoritative India Rates from Angel One)
+    if (angelOneData) {
+        context += '\n\nCOMMODITIES (Source: Angel One India):';
+        if (angelOneData.gold) {
+            context += `\n• Gold (24K, 10g): ₹${Number(angelOneData.gold.price).toLocaleString('en-IN')} (${angelOneData.gold.changePercent >= 0 ? '+' : ''}${angelOneData.gold.changePercent.toFixed(2)}%)`;
+        }
+        if (angelOneData.silver) {
+            context += `\n• Silver (1kg): ₹${Number(angelOneData.silver.price).toLocaleString('en-IN')} (${angelOneData.silver.changePercent >= 0 ? '+' : ''}${angelOneData.silver.changePercent.toFixed(2)}%)`;
+        }
+    } else {
+        // Fallback to Google Finance MCX if Angel One fails
+        const goldData = await fetchGoogleFinancePrice('GOLD:MCX');
+        const silverData = await fetchGoogleFinancePrice('SILVER:MCX');
 
-    if (goldData) {
-        context += '\n\nCOMMODITIES (Official India MCX Rates):';
-        context += `\n• Gold (24K, 10g): ₹${Number(goldData.price).toLocaleString('en-IN')} (${goldData.changePercent >= 0 ? '+' : ''}${goldData.changePercent.toFixed(2)}%)`;
-        
-        if (silverData) {
-            context += `\n• Silver (1kg): ₹${Number(silverData.price).toLocaleString('en-IN')} (${silverData.changePercent >= 0 ? '+' : ''}${silverData.changePercent.toFixed(2)}%)`;
+        if (goldData || silverData) {
+            context += '\n\nCOMMODITIES (MCX Fallback rates):';
+            if (goldData) {
+                context += `\n• Gold (24K, 10g): ₹${Number(goldData.price).toLocaleString('en-IN')} (${goldData.changePercent >= 0 ? '+' : ''}${goldData.changePercent.toFixed(2)}%)`;
+            }
+            if (silverData) {
+                context += `\n• Silver (1kg): ₹${Number(silverData.price).toLocaleString('en-IN')} (${silverData.changePercent >= 0 ? '+' : ''}${silverData.changePercent.toFixed(2)}%)`;
+            }
         }
     }
 
@@ -182,8 +247,8 @@ export const fetchMarketContext = async () => {
     }
 
     context += `\n\nIMPORTANT: Use this live data when answering questions about current market conditions, prices, or exchange rates. 
-Always use the direct MCX rates for Gold and Silver provided above.
-The rates represent the professional Multi Commodity Exchange (MCX) price in India. Always cite the real-time data provided above rather than your outdated training data.`;
+Always prioritize the Angel One prices for Gold and Silver provided above as they are localized for India.
+The rates represent the professional price in India. Always cite the real-time data provided above rather than your outdated training data.`;
     context += '\n--- END LIVE DATA ---';
 
     return context;

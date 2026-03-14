@@ -138,9 +138,10 @@ const DEFAULT_SETTINGS = {
         email: 'analyst@ecoinsight.ai',
         avatar: null,
         tier: 'Free',
-        credits: 5,
+        credits: 10,
         lastRechargeDate: new Date().toISOString(),
-        onboarded: false
+        onboarded: false,
+        welcome_email_sent: false
     }
 };
 

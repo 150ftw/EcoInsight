@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { streamMessage } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
 import { loadChats, saveChats, deleteChat as supaDeleteChat, deleteAllChats, loadSettings, saveSettings } from './lib/SupabaseStorage'
+import { sendWelcomeEmail } from './lib/EmailService';
 import { parseChartBlocks, EcoChartRenderer } from './components/EcoCharts'
 import {
     SignedIn,
@@ -1107,24 +1108,31 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                     variants={containerVariants}
                 >
                     {[
-                        { plan: "Observer", price: "Free", feat: ["Daily Market Pulse", "3 Simulations/day", "Standard Data Feed"], priceValue: 0 },
-                        { plan: "Sentinel", price: "$19.99", feat: ["Full Simulation Suite", "Daily Insight Reports", "Priority Neural Compute"], featured: true, priceValue: 19.99 },
-                        { plan: "Strategist", price: "$24.99", feat: ["Quantum Trend Modeling", "Real-time Fiscal Alerts", "Unlimited Deep Analysis"], priceValue: 24.99 }
+                        { plan: "Observer", price: "Free", feat: ["Daily Market Pulse", "10 Simulations/day", "Standard Data Feed"], priceValue: 0 },
+                        { plan: "Sentinel", price: "Coming Soon", feat: ["Full Simulation Suite", "Daily Insight Reports", "Priority Neural Compute"], featured: true, priceValue: 19.99, isComingSoon: true },
+                        { plan: "Strategist", price: "Coming Soon", feat: ["Quantum Trend Modeling", "Real-time Fiscal Alerts", "Unlimited Deep Analysis"], priceValue: 24.99, isComingSoon: true }
                     ].map((p, i) => (
                         <TiltCard
                             key={i}
-                            className={`pricing-card ${p.featured ? 'featured' : ''} ${hoveredPlanIndex === i ? 'active' : ''} ${hoveredPlanIndex !== null && hoveredPlanIndex !== i ? 'dimmed' : ''}`}
+                            className={`pricing-card ${p.featured ? 'featured' : ''} ${hoveredPlanIndex === i ? 'active' : ''} ${hoveredPlanIndex !== null && hoveredPlanIndex !== i ? 'dimmed' : ''} ${p.isComingSoon ? 'coming-soon' : ''}`}
                             onMouseEnter={() => setHoveredPlanIndex(i)}
                             onMouseLeave={() => setHoveredPlanIndex(null)}
+                            style={p.isComingSoon ? { opacity: 0.8, cursor: 'not-allowed' } : {}}
                         >
                             <motion.div variants={itemVariants}>
                                 <h3>{p.plan}</h3>
-                                <div className="price">{p.price}<span>/mo</span></div>
+                                <div className="price">{p.price}{!p.isComingSoon && <span>/mo</span>}</div>
                                 <ul>
                                     {p.feat.map((f, j) => <li key={j}><Sparkles size={16} /> {f}</li>)}
                                 </ul>
                                 <Magnetic distance={0.3}>
-                                    <button className="btn-shine-primary" onClick={() => onSelectPlan(p)}>Select Plan</button>
+                                    <button 
+                                        className={p.isComingSoon ? "btn-secondary" : "btn-shine-primary"} 
+                                        onClick={() => !p.isComingSoon && onSelectPlan(p)}
+                                        disabled={p.isComingSoon}
+                                    >
+                                        {p.isComingSoon ? "Coming Soon" : "Select Plan"}
+                                    </button>
                                 </Magnetic>
                             </motion.div>
                         </TiltCard>
@@ -3474,7 +3482,7 @@ function App() {
         email: 'guest@ecoinsight.ai',
         avatar: null,
         tier: 'Free',
-        credits: 5,
+        credits: 10,
         lastRechargeDate: new Date().toISOString(),
         onboarded: false // New state for onboarding status
     })
@@ -3706,6 +3714,24 @@ function App() {
         }
     };
 
+    // Welcome Email Automation
+    useEffect(() => {
+        if (isSignedIn && user?.id && supaLoaded && profile?.welcome_email_sent === false) {
+            const handleWelcomeEmail = async () => {
+                const response = await sendWelcomeEmail(
+                    user.primaryEmailAddress?.emailAddress,
+                    user.firstName || user.fullName
+                );
+                
+                if (response.success) {
+                    // Update profile flag to ensure we don't send it again
+                    setProfile(prev => ({ ...prev, welcome_email_sent: true }));
+                }
+            };
+            handleWelcomeEmail();
+        }
+    }, [isSignedIn, user?.id, supaLoaded, profile?.welcome_email_sent]);
+
     // Dynamic Profile Sync (Clerk -> Profile State)
     useEffect(() => {
         if (!user || !supaLoaded) return;
@@ -3741,7 +3767,7 @@ function App() {
             console.log("Recharging weekly credits...");
             setProfile(prev => ({
                 ...prev,
-                credits: 5,
+                credits: 10,
                 lastRechargeDate: now.toISOString()
             }));
         }
@@ -4588,7 +4614,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     setProfile(prev => ({
                         ...prev,
                         tier: newTier,
-                        credits: newTier === 'Free' ? 5 : 999999 // Effectively unlimited for paid
+                        credits: newTier === 'Free' ? 10 : 999999 // Effectively unlimited for paid
                     }));
                     setSelectedPlan(null);
                     setAppSection('chat');

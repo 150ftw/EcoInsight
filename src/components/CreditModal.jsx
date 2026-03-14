@@ -21,10 +21,16 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade }) => {
                     
                     <div className="modal-header">
                         <div className="alert-icon">
-                            <ShieldAlert size={32} />
+                            <Clock size={32} />
                         </div>
-                        <h2>Credit Limit Reached</h2>
-                        <p>Your weekly analytical capacity has been reached. To maintain the highest compute quality, we restrict free tier frequency.</p>
+                        <h2>Capacity reached. Let's take a breather.</h2>
+                        <p>
+                            Your analytical credits for this week are fully utilized. 
+                            To ensure high-quality, real-time compute for all users, we recharge free credits every 7 days.
+                        </p>
+                        <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '1rem', fontStyle: 'italic' }}>
+                            Quality AI models require significant compute resources to run. We appreciate your patience as we scale our infrastructure.
+                        </p>
                     </div>
 
                     <div className="recharge-info">
@@ -36,11 +42,11 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade }) => {
                     </div>
 
                     <div className="modal-actions">
-                        <button className="btn-upgrade-now" onClick={onUpgrade}>
-                            <Zap size={18} /> Upgrade to Sentinel <ArrowRight size={16} />
+                        <button className="btn-upgrade-now" style={{ opacity: 0.7, cursor: 'default' }} onClick={(e) => e.preventDefault()}>
+                            <Zap size={18} /> Premium Tiers: Coming Soon
                         </button>
                         <button className="btn-secondary-modal" onClick={onClose}>
-                            Maybe Later
+                            I understand
                         </button>
                     </div>
 

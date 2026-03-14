@@ -1569,6 +1569,10 @@ select,
     border: 1px solid rgba(139, 92, 246, 0.2);
     border-radius: 56px;
     padding: 8rem 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     backdrop-filter: blur(40px);
     overflow: hidden;
