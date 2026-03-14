@@ -3828,9 +3828,13 @@ CRITICAL JSON RULES (FAILURE TO FOLLOW WILL BREAK THE SYSTEM):
 1. The JSON must be 100% valid RFC 8259 JSON. If not, the UI will crash.
 2. NO trailing commas.
 3. ALL keys must be enclosed in double quotes.
-4. ALL values for data points MUST be raw numbers (e.g., 15000), NOT formatted strings (e.g., "15k") and NOT invalid structures (e.g., 2022:15000). 
-5. The "name" key is ALWAYS the X-axis label (the year, month, or category). All other keys represent the Y-axis numerical values.
-6. The JSON block should be standalone. Do not add conversational text inside the code block. Use text before/after for explanations.`;
+4. ALL values for data points MUST be RAW NUMBERS (e.g., 15000), NOT formatted strings (e.g., "15k", "10%", "100M").
+5. FORBIDDEN: NEVER include units like "%", "M", "B", "Cr", "L" inside the numerical value.
+   - WRONG: {"value": "10%"} or {"value": 10%}
+   - RIGHT: {"value": 10}
+6. If you need to specify units, do it in the "title" of the chart, NOT in the data points.
+7. The "name" key is ALWAYS the X-axis label (the year, month, or category). All other keys represent the Y-axis numerical values.
+8. The JSON block should be standalone. Do not add conversational text inside the code block. Use text before/after for explanations.`;
 
         // PDF Context Integration
         if (currentPdfText) {
