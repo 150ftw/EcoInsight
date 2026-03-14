@@ -3411,6 +3411,7 @@ function App() {
     ]);
     const [activeChatId, setActiveChatId] = useState('default');
     const [view, setView] = useState('chat')
+    const [saveStatus, setSaveStatus] = useState('idle') // 'idle', 'saving', 'saved', 'error'
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [authLoadingTimeout, setAuthLoadingTimeout] = useState(false)
@@ -3681,9 +3682,29 @@ function App() {
                 appearance: appearance,
                 profile: profile
             });
-        }, 1000);
+        }, 3000); // Increased debounce to 3s since we now have manual save
         return () => clearTimeout(timer);
     }, [aiSettings, chatSettings, personalization, appearance, profile, user?.id, supaLoaded]);
+
+    const handleSaveSettings = async () => {
+        if (!user?.id || !supaLoaded) return;
+        setSaveStatus('saving');
+        try {
+            await saveSettings(user.id, {
+                ai_settings: aiSettings,
+                chat_settings: chatSettings,
+                personalization: personalization,
+                appearance: appearance,
+                profile: profile
+            });
+            setSaveStatus('saved');
+            setTimeout(() => setSaveStatus('idle'), 3000);
+        } catch (err) {
+            console.error('Manual save failed:', err);
+            setSaveStatus('error');
+            setTimeout(() => setSaveStatus('idle'), 3000);
+        }
+    };
 
     // Dynamic Profile Sync (Clerk -> Profile State)
     useEffect(() => {
@@ -4166,9 +4187,22 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             case 'settings':
                 return (
                     <div className="view-content settings-view" key={view}>
-                        <div className="view-header">
-                            <h1>Settings</h1>
-                            <p>Manage your EcoInsight profile and preferences.</p>
+                        <div className="view-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <h1>Settings</h1>
+                                <p>Manage your EcoInsight profile and preferences.</p>
+                            </div>
+                            <button 
+                                className={`btn-primary ${saveStatus === 'saved' ? 'success' : ''}`} 
+                                onClick={handleSaveSettings}
+                                disabled={saveStatus === 'saving'}
+                                style={{ minWidth: '140px' }}
+                            >
+                                {saveStatus === 'saving' ? <><Loader2 size={16} className="animate-spin" /> Saving...</> :
+                                 saveStatus === 'saved' ? <><Check size={16} /> Changes Saved</> :
+                                 saveStatus === 'error' ? <><AlertTriangle size={16} /> Error Saving</> :
+                                 <><Save size={16} /> Save Changes</>}
+                            </button>
                         </div>
 
                         {/* Account Settings */}
@@ -4409,6 +4443,20 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 </div>
                             </div>
                         </section>
+
+                        <div className="settings-footer" style={{ marginTop: '2rem', padding: '2rem 0', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                             <button className="secondary-btn" onClick={() => setView('chat')}>Cancel</button>
+                             <button 
+                                className={`btn-primary ${saveStatus === 'saved' ? 'success' : ''}`} 
+                                onClick={handleSaveSettings}
+                                disabled={saveStatus === 'saving'}
+                                style={{ minWidth: '160px' }}
+                            >
+                                {saveStatus === 'saving' ? <><Loader2 size={16} className="animate-spin" /> Saving...</> :
+                                 saveStatus === 'saved' ? <><Check size={16} /> Changes Saved</> :
+                                 <><Save size={16} /> Save Changes</>}
+                            </button>
+                        </div>
                     </div>
                 )
             default:
