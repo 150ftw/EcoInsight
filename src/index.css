@@ -1627,6 +1627,12 @@ input[type="range"] {
     padding: 2rem 4rem;
 }
 
+@media (max-width: 768px) {
+    .page-content-v2 {
+        padding: 2rem 1rem;
+    }
+}
+
 .page-header-v2 {
     display: flex;
     justify-content: space-between;
@@ -1701,6 +1707,7 @@ input[type="range"] {
 @media (max-width: 900px) {
     .subpage-body-grid {
         grid-template-columns: 1fr;
+        gap: 2rem;
     }
 }
 
@@ -1864,6 +1871,8 @@ input[type="range"] {
     display: flex;
     justify-content: space-between;
     font-size: 0.85rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .tiny-item span {
