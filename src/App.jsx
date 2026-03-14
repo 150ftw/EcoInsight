@@ -3678,13 +3678,18 @@ function App() {
         // Automatically update profile if it's currently at default state or missing real data
         const isDefault = profile.name === 'Professional Analyst' || profile.name === 'Guest User' || profile.email === 'analyst@ecoinsight.ai';
         
-        if (isDefault || !profile.onboarded) { // Also update if not onboarded yet
+        if (isDefault || !profile.onboarded) {
+            const clerkName = user.fullName;
+            const clerkUsername = user.username ? `@${user.username}` : (user.firstName ? `@${user.firstName.toLowerCase()}` : null);
+            
             setProfile(prev => ({
                 ...prev,
-                name: user.fullName || prev.name,
+                name: clerkName || prev.name,
                 email: user.primaryEmailAddress?.emailAddress || prev.email,
                 avatar: user.imageUrl || prev.avatar,
-                username: user.username ? `@${user.username}` : (user.firstName ? `@${user.firstName.toLowerCase()}` : prev.username)
+                username: clerkUsername || prev.username,
+                // AUTO-ONBOARD: If they have a name and username from Clerk, consider them onboarded
+                onboarded: prev.onboarded || (!!clerkName && !!clerkUsername)
             }));
         }
     }, [user, supaLoaded, profile.onboarded]);
@@ -4469,13 +4474,17 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 setAppSection={setAppSection}
                 setAuthType={setAuthType}
                 onLaunchEngine={() => {
-                    // Check if onboarding is needed
-                    if (isSignedIn && !profile.onboarded) {
+                    // Check if onboarding is needed, but only after settings are loaded
+                    if (isSignedIn && supaLoaded && !profile.onboarded) {
                         setAppSection('onboarding');
-                    } else {
+                    } else if (isSignedIn && supaLoaded) {
                         createNewChat();
                         setAppSection('chat');
+                    } else if (!isSignedIn) {
+                        setAppSection('auth');
                     }
+                    // If supaLoaded is false, we might want to show a loader or wait, 
+                    // but usually it's fast enough or handled by the next condition.
                 }}
                 onSelectPlan={(plan) => {
                     setSelectedPlan(plan);
@@ -4484,7 +4493,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             />
         );
 
-        if (appSection === 'onboarding' || (isSignedIn && !profile.onboarded && appSection !== 'landing' && appSection !== 'checkout')) return (
+        if (appSection === 'onboarding' || (isSignedIn && supaLoaded && !profile.onboarded && appSection !== 'landing' && appSection !== 'checkout')) return (
             <OnboardingView 
                 user={user} 
                 onComplete={(data) => {
