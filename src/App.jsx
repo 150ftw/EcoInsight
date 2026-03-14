@@ -3484,7 +3484,8 @@ function App() {
         tier: 'Free',
         credits: 10,
         lastRechargeDate: new Date().toISOString(),
-        onboarded: false // New state for onboarding status
+        onboarded: false,
+        welcome_email_sent: false
     })
 
     const [aiSettings, setAiSettings] = useState({

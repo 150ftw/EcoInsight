@@ -55,27 +55,58 @@ export const sendWelcomeEmail = async (userEmail, userName = 'Valued Analyst') =
         const apiKey = import.meta.env.VITE_RESEND_API_KEY;
 
         if (apiKey && apiKey !== 'your_mock_key') {
-            const response = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    from: 'Shivam from EcoInsight <shivam@ecoinsight.online>',
-                    to: userEmail,
-                    reply_to: 'ss18244646@gmail.com', // Founder's direct email for replies
-                    subject: emailContent.subject,
-                    html: emailContent.html
-                })
-            });
+            try {
+                const response = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        from: 'Shivam from EcoInsight <shivam@ecoinsight.online>',
+                        to: userEmail,
+                        reply_to: 'ss18244646@gmail.com',
+                        subject: emailContent.subject,
+                        html: emailContent.html
+                    })
+                });
 
-            if (response.ok) {
-                console.log('--- WELCOME EMAIL SENT (RESEND) ---');
-                return { success: true, message: 'Welcome email sent via Resend' };
-            } else {
-                const errorData = await response.json();
-                console.error('[EmailService] Resend API error:', errorData);
+                if (response.ok) {
+                    console.log('--- WELCOME EMAIL SENT (RESEND) ---');
+                    return { success: true, message: 'Welcome email sent via Resend' };
+                } else {
+                    const errorData = await response.json();
+                    console.error('[EmailService] Resend API error:', JSON.stringify(errorData, null, 2));
+                    
+                    // Specific check for unverified domain
+                    if (errorData.message?.includes('unverified') || errorData.name === 'validation_error') {
+                        console.warn('[EmailService] Domain ecoinsight.online may not be verified. Trying again with onboarding@resend.dev...');
+                        
+                        const fallbackResponse = await fetch('https://api.resend.com/emails', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${apiKey}`
+                            },
+                            body: JSON.stringify({
+                                from: 'EcoInsight <onboarding@resend.dev>',
+                                to: userEmail,
+                                subject: emailContent.subject,
+                                html: emailContent.html
+                            })
+                        });
+                        
+                        if (fallbackResponse.ok) {
+                            console.log('--- WELCOME EMAIL SENT (RESEND FALLBACK) ---');
+                            return { success: true, message: 'Welcome email sent via Resend (onboarding fallback)' };
+                        } else {
+                            const fallbackError = await fallbackResponse.json();
+                            console.error('[EmailService] Resend Fallback failed:', fallbackError);
+                        }
+                    }
+                }
+            } catch (fetchError) {
+                console.error('[EmailService] Network error during Resend call:', fetchError);
             }
         }
 
