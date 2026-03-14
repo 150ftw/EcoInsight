@@ -108,21 +108,46 @@ body {
     display: flex;
     height: 100vh;
     width: 100vw;
-    position: relative;
+    background-color: var(--bg-dark);
     overflow: hidden;
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     overflow-anchor: none;
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
 }
 
 /* Sidebar Styles */
 .sidebar {
-    width: 280px;
-    background-color: var(--sidebar-bg);
+    flex-basis: 280px;
+    background: rgba(10, 10, 12, 0.7);
     border-right: 1px solid var(--glass-border);
     display: flex;
     flex-direction: column;
     padding: 2rem 1rem;
-    z-index: 10;
+    z-index: 100;
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        transform: translateX(-100%);
+        flex-basis: auto;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
 }
 
 .sidebar-header {
@@ -332,13 +357,66 @@ body {
     background: rgba(239, 68, 68, 0.1);
 }
 
+/* Mobile Header */
+.mobile-app-header {
+    display: none;
+    height: 70px;
+    align-items: center;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur));
+    z-index: 5;
+    background-color: var(--bg-dark);
+}
+
+@media (max-width: 768px) {
+    .mobile-app-header {
+        display: flex;
+    }
+}
+
+.sidebar-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-overlay.open {
+    display: block;
+    opacity: 1;
+}
+
 /* Chat Area Styles */
-.chat-area {
+/* Main Viewport */
+main {
     flex: 1;
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .chat-header {
@@ -2050,4 +2128,79 @@ input[type="range"] {
     justify-content: center;
     gap: 0.5rem;
     opacity: 0.7;
+}
+/* Mobile App Header */
+.mobile-app-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    background: rgba(10, 10, 12, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 90;
+}
+
+.sidebar-toggle-btn, .mobile-new-chat {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.sidebar-toggle-btn:hover, .mobile-new-chat:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 95;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .messages-list {
+        padding: 1rem !important;
+    }
+
+    .input-container {
+        padding: 1rem !important;
+    }
+
+    .faq-grid {
+        display: none !important; /* Hide on small mobile to save space */
+    }
+
+    .view-content {
+        padding: 1.5rem !important;
+    }
 }

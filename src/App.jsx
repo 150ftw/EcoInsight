@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download } from 'lucide-react'
+import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { streamMessage } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
@@ -822,6 +822,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
     const [hoveredPlanIndex, setHoveredPlanIndex] = useState(null);
     const { scrollYProgress } = useScroll();
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const lastScrollY = useRef(0);
 
     const [authTimeout, setAuthTimeout] = useState(false);
@@ -895,11 +896,11 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                 <div className="logo" onClick={() => setAppSection('landing')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <EcoInsightLogo size={48} /> <span>EcoInsight</span>
                 </div>
-                <div className="landing-nav">
-                    <Magnetic distance={0.3}><button className="nav-link" onClick={() => scrollToSection('features')}>Features</button></Magnetic>
-                    <Magnetic distance={0.3}><button className="nav-link" onClick={() => scrollToSection('solutions')}>Solutions</button></Magnetic>
+                <div className={`landing-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+                    <Magnetic distance={0.3}><button className="nav-link" onClick={() => { scrollToSection('features'); setIsMobileMenuOpen(false); }}>Features</button></Magnetic>
+                    <Magnetic distance={0.3}><button className="nav-link" onClick={() => { scrollToSection('solutions'); setIsMobileMenuOpen(false); }}>Solutions</button></Magnetic>
 
-                    <Magnetic distance={0.3}><button className="nav-link" onClick={() => scrollToSection('pricing')}>Pricing</button></Magnetic>
+                    <Magnetic distance={0.3}><button className="nav-link" onClick={() => { scrollToSection('pricing'); setIsMobileMenuOpen(false); }}>Pricing</button></Magnetic>
                     {!isLoaded ? (
                         <div className="auth-loading-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6, fontSize: '0.9rem' }}>
                             <Loader2 size={14} className="animate-spin" /> 
@@ -907,35 +908,33 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine 
                                 <span style={{ color: '#f87171' }}>
                                     Network issue? 
                                     <button onClick={() => window.location.reload()} style={{ background: 'none', border: 'none', color: '#60a5fa', textDecoration: 'underline', cursor: 'pointer', padding: '0 4px' }}>Reload</button>
-                                    <span style={{ opacity: 0.5, fontSize: '0.7rem' }}>[Key: {!!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? 'OK' : 'MISSING'}]</span>
                                 </span>
                             ) : "initializing security protocol..."}
                         </div>
                     ) : (
                         <>
                             <SignedIn>
-                                <div className="signed-in-nav" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                <div className="signed-in-nav">
                                     <button className="btn-signin" onClick={onLaunchEngine}>Open Engine</button>
                                     <UserButton afterSignOutUrl="/" />
                                 </div>
                             </SignedIn>
                             <SignedOut>
-                                <div className="signed-out-nav" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                    <Magnetic distance={0.3}>
-                                        <SignInButton mode="modal">
-                                            <button className="nav-link">Sign In</button>
-                                        </SignInButton>
-                                    </Magnetic>
-                                    <Magnetic distance={0.3}>
-                                        <SignUpButton mode="modal">
-                                            <button className="btn-header">Get Started</button>
-                                        </SignUpButton>
-                                    </Magnetic>
+                                <div className="signed-out-nav">
+                                    <SignInButton mode="modal">
+                                        <button className="nav-link">Sign In</button>
+                                    </SignInButton>
+                                    <SignUpButton mode="modal">
+                                        <button className="btn-header">Get Started</button>
+                                    </SignUpButton>
                                 </div>
                             </SignedOut>
                         </>
                     )}
                 </div>
+                <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
             </header>
 
             <main className="landing-hero" style={{ perspective: '2000px', position: 'relative' }}>
@@ -3426,6 +3425,19 @@ function App() {
         compactMode: false
     })
 
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const mobile = window.innerWidth <= 768;
+            setIsMobile(mobile);
+            if (!mobile) setIsSidebarOpen(false);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const activeChat = chats.find(c => c.id === activeChatId) || chats[0] || { title: 'New Session', messages: [] };
     const messages = activeChat.messages || [];
 
@@ -4442,8 +4454,22 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         }
 
         return (
-            <div className="app-container">
-                <aside className="sidebar">
+            <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+                {isMobile && isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
+                {isMobile && (
+                    <header className="mobile-app-header">
+                        <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(true)}>
+                            <Menu size={20} />
+                        </button>
+                        <div className="mobile-logo">
+                            <EcoInsightLogo size={24} /> <span>EcoInsight</span>
+                        </div>
+                        <button className="mobile-new-chat" onClick={createNewChat}>
+                            <EcoNewChatIcon size={18} />
+                        </button>
+                    </header>
+                )}
+                <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                     <div className="sidebar-header">
                         <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <EcoInsightLogo size={36} className="logo-icon" /> <span>EcoInsight</span>
