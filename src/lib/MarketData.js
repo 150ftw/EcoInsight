@@ -216,7 +216,7 @@ const STOCK_SYMBOL_MAP = {
     'tata power': 'TATAPOWER', 'tatapower': 'TATAPOWER',
     'tata consumer': 'TATACONSUM', 'tataconsum': 'TATACONSUM',
     'tech mahindra': 'TECHM', 'techm': 'TECHM',
-    'm&m': 'M%26M', 'mahindra': 'M%26M',
+    'm&m': 'M&M', 'mahindra': 'M&M',
     'hindalco': 'HINDALCO', 'jsw steel': 'JSWSTEEL', 'jswsteel': 'JSWSTEEL',
     'bajaj finance': 'BAJFINANCE', 'bajfinance': 'BAJFINANCE',
     'bajaj finserv': 'BAJAJFINSV', 'bajajfinsv': 'BAJAJFINSV',
@@ -236,7 +236,7 @@ const STOCK_SYMBOL_MAP = {
     'godrej': 'GODREJCP', 'godrejcp': 'GODREJCP',
 
     // Popular New-age & Mid Caps
-    'zomato': 'ETERNAL', 'eternal': 'ETERNAL', 'eternal ltd': 'ETERNAL',
+    'zomato': 'ZOMATO',
     'paytm': 'PAYTM', 'one97': 'PAYTM',
     'nykaa': 'NYKAA', 'fsn e-commerce': 'NYKAA',
     'policybazaar': 'POLICYBZR', 'policybzr': 'POLICYBZR', 'pb fintech': 'POLICYBZR',
@@ -248,6 +248,12 @@ const STOCK_SYMBOL_MAP = {
     'bhel': 'BHEL', 'sail': 'SAIL', 'iex': 'IEX',
     'dixon': 'DIXON', 'dixon tech': 'DIXON',
     'dmart': 'DMART', 'avenue supermarts': 'DMART',
+    'varun beverages': 'VBL', 'vbl': 'VBL',
+    'patanjali': 'PATANJALI',
+    'rvnl': 'RVNL', 'irfc': 'IRFC', 'pfc': 'PFC', 'rec': 'RECLTD',
+    'mazagon dock': 'MAZDOCK', 'mazdock': 'MAZDOCK',
+    'cochin shipyard': 'COCHINSHIP',
+    'ireda': 'IREDA',
     'ltimindtree': 'LTIM', 'ltim': 'LTIM', 'lti mindtree': 'LTIM',
     'mphasis': 'MPHASIS', 'persistent': 'PERSISTENT', 'coforge': 'COFORGE',
     'bank of baroda': 'BANKBARODA', 'bankbaroda': 'BANKBARODA',
@@ -296,17 +302,38 @@ const fetchGoogleFinancePrice = async (nseSymbol) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
 
+        // Sanitize symbol: remove any existing encoding and handle symbols like M&M
+        const cleanSymbol = nseSymbol.replace(/%26/g, '&');
+        
         const res = await fetch(
-            `/google-finance/finance/quote/${encodeURIComponent(nseSymbol)}:NSE`,
+            `/google-finance/finance/quote/${encodeURIComponent(cleanSymbol)}:NSE`,
             { signal: controller.signal }
         );
         clearTimeout(timeoutId);
 
         if (!res.ok) return null;
-        const html = await res.text();
+        let html = await res.text();
 
-        // Extract the last price from data attribute
-        const priceMatch = html.match(/data-last-price="([^"]+)"/);
+        // Regex for the price and other stats
+        let priceMatch = html.match(/data-last-price="([^"]+)"/);
+        
+        // Fallback to BSE if NSE fails to give a price
+        if (!priceMatch) {
+            console.log(`NSE price not found for ${cleanSymbol}, trying BSE...`);
+            const bseRes = await fetch(
+                `/google-finance/finance/quote/${encodeURIComponent(cleanSymbol)}:BSE`,
+                { signal: controller.signal }
+            );
+            if (bseRes.ok) {
+                const bseHtml = await bseRes.text();
+                const bsePriceMatch = bseHtml.match(/data-last-price="([^"]+)"/);
+                if (bsePriceMatch) {
+                    html = bseHtml;
+                    priceMatch = bsePriceMatch;
+                }
+            }
+        }
+
         if (!priceMatch) return null;
 
         const price = parseFloat(priceMatch[1]);
