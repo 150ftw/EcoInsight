@@ -872,8 +872,7 @@ const ReviewsSection = () => {
 
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
-        const element = document.getElementById('reviews');
-        if (element) element.scrollIntoView({ behavior: 'smooth' });
+        // Removed scrollIntoView to prevent disruptive jumps
     };
     
     return (
@@ -888,21 +887,22 @@ const ReviewsSection = () => {
                 flexDirection: 'column', 
                 alignItems: 'center', 
                 justifyContent: 'center',
-                marginBottom: '3rem'
+                marginBottom: '2rem',
+                scale: '0.85' // Subtle downscale to prevent "zoomed in" feel
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                    <span style={{ fontSize: '3.5rem', fontWeight: 800, color: 'white' }}>{averageRating}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.25rem' }}>
+                    <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'white' }}>{averageRating}</span>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <div style={{ display: 'flex', gap: '2px' }}>
                             {[1, 2, 3, 4, 5].map(s => (
-                                <Star key={s} size={20} fill="#f59e0b" color="#f59e0b" />
+                                <Star key={s} size={16} fill="#f59e0b" color="#f59e0b" />
                             ))}
                         </div>
-                        <span style={{ color: '#a1a1aa', fontSize: '0.9rem', marginTop: '4px' }}>Based on {totalRatings} global ratings</span>
+                        <span style={{ color: '#a1a1aa', fontSize: '0.8rem', marginTop: '2px' }}>Based on {totalRatings} global ratings</span>
                     </div>
                 </div>
                 
-                <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ width: '100%', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     {[
                         { stars: 5, count: 180, percent: 85 },
                         { stars: 4, count: 20, percent: 10 },
@@ -910,9 +910,9 @@ const ReviewsSection = () => {
                         { stars: 2, count: 0, percent: 0 },
                         { stars: 1, count: 0, percent: 0 }
                     ].map(row => (
-                        <div key={row.stars} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ color: '#a1a1aa', fontSize: '0.8rem', minWidth: '45px' }}>{row.stars} stars</span>
-                            <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+                        <div key={row.stars} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ color: '#a1a1aa', fontSize: '0.75rem', minWidth: '40px' }}>{row.stars} stars</span>
+                            <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
                                 <motion.div 
                                     initial={{ width: 0 }}
                                     whileInView={{ width: `${row.percent}%` }}
@@ -921,7 +921,7 @@ const ReviewsSection = () => {
                                     style={{ height: '100%', background: row.stars >= 4 ? '#8b5cf6' : '#f59e0b' }} 
                                 />
                             </div>
-                            <span style={{ color: '#71717a', fontSize: '0.8rem', minWidth: '35px', textAlign: 'right' }}>{row.count}</span>
+                            <span style={{ color: '#71717a', fontSize: '0.75rem', minWidth: '30px', textAlign: 'right' }}>{row.count}</span>
                         </div>
                     ))}
                 </div>
@@ -930,48 +930,49 @@ const ReviewsSection = () => {
             <AnimatePresence mode="wait">
                 <motion.div 
                     key={currentPage}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
                     className="reviews-grid"
                 >
                     {currentReviews.map((review, i) => (
                         <motion.div 
                             key={review.id}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05 }}
+                            transition={{ delay: i * 0.03 }}
                             className="review-card"
+                            style={{ padding: '1.5rem', gap: '1rem' }}
                         >
-                            <div className="review-header">
+                            <div className="review-header" style={{ marginBottom: '-0.5rem' }}>
                                 <div className="stars-row">
                                     {[...Array(5)].map((_, idx) => (
                                         <Star 
                                             key={idx} 
-                                            size={14} 
+                                            size={12} 
                                             fill={idx < review.rating ? "#f59e0b" : "transparent"} 
                                             color={idx < review.rating ? "#f59e0b" : "#3f3f46"} 
                                         />
                                     ))}
                                 </div>
-                                {review.verified && <span className="verified-badge"><Check size={10} /> Verified Analyst</span>}
+                                {review.verified && <span className="verified-badge"><Check size={8} /> Verified Analyst</span>}
                             </div>
-                            <p className="review-content">"{review.content}"</p>
+                            <p className="review-content" style={{ fontSize: '0.9rem' }}>"{review.content}"</p>
                             <div className="review-footer">
                                 <div className="reviewer-info">
-                                    <span className="reviewer-name">{review.name}</span>
-                                    <span className="reviewer-role">{review.role}</span>
+                                    <span className="reviewer-name" style={{ fontSize: '0.85rem' }}>{review.name}</span>
+                                    <span className="reviewer-role" style={{ fontSize: '0.75rem' }}>{review.role}</span>
                                 </div>
                             </div>
 
                             {review.response && (
-                                <div className="review-response">
-                                    <div className="response-header">
-                                        <EcoInsightLogo size={12} />
+                                <div className="review-response" style={{ padding: '0.75rem', marginTop: '0.5rem' }}>
+                                    <div className="response-header" style={{ fontSize: '0.65rem', marginBottom: '0.25rem' }}>
+                                        <EcoInsightLogo size={10} />
                                         <span>Official Response</span>
                                     </div>
-                                    <p>{review.response}</p>
+                                    <p style={{ fontSize: '0.8rem' }}>{review.response}</p>
                                 </div>
                             )}
                         </motion.div>
@@ -979,7 +980,7 @@ const ReviewsSection = () => {
                 </motion.div>
             </AnimatePresence>
             
-            <div className="pagination-controls">
+            <div className="pagination-controls" style={{ marginTop: '2.5rem' }}>
                 <button 
                     className="page-btn" 
                     onClick={() => paginate(currentPage - 1)}
