@@ -1333,7 +1333,7 @@ const SubpageRenderer = ({ view, onBack }) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || "a484a81c-092a-4bd5-8b64-a6f6e5042438";
+        const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || "f439bd5e-b5ed-4660-8a7d-6f88a1f2a195";
         
         try {
             const response = await fetch("https://api.web3forms.com/submit", {
