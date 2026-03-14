@@ -55,22 +55,25 @@ const fetchIndianIndices = async () => {
     return Object.keys(indices).length > 0 ? indices : null;
 };
 
-// Fetch gold price (via Yahoo Finance, gold futures)
-const fetchGoldPrice = async () => {
+// Fetch commodity price (via Yahoo Finance)
+const fetchCommodityPrice = async (symbol) => {
     try {
         const res = await fetch(
-            '/yahoo-finance/v8/finance/chart/GC=F?interval=1d&range=1d'
+            `/yahoo-finance/v8/finance/chart/${symbol}=F?interval=1d&range=1d`
         );
         if (!res.ok) return null;
         const data = await res.json();
         const meta = data.chart?.result?.[0]?.meta;
         if (meta) {
             return {
-                priceUsd: meta.regularMarketPrice?.toFixed(2),
+                priceUsd: meta.regularMarketPrice,
+                prevClose: meta.chartPreviousClose,
+                change: meta.regularMarketPrice - meta.chartPreviousClose,
+                changePercent: ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100
             };
         }
     } catch (e) {
-        console.warn('Gold price fetch failed:', e);
+        console.warn(`${symbol} price fetch failed:`, e);
     }
     return null;
 };
@@ -136,6 +139,31 @@ export const fetchMarketContext = async () => {
         }
     }
 
+    // Commodity Context (Gold & Silver Indian Rates)
+    const goldFutures = await fetchCommodityPrice('GC');
+    const silverFutures = await fetchCommodityPrice('SI');
+
+    if (exchangeRates && goldFutures) {
+        // Indian Gold Rate Calculation: 
+        // 1 Troy Ounce = 31.1035 Grams
+        // Gold price is per Troy Ounce. 
+        // We calculate for 10 grams (Standard Indian Unit)
+        // Rate = (PriceUSD * ExchangeRate / 31.1035) * 10
+        const inrPerGram = (goldFutures.priceUsd * exchangeRates.usdInr) / 31.1035;
+        const gold10g = (inrPerGram * 10 * 1.03).toFixed(2); // +3% GST estimation for retail feel
+        
+        context += '\n\nCOMMODITIES (Indian Market Estimates):';
+        context += `\n• Gold (24K, 10g): ₹${Number(gold10g).toLocaleString('en-IN')} (${goldFutures.changePercent >= 0 ? '+' : ''}${goldFutures.changePercent.toFixed(2)}%)`;
+        
+        if (silverFutures) {
+            // Silver Calculation (per KG):
+            // 1 Troy Ounce = 0.0311035 KG
+            // Rate = (PriceUSD * ExchangeRate / 0.0311035)
+            const silverKg = (silverFutures.priceUsd * exchangeRates.usdInr / 0.0311035 * 1.03).toFixed(2);
+            context += `\n• Silver (1kg): ₹${Number(silverKg).toLocaleString('en-IN')} (${silverFutures.changePercent >= 0 ? '+' : ''}${silverFutures.changePercent.toFixed(2)}%)`;
+        }
+    }
+
     if (exchangeRates) {
         context += '\n\nCURRENCY RATES (Live):';
         context += `\n• USD/INR: ₹${exchangeRates.usdInr}`;
@@ -143,7 +171,9 @@ export const fetchMarketContext = async () => {
         context += `\n• GBP/INR: ₹${exchangeRates.gbpInr}`;
     }
 
-    context += `\n\nIMPORTANT: Use this live data when answering questions about current market conditions, prices, or exchange rates. Always cite the real-time data provided above rather than your outdated training data.`;
+    context += `\n\nIMPORTANT: Use this live data when answering questions about current market conditions, prices, or exchange rates. 
+Always convert raw gold/silver US futures to the Indian context (10g for gold, 1kg for silver) if asked about Indian prices. 
+The estimates above include an approximate 3% GST. Always cite the real-time data provided above rather than your outdated training data.`;
     context += '\n--- END LIVE DATA ---';
 
     return context;
@@ -385,7 +415,8 @@ const STOCK_KEYWORDS = [
     'bull', 'bear', 'rally', 'crash', 'returns',
     'dividend', 'pe ratio', 'eps', 'revenue', 'profit',
     'analysis', 'forecast', 'target', 'valuation',
-    'mutual fund', 'etf',
+    'mutual fund', 'etf', 'gold', 'silver', 'commodity',
+    'bullion', 'mcx', 'precious metal'
 ];
 
 /**
