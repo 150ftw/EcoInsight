@@ -1,9 +1,9 @@
 /**
  * EmailService.js - Utility for sending automated emails to EcoInsight users.
  * 
- * To activate live emails:
- * 1. Install an email service provider (e.g., npm install @emailjs/browser or resend)
- * 2. Update the sendWelcomeEmail function with your API keys.
+ * - **Founder's Welcome Email**: Implemented the personalized template from Shivam Sharma. New users receive a "direct" note from the founder upon signup.
+ * - **Template Identification**: Labeled the automated emails with the specific template identifier `founder-welcome-introduction` for tracking in the Resend dashboard.
+ * - **Direct Reply-to**: Configured the email to route replies straight to `ss18244646@gmail.com`, enabling personal engagement with new analysts.
  */
 
 export const sendWelcomeEmail = async (userEmail, userName = 'Valued Analyst') => {
