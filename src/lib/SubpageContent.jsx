@@ -1,3 +1,7 @@
+import React from 'react';
+import { 
+    LifeBuoy, BookOpen, Activity, ShieldAlert, 
+    Info, Briefcase, Users, Gift, Mail, 
     ShieldCheck, ScrollText, Scale, CreditCard, AlertTriangle 
 } from 'lucide-react';
 
