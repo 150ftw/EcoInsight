@@ -3717,16 +3717,23 @@ function App() {
 
     // Welcome Email Automation
     useEffect(() => {
-        if (isSignedIn && user?.id && supaLoaded && profile?.welcome_email_sent === false) {
+        if (isSignedIn && user?.id && supaLoaded && !profile?.welcome_email_sent) {
+            console.log(`[App] Welcome email trigger conditions met for: ${user.primaryEmailAddress?.emailAddress}`);
             const handleWelcomeEmail = async () => {
-                const response = await sendWelcomeEmail(
-                    user.primaryEmailAddress?.emailAddress,
-                    user.firstName || user.fullName
-                );
-                
-                if (response.success) {
-                    // Update profile flag to ensure we don't send it again
-                    setProfile(prev => ({ ...prev, welcome_email_sent: true }));
+                try {
+                    const response = await sendWelcomeEmail(
+                        user.primaryEmailAddress?.emailAddress,
+                        user.firstName || user.fullName
+                    );
+                    
+                    console.log(`[App] sendWelcomeEmail response:`, response);
+
+                    if (response.success) {
+                        // Update profile flag to ensure we don't send it again
+                        setProfile(prev => ({ ...prev, welcome_email_sent: true }));
+                    }
+                } catch (emailErr) {
+                    console.error(`[App] Failed to handle welcome email:`, emailErr);
                 }
             };
             handleWelcomeEmail();

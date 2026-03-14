@@ -12,10 +12,14 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: 'Email is required' });
   }
 
-  const apiKey = process.env.VITE_RESEND_API_KEY;
+  console.log(`[API Send Welcome] Processing request for email: ${email}`);
+
+  // Use the API key from environment variables (server-side)
+  // Support both common names
+  const apiKey = process.env.VITE_RESEND_API_KEY || process.env.RESEND_API_KEY;
 
   if (!apiKey) {
-    console.error('[API Send Welcome] Missing Resend API Key');
+    console.error('[API Send Welcome] Missing Resend API Key. Keys found:', Object.keys(process.env).filter(k => k.includes('KEY')));
     return res.status(500).json({ status: 'error', message: 'Missing API Key on server' });
   }
 
