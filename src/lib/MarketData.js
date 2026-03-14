@@ -161,28 +161,16 @@ export const fetchMarketContext = async () => {
         }
     }
 
-    // Commodity Context (Gold & Silver Indian Rates)
-    const goldFutures = await fetchCommodityPrice('GC');
-    const silverFutures = await fetchCommodityPrice('SI');
+    // Commodity Context (Direct MCX Indian Rates)
+    const goldData = await fetchGoogleFinancePrice('GOLD:MCX');
+    const silverData = await fetchGoogleFinancePrice('SILVER:MCX');
 
-    if (exchangeRates && goldFutures) {
-        // Indian Gold Rate Calculation: 
-        // 1 Troy Ounce = 31.1035 Grams
-        // Gold price is per Troy Ounce. 
-        // We calculate for 10 grams (Standard Indian Unit)
-        // Rate = (PriceUSD * ExchangeRate / 31.1035) * 10
-        const inrPerGram = (goldFutures.priceUsd * exchangeRates.usdInr) / 31.1035;
-        const gold10g = (inrPerGram * 10 * 1.03).toFixed(2); // +3% GST estimation for retail feel
+    if (goldData) {
+        context += '\n\nCOMMODITIES (Official India MCX Rates):';
+        context += `\n• Gold (24K, 10g): ₹${Number(goldData.price).toLocaleString('en-IN')} (${goldData.changePercent >= 0 ? '+' : ''}${goldData.changePercent.toFixed(2)}%)`;
         
-        context += '\n\nCOMMODITIES (Indian Market Estimates):';
-        context += `\n• Gold (24K, 10g): ₹${Number(gold10g).toLocaleString('en-IN')} (${goldFutures.changePercent >= 0 ? '+' : ''}${goldFutures.changePercent.toFixed(2)}%)`;
-        
-        if (silverFutures) {
-            // Silver Calculation (per KG):
-            // 1 Troy Ounce = 0.0311035 KG
-            // Rate = (PriceUSD * ExchangeRate / 0.0311035)
-            const silverKg = (silverFutures.priceUsd * exchangeRates.usdInr / 0.0311035 * 1.03).toFixed(2);
-            context += `\n• Silver (1kg): ₹${Number(silverKg).toLocaleString('en-IN')} (${silverFutures.changePercent >= 0 ? '+' : ''}${silverFutures.changePercent.toFixed(2)}%)`;
+        if (silverData) {
+            context += `\n• Silver (1kg): ₹${Number(silverData.price).toLocaleString('en-IN')} (${silverData.changePercent >= 0 ? '+' : ''}${silverData.changePercent.toFixed(2)}%)`;
         }
     }
 
@@ -194,8 +182,8 @@ export const fetchMarketContext = async () => {
     }
 
     context += `\n\nIMPORTANT: Use this live data when answering questions about current market conditions, prices, or exchange rates. 
-Always convert raw gold/silver US futures to the Indian context (10g for gold, 1kg for silver) if asked about Indian prices. 
-The estimates above include an approximate 3% GST. Always cite the real-time data provided above rather than your outdated training data.`;
+Always use the direct MCX rates for Gold and Silver provided above.
+The rates represent the professional Multi Commodity Exchange (MCX) price in India. Always cite the real-time data provided above rather than your outdated training data.`;
     context += '\n--- END LIVE DATA ---';
 
     return context;
@@ -327,10 +315,12 @@ const fetchGoogleFinancePrice = async (nseSymbol) => {
         // Sanitize symbol: remove any existing encoding and handle symbols like M&M
         const cleanSymbol = nseSymbol.replace(/%26/g, '&');
         
-        const res = await fetch(
-            `/google-finance/finance/quote/${encodeURIComponent(cleanSymbol)}:NSE`,
-            { signal: controller.signal }
-        );
+        // If the symbol already contains a colon (e.g. MCX:GOLD), use it directly
+        const finalUrl = cleanSymbol.includes(':') 
+            ? `/google-finance/finance/quote/${encodeURIComponent(cleanSymbol)}`
+            : `/google-finance/finance/quote/${encodeURIComponent(cleanSymbol)}:NSE`;
+
+        const res = await fetch(finalUrl, { signal: controller.signal });
         clearTimeout(timeoutId);
 
         if (!res.ok) return null;
