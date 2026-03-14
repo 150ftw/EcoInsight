@@ -78,15 +78,28 @@ const EcoLineChart = ({ data, title, dataKeys }) => {
     if (!data || !data.length) return null;
 
     // Automatically find data keys if not provided
-    // Skip 'name' and any keys that aren't numbers
-    const keys = dataKeys || Object.keys(data[0]).filter(k =>
-        k !== 'name' && k !== 'label' && typeof data[0][k] === 'number'
-    );
+    // Skip 'name' and any keys that aren't numbers (or numeric strings)
+    const keys = dataKeys || Object.keys(data[0]).filter(k => {
+        if (k === 'name' || k === 'label') return false;
+        const val = data[0][k];
+        return typeof val === 'number' || (typeof val === 'string' && !isNaN(parseFloat(val)));
+    });
+
+    // Ensure all data points are numbers
+    const processedData = data.map(item => {
+        const newItem = { ...item };
+        keys.forEach(k => {
+            if (typeof newItem[k] === 'string') {
+                newItem[k] = parseFloat(newItem[k]) || 0;
+            }
+        });
+        return newItem;
+    });
 
     return (
         <ChartWrapper title={title}>
             <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                <LineChart data={processedData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={CHART_THEME.gridColor} />
                     <XAxis dataKey="name" tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
                     <YAxis tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
@@ -114,14 +127,27 @@ const EcoBarChart = ({ data, title, dataKeys }) => {
     if (!data || !data.length) return null;
 
     // Automatically find data keys if not provided
-    const keys = dataKeys || Object.keys(data[0]).filter(k =>
-        k !== 'name' && k !== 'label' && typeof data[0][k] === 'number'
-    );
+    const keys = dataKeys || Object.keys(data[0]).filter(k => {
+        if (k === 'name' || k === 'label') return false;
+        const val = data[0][k];
+        return typeof val === 'number' || (typeof val === 'string' && !isNaN(parseFloat(val)));
+    });
+
+    // Ensure all data points are numbers
+    const processedData = data.map(item => {
+        const newItem = { ...item };
+        keys.forEach(k => {
+            if (typeof newItem[k] === 'string') {
+                newItem[k] = parseFloat(newItem[k]) || 0;
+            }
+        });
+        return newItem;
+    });
 
     return (
         <ChartWrapper title={title}>
             <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                <BarChart data={processedData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={CHART_THEME.gridColor} />
                     <XAxis dataKey="name" tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
                     <YAxis tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
@@ -179,14 +205,27 @@ const EcoAreaChart = ({ data, title, dataKeys }) => {
     if (!data || !data.length) return null;
 
     // Automatically find data keys if not provided
-    const keys = dataKeys || Object.keys(data[0]).filter(k =>
-        k !== 'name' && k !== 'label' && typeof data[0][k] === 'number'
-    );
+    const keys = dataKeys || Object.keys(data[0]).filter(k => {
+        if (k === 'name' || k === 'label') return false;
+        const val = data[0][k];
+        return typeof val === 'number' || (typeof val === 'string' && !isNaN(parseFloat(val)));
+    });
+
+    // Ensure all data points are numbers
+    const processedData = data.map(item => {
+        const newItem = { ...item };
+        keys.forEach(k => {
+            if (typeof newItem[k] === 'string') {
+                newItem[k] = parseFloat(newItem[k]) || 0;
+            }
+        });
+        return newItem;
+    });
 
     return (
         <ChartWrapper title={title}>
             <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                <AreaChart data={processedData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                     <defs>
                         {keys.map((key, idx) => (
                             <linearGradient key={key} id={`gradient-${key}`} x1="0" y1="0" x2="0" y2="1">
@@ -214,6 +253,33 @@ const EcoAreaChart = ({ data, title, dataKeys }) => {
             </ResponsiveContainer>
         </ChartWrapper>
     );
+};
+
+/**
+ * Sanitizes a raw JSON string from the AI to be more parser-friendly.
+ * Removes units like %, M, B, Cr, L and fixes minor syntax errors.
+ */
+const sanitizeChartJson = (raw) => {
+    if (!raw) return '';
+
+    let sanitized = raw.trim();
+
+    // 1. Strip units from values (e.g., "10%", 10%, "100M", "10.5B")
+    // This regex looks for digits followed by units inside quotes or as raw values
+    // It captures: "10%", 10%, "10.5M", etc.
+    sanitized = sanitized.replace(/(\d+(?:\.\d+)?)\s*[%MBK]|[₹$](?=\d)/gi, '$1');
+
+    // 2. Handle cases where the AI puts units inside quotes: "10%" -> "10"
+    // We do this by targeting common suffix patterns inside values
+    sanitized = sanitized.replace(/: \s*"(\d+(?:\.\d+)?)(?:%|[MBK]|Cr|L)"/gi, ': $1');
+
+    // 3. Fix common missing quotes for keys if AI is lazy
+    // sanitized = sanitized.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+
+    // 4. Strip trailing commas in objects/arrays which JSON.parse hates
+    sanitized = sanitized.replace(/,\s*([\]}])/g, '$1');
+
+    return sanitized;
 };
 
 /**
@@ -245,16 +311,34 @@ export const parseChartBlocks = (text) => {
         // Parse the block content (match[1] is backticks, match[2] is raw json)
         try {
             const blockContent = (match[1] || match[2]).trim();
-            const json = JSON.parse(blockContent);
+            const sanitizedContent = sanitizeChartJson(blockContent);
+            const json = JSON.parse(sanitizedContent);
 
             // Validate it looks like our chart schema
             if (json && json.type && json.data && Array.isArray(json.data)) {
-                parts.push({ type: 'chart', content: json });
+                // Ensure data points are numbers or convertable strings
+                const cleanData = json.data.map(item => {
+                    const newItem = { ...item };
+                    Object.keys(newItem).forEach(k => {
+                        if (k !== 'name' && k !== 'label') {
+                            const val = newItem[k];
+                            if (typeof val === 'string') {
+                                // One last cleanup for strings that made it through JSON.parse
+                                const cleanVal = val.replace(/[%,MBK₹$]/gi, '');
+                                newItem[k] = parseFloat(cleanVal);
+                            }
+                        }
+                    });
+                    return newItem;
+                });
+
+                parts.push({ type: 'chart', content: { ...json, data: cleanData } });
             } else {
                 // Not a chart, fallback to text
                 parts.push({ type: 'text', content: match[0] });
             }
         } catch (e) {
+            console.warn('Chart parsing failed after sanitation:', e);
             // Parsing failed (not valid JSON), fallback to text
             parts.push({ type: 'text', content: match[0] });
         }
