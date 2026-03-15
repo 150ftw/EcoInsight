@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useId } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X, Star, Check } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
@@ -38,6 +38,10 @@ import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
 
 const EcoInsightLogo = ({ size = 24, className = "" }) => {
+    const id = useId();
+    const gradientId = `logoGradientMain-${id.replace(/:/g, '')}`;
+    const filterId = `logoGlowEffect-${id.replace(/:/g, '')}`;
+
     const x = useMotionValue(0);
     const y = useMotionValue(0);
 
@@ -88,11 +92,11 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                 style={{ translateZ: "50px" }}
             >
                 <defs>
-                    <linearGradient id="logoGradientMain" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="var(--accent-primary)" />
                         <stop offset="100%" stopColor="var(--accent-secondary)" />
                     </linearGradient>
-                    <filter id="logoGlowEffect" x="-20%" y="-20%" width="140%" height="140%">
+                    <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
                         <feGaussianBlur stdDeviation="15" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
@@ -101,7 +105,7 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                 <motion.rect
                     x="40" y="40" width="432" height="432" rx="80"
                     fill="rgba(10, 10, 12, 0.8)"
-                    stroke="url(#logoGradientMain)"
+                    stroke={`url(#${gradientId})`}
                     strokeWidth="8"
                     variants={{
                         rest: { opacity: 0.8, strokeWidth: 8 },
@@ -112,7 +116,7 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                             boxShadow: "0 0 30px var(--accent-glow)"
                         }
                     }}
-                    style={{ filter: 'url(#logoGlowEffect)' }}
+                    style={{ filter: `url(#${filterId})` }}
                 />
 
                 {[
@@ -124,7 +128,7 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                     <motion.rect
                         key={`bar-${i}`}
                         x={bar.x} y={bar.y} width="30" height={bar.h} rx="4"
-                        fill="url(#logoGradientMain)"
+                        fill={`url(#${gradientId})`}
                         opacity={bar.op}
                         variants={{
                             rest: { height: bar.h, y: bar.y },
