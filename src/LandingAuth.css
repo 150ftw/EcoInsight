@@ -237,10 +237,6 @@ select,
     font-weight: 800;
     font-size: 1.4rem;
     letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .landing-nav {
@@ -347,6 +343,11 @@ select,
 .logo span {
     font-weight: 700;
     letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
 }
 
 .hero-content {
