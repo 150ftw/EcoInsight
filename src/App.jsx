@@ -42,54 +42,20 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
     const gradientId = `logoGradientMain-${id.replace(/:/g, '')}`;
     const filterId = `logoGlowEffect-${id.replace(/:/g, '')}`;
 
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-
-    const mouseXSpring = useSpring(x);
-    const mouseYSpring = useSpring(y);
-
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["20deg", "-20deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-20deg", "20deg"]);
-
-    const handleMouseMove = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        const xPct = mouseX / width - 0.5;
-        const yPct = mouseY / height - 0.5;
-        x.set(xPct);
-        y.set(yPct);
-    };
-
-    const handleMouseLeave = () => {
-        x.set(0);
-        y.set(0);
-    };
-
     return (
-        <motion.div
+        <div
             style={{
                 width: size,
                 height: size,
-                rotateX,
-                rotateY,
-                transformStyle: "preserve-3d",
             }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
             className={`logo-interactive-container ${className}`}
         >
-            <motion.svg
+            <svg
                 width={size}
                 height={size}
                 viewBox="0 0 512 512"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                whileHover="hover"
-                initial="rest"
-                style={{ translateZ: "50px" }}
             >
                 <defs>
                     <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -102,20 +68,12 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                     </filter>
                 </defs>
 
-                <motion.rect
+                <rect
                     x="40" y="40" width="432" height="432" rx="80"
                     fill="rgba(10, 10, 12, 0.8)"
                     stroke={`url(#${gradientId})`}
                     strokeWidth="8"
-                    variants={{
-                        rest: { opacity: 0.8, strokeWidth: 8 },
-                        hover: {
-                            opacity: 1,
-                            strokeWidth: 12,
-                            scale: 1.05,
-                            boxShadow: "0 0 30px var(--accent-glow)"
-                        }
-                    }}
+                    opacity="0.8"
                     style={{ filter: `url(#${filterId})` }}
                 />
 
@@ -125,39 +83,21 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                     { x: 220, y: 220, h: 200, op: 0.8 },
                     { x: 270, y: 180, h: 240, op: 1.0 }
                 ].map((bar, i) => (
-                    <motion.rect
+                    <rect
                         key={`bar-${i}`}
                         x={bar.x} y={bar.y} width="30" height={bar.h} rx="4"
                         fill={`url(#${gradientId})`}
                         opacity={bar.op}
-                        variants={{
-                            rest: { height: bar.h, y: bar.y },
-                            hover: {
-                                height: bar.h + 30,
-                                y: bar.y - 30,
-                                transition: { type: "spring", stiffness: 300, damping: 10, delay: i * 0.05 }
-                            }
-                        }}
-                        style={{ translateZ: "20px" }}
                     />
                 ))}
 
-                <motion.path
+                <path
                     d="M120 380 L220 280 L280 320 L400 150 M370 150 L400 150 L400 180"
                     stroke="#fff"
                     strokeWidth="24"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    variants={{
-                        rest: { pathLength: 1, opacity: 0.9 },
-                        hover: {
-                            opacity: 1,
-                            scale: 1.1,
-                            transformOrigin: '200px 200px',
-                            transition: { type: "spring", stiffness: 400 }
-                        }
-                    }}
-                    style={{ translateZ: "40px" }}
+                    opacity="0.9"
                 />
 
                 {[
@@ -166,30 +106,22 @@ const EcoInsightLogo = ({ size = 24, className = "" }) => {
                     { cx: 320, cy: 200, r: 15 },
                     { cx: 240, cy: 220, r: 12 }
                 ].map((node, i) => (
-                    <motion.circle
+                    <circle
                         key={`node-${i}`}
                         cx={node.cx} cy={node.cy} r={node.r}
                         fill="#fff"
-                        variants={{
-                            hover: {
-                                scale: [1, 1.4, 1],
-                                opacity: [0.8, 1, 0.8],
-                                transition: { repeat: Infinity, duration: 1.5, delay: i * 0.2 }
-                            }
-                        }}
-                        style={{ translateZ: "60px" }}
                     />
                 ))}
 
-                <motion.g stroke="#fff" strokeWidth="4" variants={{ rest: { opacity: 0.3 }, hover: { opacity: 0.7 } }} style={{ translateZ: "30px" }}>
+                <g stroke="#fff" strokeWidth="4" opacity="0.3">
                     <line x1="200" y1="180" x2="260" y2="140" />
                     <line x1="260" y1="140" x2="320" y2="200" />
                     <line x1="200" y1="180" x2="240" y2="220" />
                     <line x1="260" y1="140" x2="240" y2="220" />
                     <line x1="320" y1="200" x2="240" y2="220" />
-                </motion.g>
-            </motion.svg>
-        </motion.div>
+                </g>
+            </svg>
+        </div>
     );
 };
 
@@ -348,36 +280,8 @@ const extractTextFromPDF = async (file) => {
 
 
 
-const Magnetic = ({ children, distance = 0.5 }) => {
-    const ref = useRef(null);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-
-    const handleMouse = (e) => {
-        const { clientX, clientY } = e;
-        const { height, width, left, top } = ref.current.getBoundingClientRect();
-        const middleX = clientX - (left + width / 2);
-        const middleY = clientY - (top + height / 2);
-        setPosition({ x: middleX * distance, y: middleY * distance });
-    };
-
-    const reset = () => {
-        setPosition({ x: 0, y: 0 });
-    };
-
-    const { x, y } = position;
-
-    return (
-        <motion.div
-            ref={ref}
-            onMouseMove={handleMouse}
-            onMouseLeave={reset}
-            animate={{ x, y }}
-            transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-            className="magnetic-wrap"
-        >
-            {children}
-        </motion.div>
-    );
+const Magnetic = ({ children }) => {
+    return children;
 };
 
 const CountUp = ({ to, duration = 2 }) => {
@@ -448,48 +352,13 @@ const PartnerMarquee = () => {
 };
 
 const TiltCard = ({ children, className, ...props }) => {
-    const cardRef = useRef(null);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-    const mouseXSpring = useSpring(x);
-    const mouseYSpring = useSpring(y);
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
-
-    const handleMouseMove = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        // Set CSS variables for card-glow
-        e.currentTarget.style.setProperty("--mouse-x", `${mouseX}px`);
-        e.currentTarget.style.setProperty("--mouse-y", `${mouseY}px`);
-
-        const xPct = mouseX / width - 0.5;
-        const yPct = mouseY / height - 0.5;
-        x.set(xPct);
-        y.set(yPct);
-    };
-
-    const handleMouseLeave = () => {
-        x.set(0);
-        y.set(0);
-    };
-
     return (
-        <motion.div
-            ref={cardRef}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        <div
             className={className}
             {...props}
         >
             {children}
-            <div className="card-glow" />
-        </motion.div>
+        </div>
     );
 };
 
@@ -951,14 +820,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
             }
         }, 25000);
 
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            setIsHeaderVisible(currentScrollY < lastScrollY.current || currentScrollY < 100);
-            lastScrollY.current = currentScrollY;
-        };
-        window.addEventListener('scroll', handleScroll);
         return () => {
-            window.removeEventListener('scroll', handleScroll);
             clearTimeout(timer);
         };
     }, [isLoaded]);
@@ -1004,9 +866,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
 
     return (
         <div className="landing-container">
-            <motion.div className="scroll-indicator" style={{ scaleX: scrollYProgress }} />
-
-            <header className={`landing-header ${isHeaderVisible ? '' : 'header-hidden'}`}>
+            <header className="landing-header">
                 <div className="logo" onClick={() => setAppSection('landing')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <EcoInsightLogo size={48} /> <span>EcoInsight</span>
                 </div>
