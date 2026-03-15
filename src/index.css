@@ -81,7 +81,6 @@ body {
     margin: 0;
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
-    cursor: none;
     overflow-anchor: none;
 }
 
@@ -95,9 +94,9 @@ body {
     background-image: none !important;
 }
 
-/* Hide native cursor on our own elements, but NOT on third-party iframes/inputs */
+/* Restore native cursor */
 *:not(iframe):not(input):not(textarea):not(select):not([class*="cl-"]):not([data-clerk]) {
-    cursor: none !important;
+    cursor: auto;
 }
 
 #root {

@@ -33,65 +33,6 @@ import { fetchNewsTickerData } from './lib/MarketData'
 import './LandingAuth.css'
 import Threads from './components/Threads'
 import { SUBPAGE_DATA } from './lib/SubpageContent'
-const CustomCursor = () => {
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
-    const [isHovered, setIsHovered] = useState(false);
-
-    const springConfig = { damping: 20, stiffness: 600, mass: 0.5 };
-    const cursorX = useSpring(mouseX, springConfig);
-    const cursorY = useSpring(mouseY, springConfig);
-
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            mouseX.set(e.clientX);
-            mouseY.set(e.clientY);
-        };
-
-        const handleOver = (e) => {
-            if (e.target.closest('button, a, .nav-link, .magnetic-wrap, [role="button"], .interactive')) {
-                setIsHovered(true);
-            }
-        };
-        const handleOut = () => setIsHovered(false);
-
-        window.addEventListener('mousemove', handleMouseMove, { passive: true });
-        window.addEventListener('mouseover', handleOver);
-        window.addEventListener('mouseout', handleOut);
-
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseover', handleOver);
-            window.removeEventListener('mouseout', handleOut);
-        };
-    }, []);
-
-    return (
-        <motion.div
-            className={`vanguard-cursor ${isHovered ? 'hovered' : ''}`}
-            style={{
-                left: cursorX,
-                top: cursorY,
-            }}
-        >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M5.5 3.5L18.5 12L5.5 20.5V3.5Z"
-                    fill="white"
-                    className="arrow-main"
-                />
-                <path
-                    d="M5.5 3.5L18.5 12L5.5 20.5V3.5Z"
-                    stroke="#8B5CF6"
-                    strokeWidth="1.5"
-                    strokeLinejoin="round"
-                    className="arrow-border"
-                />
-            </svg>
-            <div className="cursor-glow-v3" />
-        </motion.div>
-    );
-};
 
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
@@ -4974,7 +4915,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     return (
         <>
-            <CustomCursor />
             {renderActiveSection()}
             <AnimatePresence>
                 {showInitialization && (
