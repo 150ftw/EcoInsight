@@ -430,11 +430,9 @@ const PerspectiveSection = ({ children, id, className }) => {
         offset: ["start end", "end start"]
     });
 
-    // Zoom in when coming into view, zoom "through" when leaving
-    const rotateX = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [10, 0, 0, -10]);
-    const scale = useTransform(scrollYProgress, [0, 0.4, 0.8, 1], [0.95, 1, 1.05, 1.15]);
+    // Flatten to 2D for high-stability rendering on Windows
+    const scale = useTransform(scrollYProgress, [0, 0.4, 0.8, 1], [0.95, 1, 1.0, 1.05]);
     const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-    const z = useTransform(scrollYProgress, [0, 0.5, 1], [-100, 0, 200]);
 
     return (
         <motion.section
@@ -442,12 +440,8 @@ const PerspectiveSection = ({ children, id, className }) => {
             ref={ref}
             className={className}
             style={{
-                rotateX,
                 scale,
-                opacity,
-                z,
-                perspective: "2000px",
-                transformStyle: "preserve-3d"
+                opacity
             }}
         >
             {children}
@@ -985,9 +979,8 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
     }, [isLoaded]);
 
     // Dramatic Hero Zoom
-    const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.2]);
+    const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.3]);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-    const heroZ = useTransform(scrollYProgress, [0, 0.2], [0, 150]);
 
     const splitText = (text) => {
         return text.split(" ").filter(w => w !== "").map((word, wordIndex) => (
@@ -1079,15 +1072,14 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                 </button>
             </header>
 
-            <main className="landing-hero" style={{ perspective: '2000px', position: 'relative' }}>
+            <main className="landing-hero" style={{ position: 'relative', overflow: 'hidden' }}>
                 <div className="hero-threads-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 0.6 }}>
                     <Threads amplitude={2.5} distance={0.3} enableMouseInteraction={false} color={[0.8, 0.7, 1.0]} />
                 </div>
                 <motion.div
                     style={{
                         scale: heroScale,
-                        opacity: heroOpacity,
-                        z: heroZ
+                        opacity: heroOpacity
                     }}
                     className="hero-content"
                 >
