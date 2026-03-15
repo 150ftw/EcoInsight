@@ -35,7 +35,6 @@
     z-index: 5;
     font-family: var(--font-main);
     scroll-behavior: smooth;
-    cursor: none;
 }
 
 .custom-cursor-container {
@@ -97,18 +96,8 @@
 
 .magnetic-wrap {
     display: inline-block;
-    cursor: none;
 }
 
-.nav-link,
-.btn-signin,
-.btn-primary,
-.btn-secondary,
-.btn-shine-primary,
-.btn-shine-secondary,
-.logo {
-    cursor: none !important;
-}
 
 /* Restore native cursor for Clerk auth, iframes, and form inputs */
 [class*="cl-"] *,
