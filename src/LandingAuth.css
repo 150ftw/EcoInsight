@@ -279,6 +279,9 @@ select,
     min-height: 100vh;
     justify-content: center;
     overflow: hidden;
+    background: #000000;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
 }
 
 .hero-badge {
@@ -1404,10 +1407,12 @@ select,
 /* Landing Footer Styles */
 .landing-footer {
     padding: 8rem 8% 4rem;
-    background: rgba(3, 3, 3, 0.8);
+    background: #000000;
     position: relative;
     z-index: 2;
     border-top: 1px solid var(--glass-border);
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
 }
 
 .footer-content {
@@ -1553,6 +1558,7 @@ select,
     padding: 160px 8%;
     position: relative;
     z-index: 2;
+    background: #000000;
 }
 
 .cta-card {
