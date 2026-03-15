@@ -350,7 +350,6 @@ select,
     width: 100%;
     position: relative;
     z-index: 30;
-    will-change: transform, opacity, filter;
 }
 
 .hero-content p {
@@ -933,7 +932,6 @@ select,
     background: #000000 !important;
     backface-visibility: hidden;
     transform: translate3d(0, 0, 0);
-    will-change: transform, opacity;
 }
 
 .solutions-grid {
@@ -989,7 +987,6 @@ select,
     background: #000000 !important;
     backface-visibility: hidden;
     transform: translate3d(0, 0, 0);
-    will-change: transform, opacity;
 }
 
 .pricing-grid {
@@ -2181,7 +2178,6 @@ select,
 .pricing-section {
     position: relative;
     z-index: 25;
-    will-change: transform, opacity;
     padding: 120px 8%;
     min-height: 80vh;
     display: flex;
