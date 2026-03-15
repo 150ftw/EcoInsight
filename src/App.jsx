@@ -456,7 +456,7 @@ const PerspectiveSection = ({ children, id, className }) => {
 };
 
 const PartnerMarquee = () => {
-    const partners = ["Bloomberg", "Reuters", "Financial Times", "Wall Street Journal", "Nasdaq", "BlackRock", "Goldman Sachs"];
+    const partners = ["NSE India", "BSE", "SEBI", "Reliance", "Tata Group", "HDFC Bank", "ICICI Bank", "SBI", "NIFTY 50", "Mint", "Moneycontrol", "Bloomberg"];
     return (
         <div className="partner-marquee">
             <div className="marquee-content">
