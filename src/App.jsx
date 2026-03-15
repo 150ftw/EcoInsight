@@ -988,7 +988,6 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
     const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.2]);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
     const heroZ = useTransform(scrollYProgress, [0, 0.2], [0, 150]);
-    const heroBlur = useTransform(scrollYProgress, [0, 0.2], [0, 5]);
 
     const splitText = (text) => {
         return text.split(" ").filter(w => w !== "").map((word, wordIndex) => (
@@ -1026,7 +1025,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
     };
 
     return (
-        <div className="landing-container" style={{ isolation: 'isolate' }}>
+        <div className="landing-container">
             <motion.div className="scroll-indicator" style={{ scaleX: scrollYProgress }} />
 
             <header className={`landing-header ${isHeaderVisible ? '' : 'header-hidden'}`}>
@@ -1088,8 +1087,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                     style={{
                         scale: heroScale,
                         opacity: heroOpacity,
-                        z: heroZ,
-                        filter: `blur(${heroBlur}px)`
+                        z: heroZ
                     }}
                     className="hero-content"
                 >
@@ -1894,8 +1892,7 @@ const SecurityPage = ({ onBack, onInit }) => {
                             padding: '2rem',
                             borderRadius: '16px',
                             textAlign: 'center',
-                            border: '1px solid rgba(255,255,255,0.05)',
-                            backdropFilter: 'blur(10px)'
+                            border: '1px solid rgba(255,255,255,0.05)'
                         }}>
                             <div style={{ fontSize: '0.65rem', color: '#71717a', marginBottom: '0.8rem', letterSpacing: '0.1em' }}>{id}</div>
                             <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--accent-primary)', textShadow: '0 0 15px rgba(139, 92, 246, 0.3)' }}>SECURE</div>

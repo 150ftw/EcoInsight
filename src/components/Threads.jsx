@@ -129,11 +129,11 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     if (!containerRef.current) return;
     const container = containerRef.current;
 
-    const renderer = new Renderer({ alpha: true });
+    const renderer = new Renderer({ alpha: false });
     const gl = renderer.gl;
-    gl.clearColor(0, 0, 0, 0);
+    gl.clearColor(0, 0, 0, 1);
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     container.appendChild(gl.canvas);
 
     const geometry = new Triangle(gl);

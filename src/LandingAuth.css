@@ -28,13 +28,14 @@
 
 .landing-container {
     min-height: 100vh;
-    background: transparent;
+    background: #000000 !important;
     color: var(--text-primary);
     overflow-x: hidden;
     position: relative;
     z-index: 5;
     font-family: var(--font-main);
     scroll-behavior: smooth;
+    contain: paint;
 }
 
 .custom-cursor-container {
@@ -156,9 +157,8 @@ select,
     top: 0;
     width: 100%;
     z-index: 1000;
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    background: rgba(3, 3, 3, 0.7);
-    border-bottom: 1px solid var(--glass-border);
+    background: #000000 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -934,6 +934,10 @@ select,
 .solutions-section {
     padding: 160px 8%;
     text-align: center;
+    background: #000000 !important;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+    will-change: transform, opacity;
 }
 
 .solutions-grid {
@@ -986,8 +990,11 @@ select,
 .pricing-section {
     padding: 160px 8% 200px;
     z-index: 20;
-    /* Ensure sections have high z-index */
     position: relative;
+    background: #000000 !important;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+    will-change: transform, opacity;
 }
 
 .pricing-grid {
