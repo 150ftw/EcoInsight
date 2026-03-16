@@ -997,8 +997,6 @@ select,
     margin: 6rem auto 0;
 }
 
-.pricing-card-wrapper {
-}
 
 .pricing-card {
     background: rgba(15, 15, 17, 0.6);
@@ -1587,8 +1585,6 @@ select,
 }
 
 /* Scroll Animation Utilities */
-.perspective-container {
-}
 
 /* Responsive Overrides */
 @media (max-width: 1024px) {
