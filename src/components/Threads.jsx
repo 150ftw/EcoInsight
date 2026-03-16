@@ -112,8 +112,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     }
 
     float colorVal = 1.0 - line_strength;
-    if (colorVal < 0.005) discard;
-    fragColor = vec4(uColor * colorVal, colorVal);
+    fragColor = vec4(uColor * colorVal, 1.0);
 }
 
 void main() {
@@ -129,7 +128,7 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     if (!containerRef.current) return;
     const container = containerRef.current;
 
-    const renderer = new Renderer({ alpha: false });
+    const renderer = new Renderer({ alpha: false, antialias: false });
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 1);
     gl.enable(gl.BLEND);

@@ -805,10 +805,7 @@ const ReviewsSection = () => {
 const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine, supaLoaded }) => {
     const { isSignedIn, isLoaded } = useAuth();
     const [hoveredPlanIndex, setHoveredPlanIndex] = useState(null);
-    const { scrollYProgress } = useScroll();
-    const [isHeaderVisible, setIsHeaderVisible] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const lastScrollY = useRef(0);
 
     const [authTimeout, setAuthTimeout] = useState(false);
 
@@ -829,27 +826,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
     const heroScale = 1;
     const heroOpacity = 1;
 
-    const splitText = (text) => {
-        return text.split(" ").filter(w => w !== "").map((word, wordIndex) => (
-            <span key={wordIndex} style={{ display: "inline-block", whiteSpace: "nowrap", marginRight: "0.25em" }}>
-                {word.split("").map((char, charIndex) => (
-                    <motion.span
-                        key={charIndex}
-                        initial={{ opacity: 1, y: 0 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                            duration: 0.5,
-                            delay: (wordIndex * 2 + charIndex) * 0.02,
-                            ease: "easeOut"
-                        }}
-                        style={{ display: "inline-block" }}
-                    >
-                        {char}
-                    </motion.span>
-                ))}
-            </span>
-        ));
-    };
+    const splitText = (text) => text;
 
     const containerVariants = {
         hidden: { opacity: 0 },
