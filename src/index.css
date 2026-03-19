@@ -2186,21 +2186,405 @@ input[type="range"] {
     to { opacity: 1; }
 }
 
+/* ============================================================ */
+/* COMPREHENSIVE MOBILE RESPONSIVE (≤768px)                      */
+/* ============================================================ */
 @media (max-width: 768px) {
+
+    /* --- APP CONTAINER --- */
+    .app-container {
+        padding-bottom: 0 !important; /* Remove ticker space on mobile */
+    }
+
+    /* --- CHAT HEADER --- */
+    .chat-header {
+        height: 56px;
+        padding: 0 1rem;
+    }
+
+    .chat-header h2 {
+        font-size: 0.95rem;
+    }
+
+    .header-content {
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .header-actions {
+        margin-left: auto !important;
+    }
+
+    .header-action-btn span {
+        display: none; /* Hide "Export Pro Report" text, keep icon */
+    }
+
+    .header-action-btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.4rem;
+    }
+
+    /* --- MESSAGES --- */
     .messages-list {
         padding: 1rem !important;
+        gap: 1.25rem !important;
     }
 
+    .message-wrapper {
+        gap: 0.75rem;
+        max-width: 100%;
+    }
+
+    .message-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        margin-top: 2px;
+    }
+
+    .message-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .message-content {
+        font-size: 0.92rem;
+        line-height: 1.55;
+    }
+
+    .message-content pre {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+
+    .message-content code {
+        font-size: 0.82em;
+        padding: 0.15rem 0.3rem;
+    }
+
+    .message-actions {
+        opacity: 1; /* Always show on touch devices */
+    }
+
+    /* --- INPUT AREA --- */
     .input-container {
-        padding: 1rem !important;
+        padding: 0.75rem 1rem 1rem !important;
     }
 
+    .input-wrapper {
+        border-radius: 16px;
+        padding: 0.5rem 0.5rem 0.5rem 1rem;
+    }
+
+    .input-wrapper input {
+        font-size: 0.95rem;
+        padding: 0.5rem 0;
+    }
+
+    .send-button {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+    }
+
+    .file-upload-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .input-footer {
+        font-size: 0.65rem;
+    }
+
+    /* --- FAQ GRID (show as single column instead of hiding) --- */
     .faq-grid {
-        display: none !important; /* Hide on small mobile to save space */
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+        display: grid !important;
+        margin-bottom: 1rem;
     }
 
+    .faq-button {
+        padding: 0.7rem 1rem;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+
+    /* --- VIEW CONTENT (non-chat views like trends, pulse, etc.) --- */
     .view-content {
-        padding: 1.5rem !important;
+        padding: 1.25rem 1rem !important;
+        gap: 1.5rem;
+    }
+
+    .view-content .view-header h1 {
+        font-size: 1.5rem !important;
+        margin-bottom: 0.25rem;
+    }
+
+    .view-content .view-header p {
+        font-size: 0.85rem;
+    }
+
+    .trends-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+
+    .trend-card {
+        padding: 1.25rem;
+        border-radius: 14px;
+    }
+
+    /* --- SETTINGS PAGE --- */
+    .settings-view {
+        gap: 2rem;
+        padding-bottom: 3rem;
+    }
+
+    .settings-view .view-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem;
+        margin-bottom: 1rem !important;
+    }
+
+    .settings-view .view-header .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .settings-section h3 {
+        font-size: 1rem;
+    }
+
+    .settings-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+        gap: 1.25rem;
+    }
+
+    .profile-top {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+        text-align: center;
+    }
+
+    .avatar-preview {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    .field.full {
+        grid-column: span 1;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.85rem;
+    }
+
+    .action-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .action-row .secondary-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .toggle-item {
+        gap: 1rem;
+    }
+
+    .toggle-text label {
+        font-size: 0.85rem;
+    }
+
+    .toggle-text p {
+        font-size: 0.75rem;
+    }
+
+    .theme-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .radio-group {
+        flex-wrap: wrap;
+    }
+
+    .radio-item {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .color-picker {
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .settings-footer {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+
+    .settings-footer .secondary-btn,
+    .settings-footer .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* --- BLOOMBERG TICKER (hide on mobile) --- */
+    .bloomberg-ticker {
+        display: none !important;
+    }
+
+    /* --- SUBPAGE CONTENT --- */
+    .subpage-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .subpage-header {
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-content-v2 {
+        padding: 1.5rem 1rem !important;
+    }
+
+    .page-header-v2 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .rich-content {
+        padding-bottom: 3rem;
+    }
+
+    .subpage-body-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+    }
+
+    .info-card {
+        padding: 2rem;
+        border-radius: 24px;
+    }
+
+    .info-card h3 {
+        font-size: 1.3rem;
+    }
+
+    /* --- FORM ELEMENTS --- */
+    .field-group {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem;
+    }
+
+    .interactive-portal {
+        padding: 1.5rem;
+        border-radius: 18px;
+    }
+
+    /* --- CREDIT MODAL --- */
+    .credit-modal-card {
+        max-width: 95vw;
+        padding: 1.5rem;
+        border-radius: 18px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .alert-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    /* --- LEADERSHIP / FOUNDER --- */
+    .founder-card-elite {
+        padding: 3rem 1.5rem;
+        border-radius: 28px;
+    }
+
+    .founder-avatar {
+        width: 90px;
+        height: 90px;
+        font-size: 2.2rem;
+    }
+
+    .founder-info h2 {
+        font-size: 1.8rem;
+    }
+
+    .leadership-header h3 {
+        font-size: 1.8rem !important;
+    }
+
+    /* --- REVIEWS --- */
+    .reviews-section {
+        padding: 4rem 1rem !important;
+    }
+
+    .reviews-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem;
+    }
+
+    /* --- MOBILE-SPECIFIC SIDEBAR TWEAKS --- */
+    .sidebar {
+        width: 75vw;
+        max-width: 300px;
+    }
+
+    .sidebar-header .logo {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .nav-item {
+        padding: 0.75rem 0.85rem;
+        font-size: 0.88rem;
+    }
+
+    .truncate {
+        max-width: 130px;
+    }
+
+    /* --- MOBILE APP HEADER REFINEMENTS --- */
+    .mobile-app-header {
+        height: 56px;
+        display: flex !important;
+    }
+
+    .mobile-logo {
+        font-size: 1rem;
     }
 }
 

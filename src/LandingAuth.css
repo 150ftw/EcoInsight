@@ -55,8 +55,8 @@
     /* Adjust rotation so the tip points to the mouse position */
     transform: rotate(-25deg);
     transform-origin: 0 0;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
-                scale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+        scale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vanguard-cursor svg {
@@ -200,13 +200,15 @@ select,
         font-size: 1.5rem;
     }
 
-    .signed-in-nav, .signed-out-nav {
+    .signed-in-nav,
+    .signed-out-nav {
         flex-direction: column;
         gap: 1.5rem;
     }
 }
 
-.signed-in-nav, .signed-out-nav {
+.signed-in-nav,
+.signed-out-nav {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -1613,7 +1615,12 @@ select,
     }
 }
 
+/* ============================================================ */
+/* COMPREHENSIVE MOBILE RESPONSIVE — LANDING (≤768px)            */
+/* ============================================================ */
 @media (max-width: 768px) {
+
+    /* --- FOOTER (existing, preserved) --- */
     .footer-content {
         flex-direction: column;
         gap: 3rem;
@@ -1633,6 +1640,284 @@ select,
     .stat-divider {
         width: 60px;
         height: 1px;
+    }
+
+    /* --- HERO SECTION --- */
+    .landing-hero {
+        padding: 140px 5% 80px;
+        min-height: auto;
+    }
+
+    .landing-hero h1 {
+        font-size: clamp(2rem, 8vw, 3rem) !important;
+        letter-spacing: -1.5px;
+        margin-bottom: 1.25rem !important;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+        line-height: 1.65;
+        margin-bottom: 2rem !important;
+    }
+
+    .hero-badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        height: 54px;
+    }
+
+    .stats-container {
+        margin-top: 2.5rem;
+        padding: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+    }
+
+    /* --- FLOATING ASSETS (hide on mobile) --- */
+    .floating-assets-layer,
+    .floating-asset {
+        display: none !important;
+    }
+
+    /* --- INTERACTIVE BLOB (shrink on mobile) --- */
+    .interactive-blob {
+        width: 300px;
+        height: 300px;
+    }
+
+    /* --- HEADER --- */
+    .landing-header {
+        height: 72px;
+        padding: 0 1rem;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+        gap: 0.75rem;
+    }
+
+    /* --- FEATURES / BENTO --- */
+    .features-section,
+    .solutions-section,
+    .pricing-section {
+        padding: 80px 5% !important;
+        min-height: auto !important;
+    }
+
+    .section-title {
+        margin-bottom: 3rem;
+    }
+
+    .section-title h2 {
+        font-size: clamp(1.8rem, 6vw, 2.5rem) !important;
+        margin-bottom: 1rem;
+    }
+
+    .section-title p {
+        font-size: 1rem;
+    }
+
+    .bento-grid {
+        margin-top: 2rem;
+        gap: 1.25rem;
+    }
+
+    .bento-item {
+        padding: 2rem !important;
+        border-radius: 24px;
+    }
+
+    .bento-item h3 {
+        font-size: 1.3rem;
+    }
+
+    .bento-item p {
+        font-size: 0.95rem;
+    }
+
+    .bento-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        margin-bottom: 1.25rem;
+    }
+
+    /* Bento interactive card internals */
+    .premium-compute-card,
+    .data-dynamics-card,
+    .policy-sim-card,
+    .neural-analyst-card {
+        padding: 2rem !important;
+        border-radius: 24px;
+    }
+
+    .compute-icon-container,
+    .globe-icon-container,
+    .prism-icon-container,
+    .bot-icon-container {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+    }
+
+    /* --- SOLUTIONS --- */
+    .solutions-grid {
+        gap: 1.25rem;
+    }
+
+    .solution-card {
+        padding: 2.5rem 1.5rem;
+        border-radius: 24px;
+    }
+
+    .solution-card h4 {
+        font-size: 1.15rem;
+    }
+
+    .solution-card p {
+        font-size: 0.95rem;
+        max-width: 100%;
+    }
+
+    /* --- PRICING --- */
+    .pricing-grid {
+        gap: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .pricing-card {
+        padding: 2.5rem 1.5rem;
+        border-radius: 28px;
+    }
+
+    .pricing-card.active {
+        transform: translateY(-10px) scale(1.02) !important;
+    }
+
+    .pricing-card.featured:not(.active):not(.dimmed) {
+        transform: scale(1.01);
+    }
+
+    .price {
+        font-size: 2.5rem;
+    }
+
+    .pricing-card li {
+        font-size: 0.92rem;
+    }
+
+    .btn-shine-primary,
+    .btn-shine-secondary {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.8rem;
+        width: 100%;
+    }
+
+    /* --- CTA --- */
+    .cta-section {
+        padding: 80px 5%;
+    }
+
+    .cta-card {
+        padding: 3rem 1.5rem;
+        border-radius: 32px;
+    }
+
+    .cta-card h2 {
+        font-size: clamp(1.8rem, 6vw, 2.5rem);
+        letter-spacing: -1px;
+    }
+
+    .cta-card p {
+        font-size: 1rem;
+        margin-bottom: 2rem !important;
+    }
+
+    /* --- FOOTER --- */
+    .landing-footer {
+        padding: 4rem 5% 2rem;
+    }
+
+    .footer-brand {
+        font-size: 1.2rem;
+        justify-content: center;
+    }
+
+    .footer-bottom {
+        font-size: 0.78rem;
+    }
+
+    /* --- PARTNER MARQUEE --- */
+    .partner-marquee {
+        margin-top: 3rem;
+        padding: 2rem 0;
+    }
+
+    .marquee-content {
+        gap: 4rem;
+    }
+
+    .partner-text {
+        font-size: 0.85rem;
+    }
+
+    /* --- AUTH PAGES --- */
+    .auth-card {
+        padding: 2rem 1.5rem;
+        border-radius: 24px;
+        max-width: 95vw;
+    }
+
+    .auth-clerk-card {
+        width: 95vw;
+    }
+
+    .auth-body h2 {
+        font-size: 1.4rem;
+    }
+
+    .social-auth {
+        grid-template-columns: 1fr;
+    }
+
+    /* --- SCROLL INDICATOR --- */
+    .scroll-indicator {
+        height: 2px;
+    }
+
+    /* --- CHECKOUT --- */
+    .checkout-card {
+        padding: 2rem 1.5rem;
+        border-radius: 24px;
+    }
+
+    /* --- BENTO HOVER DISABLE (touch devices don't hover) --- */
+    .bento-item:hover {
+        transform: none;
+    }
+
+    .pricing-card:hover {
+        transform: none;
+    }
+
+    .solution-card:hover {
+        transform: none;
     }
 }
 
@@ -2168,6 +2453,7 @@ select,
 .link-btn:hover {
     color: var(--accent-secondary);
 }
+
 /* Spatial Perspective Helper */
 .features-section,
 .solutions-section,
@@ -2409,15 +2695,19 @@ select,
     justify-content: center;
     gap: 0.5rem;
 }
+
 @media (max-width: 768px) {
-    .onboarding-card, .checkout-card {
+
+    .onboarding-card,
+    .checkout-card {
         padding: 2.5rem 1.5rem !important;
         border-radius: 24px !important;
         width: 100% !important;
         max-width: 100% !important;
     }
 
-    .onboarding-header h1, .order-summary-box h2 {
+    .onboarding-header h1,
+    .order-summary-box h2 {
         font-size: 1.5rem !important;
     }
 
