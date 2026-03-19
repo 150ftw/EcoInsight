@@ -246,8 +246,8 @@ export default function ComingSoon() {
             <div className="cs-footer">
                 <p className="cs-footer-text">
                     © 2026 EcoInsight AI &nbsp;·&nbsp;{' '}
-                    <a href="mailto:shivam@ecoinsight.online" className="cs-footer-link">
-                        shivam@ecoinsight.online
+                    <a href="mailto:support@ecoinsight.online" className="cs-footer-link">
+                        support@ecoinsight.online
                     </a>
                 </p>
             </div>
