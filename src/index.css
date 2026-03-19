@@ -2557,15 +2557,53 @@ input[type="range"] {
         gap: 1.25rem;
     }
 
-    /* --- MOBILE-SPECIFIC SIDEBAR TWEAKS --- */
+    /* --- MOBILE-SPECIFIC SIDEBAR FIXES --- */
     .sidebar {
-        width: 75vw;
-        max-width: 300px;
+        width: 80vw;
+        max-width: 320px;
+        background: rgba(10, 10, 12, 0.98) !important; /* Fully opaque to prevent bleed-through */
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        z-index: 200; /* Above overlay */
+        border-right: 1px solid rgba(139, 92, 246, 0.15);
+        box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .sidebar-header .logo {
         font-size: 1.25rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .sidebar-close-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-secondary);
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .sidebar-close-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    /* --- SIDEBAR OVERLAY FIX --- */
+    .sidebar-overlay {
+        z-index: 150 !important; /* Between content and sidebar */
+        background: rgba(0, 0, 0, 0.7) !important;
     }
 
     .nav-item {
@@ -2577,14 +2615,32 @@ input[type="range"] {
         max-width: 130px;
     }
 
+    /* --- HIDE DESKTOP CHAT HEADER ON MOBILE (use mobile-app-header instead) --- */
+    .chat-header {
+        display: none !important;
+    }
+
     /* --- MOBILE APP HEADER REFINEMENTS --- */
     .mobile-app-header {
         height: 56px;
         display: flex !important;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(10, 10, 12, 0.95) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--glass-border);
     }
 
     .mobile-logo {
         font-size: 1rem;
+    }
+
+    /* --- MAIN AREA HEIGHT ADJUSTMENT --- */
+    main.chat-area {
+        height: calc(100vh - 56px); /* Account for mobile header */
+        overflow: hidden;
     }
 }
 

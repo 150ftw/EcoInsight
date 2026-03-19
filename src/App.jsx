@@ -4592,8 +4592,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 {isMobile && isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
                 {isMobile && (
                     <header className="mobile-app-header">
-                        <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(true)}>
-                            <Menu size={20} />
+                        <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
                         <div className="mobile-logo">
                             <EcoInsightLogo size={24} /> <span>EcoInsight</span>
@@ -4608,17 +4608,18 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <EcoInsightLogo size={36} className="logo-icon" /> <span>EcoInsight</span>
                         </motion.div>
+                        {isMobile && <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}><X size={20} /></button>}
                     </div>
                     <nav className="sidebar-nav">
                         <div className="sidebar-section">
                             <span className="section-label">Ongoing Chat</span>
-                            <button className="nav-item new-chat" onClick={createNewChat}>
+                            <button className="nav-item new-chat" onClick={() => { createNewChat(); if (isMobile) setIsSidebarOpen(false); }}>
                                 <EcoNewChatIcon size={18} /> <span>New Chat</span>
                             </button>
                             <div className="history-item-wrapper active-chat-item">
                                 <button
                                     className={`nav-item ${view === 'chat' ? 'active' : ''}`}
-                                    onClick={() => setView('chat')}
+                                    onClick={() => { setView('chat'); if (isMobile) setIsSidebarOpen(false); }}
                                 >
                                     <EcoHistoryIcon size={18} /> <span className="truncate">{activeChat.title}</span>
                                 </button>
@@ -4638,6 +4639,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                             onClick={() => {
                                                 setActiveChatId(chat.id);
                                                 setView('chat');
+                                                if (isMobile) setIsSidebarOpen(false);
                                             }}
                                         >
                                             <EcoHistoryIcon size={16} /> <span className="truncate">{chat.title}</span>
@@ -4685,7 +4687,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 )}
                             </AnimatePresence>
 
-                            <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')} style={{ marginTop: '0.5rem' }}><Settings size={18} /> Settings</button>
+                            <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => { setView('settings'); if (isMobile) setIsSidebarOpen(false); }} style={{ marginTop: '0.5rem' }}><Settings size={18} /> Settings</button>
                         </div>
                     </nav>
                     <div className="sidebar-footer">
