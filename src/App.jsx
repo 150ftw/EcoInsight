@@ -4706,22 +4706,24 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     </div>
                 </aside>
                 <main className="chat-area">
-                    <header className="chat-header">
-                        <div className="header-content">
-                            <EcoInsightLogo size={28} />
-                            <h2>{view === 'chat' ? 'Indian Market Analyst' : view === 'trends' ? 'Market Intelligence' : 'Account Settings'}</h2>
-                            <div className="badge">{view === 'chat' ? 'Expert Mode' : 'Beta'}</div>
-                            <div className="header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
-                                <button className="header-action-btn" onClick={downloadChatAsPDF} disabled={isExporting}>
-                                    {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-                                    <span>Export Pro Report</span>
-                                </button>
+                    {!isMobile && (
+                        <header className="chat-header">
+                            <div className="header-content">
+                                <EcoInsightLogo size={28} />
+                                <h2>{view === 'chat' ? 'Indian Market Analyst' : view === 'trends' ? 'Market Intelligence' : 'Account Settings'}</h2>
+                                <div className="badge">{view === 'chat' ? 'Expert Mode' : 'Beta'}</div>
+                                <div className="header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+                                    <button className="header-action-btn" onClick={downloadChatAsPDF} disabled={isExporting}>
+                                        {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                                        <span>Export Pro Report</span>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </header>
+                        </header>
+                    )}
                     {renderView()}
                 </main>
-                <NewsTicker />
+                {!isMobile && <NewsTicker />}
             </div>
         );
     };
