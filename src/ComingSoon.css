@@ -1,0 +1,489 @@
+/* ===== EcoInsight AI — Coming Soon Page ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* ---------- Root Setup ---------- */
+.coming-soon-root {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #ffffff;
+    z-index: 99999;
+}
+
+/* ---------- Animated Gradient Mesh Background ---------- */
+.cs-gradient-mesh {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.cs-gradient-mesh::before,
+.cs-gradient-mesh::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.35;
+    animation: cs-mesh-float 12s ease-in-out infinite alternate;
+}
+
+.cs-gradient-mesh::before {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #8b5cf6, transparent 70%);
+    top: -15%;
+    right: -10%;
+    animation-delay: 0s;
+}
+
+.cs-gradient-mesh::after {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #d946ef, transparent 70%);
+    bottom: -15%;
+    left: -10%;
+    animation-delay: -6s;
+}
+
+.cs-mesh-extra {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #3b82f6, transparent 70%);
+    filter: blur(100px);
+    opacity: 0.2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: cs-mesh-pulse 8s ease-in-out infinite;
+}
+
+@keyframes cs-mesh-float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, -30px) scale(1.15); }
+}
+
+@keyframes cs-mesh-pulse {
+    0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.3; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* ---------- Grid Overlay ---------- */
+.cs-grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+}
+
+/* ---------- Floating Particles ---------- */
+.cs-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.cs-particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: cs-particle-float linear infinite;
+}
+
+@keyframes cs-particle-float {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+    }
+}
+
+/* ---------- Main Content ---------- */
+.cs-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    max-width: 800px;
+}
+
+/* ---------- Logo ---------- */
+.cs-logo-wrapper {
+    position: relative;
+    margin-bottom: 2.5rem;
+}
+
+.cs-logo-glow {
+    position: absolute;
+    inset: -30px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.25), transparent 70%);
+    filter: blur(20px);
+    animation: cs-logo-breathe 4s ease-in-out infinite;
+}
+
+@keyframes cs-logo-breathe {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.1); }
+}
+
+.cs-logo-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* ---------- Brand Name ---------- */
+.cs-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.cs-brand-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #8b5cf6, #d946ef);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.3px;
+}
+
+.cs-ai-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 6px;
+    color: #a78bfa;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+/* ---------- Headline ---------- */
+.cs-headline {
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.cs-headline-text {
+    background: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #e2e8f0 25%,
+        #8b5cf6 50%,
+        #d946ef 75%,
+        #ffffff 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: cs-text-shimmer 6s linear infinite;
+}
+
+@keyframes cs-text-shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+/* ---------- Tagline ---------- */
+.cs-tagline {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 400;
+    color: #a1a1aa;
+    line-height: 1.6;
+    max-width: 550px;
+    margin-bottom: 3rem;
+}
+
+.cs-tagline strong {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+/* ---------- Status Bar ---------- */
+.cs-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 100px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    margin-bottom: 2rem;
+}
+
+.cs-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+    animation: cs-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cs-dot-pulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+    50% { box-shadow: 0 0 18px rgba(16, 185, 129, 0.8); }
+}
+
+.cs-status-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #a1a1aa;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+/* ---------- Notify Button / CTA ---------- */
+.cs-notify-form {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 460px;
+    margin-bottom: 2.5rem;
+}
+
+.cs-email-input {
+    flex: 1;
+    padding: 0.9rem 1.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.cs-email-input::placeholder {
+    color: #52525b;
+}
+
+.cs-email-input:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.cs-notify-btn {
+    padding: 0.9rem 2rem;
+    background: linear-gradient(135deg, #8b5cf6, #d946ef);
+    border: none;
+    border-radius: 14px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.cs-notify-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #a78bfa, #e879f9);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.cs-notify-btn:hover::before {
+    opacity: 1;
+}
+
+.cs-notify-btn span {
+    position: relative;
+    z-index: 1;
+}
+
+.cs-notify-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px -5px rgba(139, 92, 246, 0.5);
+}
+
+.cs-notify-btn:active {
+    transform: translateY(0);
+}
+
+/* ---------- Feature Chips ---------- */
+.cs-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.cs-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 100px;
+    font-size: 0.8rem;
+    color: #a1a1aa;
+    font-weight: 500;
+}
+
+.cs-chip-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b5cf6;
+}
+
+/* ---------- Footer ---------- */
+.cs-footer {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 10;
+}
+
+.cs-footer-text {
+    font-size: 0.75rem;
+    color: #3f3f46;
+    letter-spacing: 0.5px;
+}
+
+.cs-footer-link {
+    color: #52525b;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.cs-footer-link:hover {
+    color: #8b5cf6;
+}
+
+/* ---------- Scan Lines (subtle CRT effect) ---------- */
+.cs-scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.005) 2px,
+        rgba(255, 255, 255, 0.005) 4px
+    );
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* ---------- Submitted State ---------- */
+.cs-submitted-msg {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.5rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 14px;
+    color: #10b981;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 2.5rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+    .cs-content {
+        padding: 1.5rem;
+    }
+
+    .cs-headline {
+        letter-spacing: -1px;
+        margin-bottom: 1rem;
+    }
+
+    .cs-tagline {
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+    }
+
+    .cs-notify-form {
+        flex-direction: column;
+    }
+
+    .cs-notify-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .cs-logo-container {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+    }
+
+    .cs-features {
+        gap: 0.5rem;
+    }
+
+    .cs-chip {
+        font-size: 0.72rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .cs-footer {
+        bottom: 1rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .cs-headline {
+        font-size: 2.5rem;
+    }
+}
