@@ -10,10 +10,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: #ffffff;
     z-index: 99999;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- Animated Gradient Mesh Background ---------- */
@@ -127,6 +129,8 @@
     text-align: center;
     padding: 2rem;
     max-width: 800px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* ---------- Logo ---------- */
@@ -554,53 +558,64 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 640px) {
+    .coming-soon-root {
+        align-items: flex-start;
+    }
+
     .cs-content {
-        padding: 1.5rem;
+        padding: 3rem 1.25rem 6rem;
+        min-height: 100vh;
+        justify-content: center;
+    }
+
+    .cs-logo-wrapper {
+        margin-bottom: 1.5rem;
+    }
+
+    .cs-logo-container {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
     }
 
     .cs-headline {
         letter-spacing: -1px;
         margin-bottom: 1rem;
+        font-size: clamp(2.2rem, 12vw, 3.5rem);
     }
 
     .cs-tagline {
-        font-size: 0.95rem;
-        margin-bottom: 2rem;
-        width: 100% !important;
-        max-width: 100% !important;
+        font-size: 0.92rem;
+        margin-bottom: 1.5rem;
+        width: 100%;
+        max-width: 100%;
     }
 
-    .cs-notify-form {
-        flex-direction: column;
-        width: 100% !important;
-        max-width: 100% !important;
+    .cs-status-bar {
+        padding: 0.6rem 1rem;
+        margin-bottom: 1.5rem;
     }
 
-    .cs-email-input {
-        width: 100% !important;
-    }
-
-    .cs-notify-btn {
-        width: 100% !important;
-        text-align: center;
+    .cs-status-text {
+        font-size: 0.65rem;
+        letter-spacing: 1px;
     }
 
     .cs-waitlist-live {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-bottom: 2rem;
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1.5rem;
     }
 
-    .cs-chip {
-        font-size: 0.72rem;
-        padding: 0.4rem 0.8rem;
+    .cs-waitlist-card {
+        padding: 1rem 1.25rem;
     }
 
     .cs-waitlist-content {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 1.25rem;
+        gap: 1rem;
     }
 
     .cs-waitlist-header {
@@ -610,20 +625,73 @@
 
     .cs-waitlist-text {
         white-space: normal;
+        font-size: 0.88rem;
     }
 
     .cs-waitlist-link {
         width: 100%;
         justify-content: center;
+        padding: 0.75rem 1.25rem;
+    }
+
+    .cs-notify-form {
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        gap: 0.6rem;
+    }
+
+    .cs-email-input {
+        width: 100%;
+        font-size: 0.9rem;
+        padding: 0.8rem 1.25rem;
+    }
+
+    .cs-notify-btn {
+        width: 100%;
+        text-align: center;
+        padding: 0.8rem 1.25rem;
+    }
+
+    .cs-features {
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .cs-chip {
+        font-size: 0.72rem;
+        padding: 0.4rem 0.8rem;
     }
 
     .cs-footer {
-        bottom: 1rem;
+        position: relative;
+        bottom: auto;
+        transform: none;
+        left: auto;
+        margin-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .cs-submitted-msg {
+        margin-bottom: 1.5rem;
     }
 }
 
 @media (max-width: 380px) {
     .cs-headline {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
+    }
+
+    .cs-brand-name {
+        font-size: 1.2rem;
+    }
+
+    .cs-chip {
+        font-size: 0.65rem;
+        padding: 0.35rem 0.65rem;
+    }
+
+    .cs-status-text {
+        font-size: 0.6rem;
     }
 }
