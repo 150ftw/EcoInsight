@@ -24,6 +24,14 @@
     --message-gap: 2rem;
 }
 
+@media (max-width: 640px) {
+    :root {
+        --container-padding: 1.25rem;
+        --message-gap: 1.25rem;
+        --base-font-size: 14px;
+    }
+}
+
 /* Performance Mode Override */
 .performance-low {
     --glass-blur: 4px;
@@ -73,6 +81,8 @@
 
 html {
     background-color: #000000 !important;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 body {

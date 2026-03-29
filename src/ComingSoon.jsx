@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useId } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ExternalLink } from 'lucide-react'
 import './ComingSoon.css'
 
 /* ---------- Inline Logo (matches existing EcoInsight branding) ---------- */
@@ -178,6 +179,32 @@ export default function ComingSoon() {
                 >
                     <div className="cs-status-dot" />
                     <span className="cs-status-text">Building something extraordinary</span>
+                </motion.div>
+
+                {/* Waitlist Live Section */}
+                <motion.div
+                    className="cs-waitlist-live"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                >
+                    <div className="cs-waitlist-card">
+                        <div className="cs-waitlist-content">
+                            <div className="cs-waitlist-header">
+                                <span className="cs-waitlist-badge">LIVE NOW</span>
+                                <p className="cs-waitlist-text">The official waitlist is now live!</p>
+                            </div>
+                            <a 
+                                href="https://www.joinecoinsight.dev" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="cs-waitlist-link"
+                            >
+                                <span>Join Waitlist</span>
+                                <ExternalLink size={14} />
+                            </a>
+                        </div>
+                    </div>
                 </motion.div>
 
                 {/* Email CTA */}
