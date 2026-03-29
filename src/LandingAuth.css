@@ -126,18 +126,9 @@ select,
     pointer-events: none;
 }
 
+/* Assets removed for pure black aesthetic */
 .floating-asset {
-    position: absolute;
-    pointer-events: none;
-    z-index: 10;
-    filter: brightness(1.2) contrast(1.1);
-}
-
-.asset-1 {
-    width: 250px;
-    top: 15%;
-    right: -2%;
-    opacity: 1.0;
+    display: none !important;
 }
 
 .asset-2 {
@@ -290,14 +281,13 @@ select,
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1.2rem;
-    background: rgba(139, 92, 246, 0.1);
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 100px;
-    color: var(--accent-primary);
+    color: var(--text-secondary);
     font-size: 0.85rem;
     font-weight: 700;
     margin-bottom: 2rem;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
 }
 
 .landing-hero h1 {
@@ -1558,8 +1548,8 @@ select,
 }
 
 .cta-card {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(217, 70, 239, 0.15));
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 56px;
     padding: 8rem 4rem;
     display: flex;

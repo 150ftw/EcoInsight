@@ -2,14 +2,14 @@
 
 :root {
     --bg-dark: #000000;
-    --sidebar-bg: rgba(0, 0, 0, 0.95);
+    --sidebar-bg: rgba(0, 0, 0, 0.98);
     --accent-primary: #8b5cf6;
     --accent-secondary: #d946ef;
-    --accent-glow: rgba(139, 92, 246, 0.3);
+    --accent-glow: rgba(139, 92, 246, 0.1);
     --text-primary: #ffffff;
     --text-secondary: #a1a1aa;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(255, 255, 255, 0.02);
+    --glass-border: rgba(255, 255, 255, 0.05);
     --font-main: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', sans-serif;
 
@@ -81,31 +81,31 @@
 
 html {
     background-color: #000000 !important;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 body {
     background-color: #000000 !important;
+    background-image: none !important;
     color: var(--text-primary);
     font-family: var(--font-main);
     font-size: var(--base-font-size);
     min-height: 100vh;
     width: 100%;
     margin: 0;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
+    position: relative;
     transition: background-color 0.3s ease, color 0.3s ease;
     overflow-anchor: none;
 }
 
-#root, .app-container, .subpage-view {
+#root, .app-container, .subpage-view, .landing-container {
     background-color: #000000 !important;
     background-image: none !important;
-}
-
-.landing-container {
-    background-color: #000000 !important;
-    background-image: none !important;
+    overflow-x: hidden;
 }
 
 /* Restore native cursor */
@@ -1449,30 +1449,41 @@ input[type="range"] {
     position: fixed;
     bottom: 0;
     left: 0;
-    width: 100%;
-    height: 32px;
-    background: rgba(10, 10, 12, 0.95);
-    border-top: 1px solid rgba(139, 92, 246, 0.3);
+    width: 100vw;
+    height: 48px;
+    background: #000000;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
-    z-index: 1000;
-    font-family: var(--font-body);
-    font-size: 0.75rem;
+    z-index: 10000;
     overflow: hidden;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .bloomberg-ticker {
+        height: 40px;
+    }
+    
+    /* Ensure no text overlap on smallest viewports */
+    .ticker-item {
+        font-size: 0.7rem !important;
+        padding: 0 0.75rem !important;
+        gap: 6px !important;
+    }
 }
 
 .ticker-label {
-    background: var(--accent-primary);
-    color: white;
+    background: #ffffff;
+    color: #000000;
     height: 100%;
     display: flex;
     align-items: center;
     padding: 0 1rem;
     font-weight: 800;
-    font-style: italic;
+    font-style: normal;
     letter-spacing: 1px;
     z-index: 2;
-    box-shadow: 10px 0 20px rgba(0, 0, 0, 0.5);
     white-space: nowrap;
 }
 
@@ -1494,10 +1505,26 @@ input[type="range"] {
 .ticker-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0 2rem;
+    gap: 0.6rem;
+    padding: 0 1.5rem;
     color: var(--text-secondary);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .ticker-item {
+        padding: 0 1rem;
+        gap: 0.4rem;
+    }
+    
+    .ticker-symbol {
+        font-weight: 700;
+    }
+    
+    .ticker-price {
+        font-weight: 500;
+    }
 }
 
 .ticker-item.headline {
@@ -2895,9 +2922,9 @@ input[type="range"] {
 /* GAP CLOSURE & FLICKER PREVENTION */
 /* ============================================================ */
 .features-section, .solutions-section, .reviews-section, .pricing-section {
-    margin-top: -1px; /* Overlap slightly to close rendering gaps */
+    margin-top: -1px;
     margin-bottom: -1px;
-    background-color: #000 !important; /* Force solid background on wrappers */
+    background-color: #000 !important;
     position: relative;
     z-index: 1;
 }
@@ -2905,4 +2932,44 @@ input[type="range"] {
 html {
     background-color: #000 !important;
     color-scheme: dark;
+}
+
+/* ============================================================ */
+/* FINAL MOBILE OVERFLOW CONSTRAINTS                            */
+/* ============================================================ */
+@media (max-width: 768px) {
+    /* Prevent any injected elements from causing overflow */
+    .whatsapp-float-btn,
+    .market-pulse-bar,
+    .ticker-track,
+    .landing-container {
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+    }
+    
+    .whatsapp-float-btn {
+        right: 15px !important;
+        bottom: 70px !important; /* Move up to clear the ticker */
+        z-index: 9999 !important;
+    }
+
+    /* Fix Ticker Overlap and 'Not Pure Black' issues found by subagent */
+    .ticker-label {
+        background: #000000 !important;
+        padding-right: 2rem !important;
+        border-right: 2px solid #ffffff !important;
+        z-index: 20 !important;
+    }
+
+    .darkveil-canvas, 
+    .pulse-gradient-overlay,
+    .hero-threads-bg,
+    .footer-threads-bg {
+        background: #000000 !important;
+        opacity: 1 !important;
+    }
+
+    canvas {
+        filter: grayscale(1) brightness(0) !important;
+    }
 }
