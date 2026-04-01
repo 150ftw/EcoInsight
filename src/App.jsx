@@ -897,8 +897,12 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
 
             <main className="landing-hero" style={{ position: 'relative', overflow: 'hidden' }}>
                 <div className="hero-threads-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 1.0 }}>
-                    <Threads amplitude={1.5} distance={0.2} enableMouseInteraction={false} color={[0, 0, 0]} />
+                    <Threads amplitude={1.5} distance={0.2} enableMouseInteraction={false} color={[0.4, 0.2, 0.8]} />
                 </div>
+                
+                {/* Restore the Purple Pulse Background Animation */}
+                <div className="purple-pulse-glow" aria-hidden="true" />
+                
                 <div
                     className="hero-content"
                 >
