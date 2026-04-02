@@ -145,7 +145,7 @@ export default function ComingSoon() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
                 >
-                    <span className="cs-brand-name">EcoInsight</span>
+                    <span className="cs-brand-name">Eko by EcoInsight</span>
                     <span className="cs-ai-badge">AI</span>
                 </motion.div>
 
@@ -167,7 +167,7 @@ export default function ComingSoon() {
                     transition={{ delay: 0.55, duration: 0.6 }}
                 >
                     <strong>AI-Powered Economic Intelligence</strong> for Indian Investors.
-                    Real-time market analysis, policy simulations, and neural insights — all in one premium platform.
+                    Real-time market analysis, policy simulations, and neural insights with Eko — all in one premium platform.
                 </motion.p>
 
                 {/* Status */}
@@ -272,7 +272,7 @@ export default function ComingSoon() {
             {/* Footer */}
             <div className="cs-footer">
                 <p className="cs-footer-text">
-                    © 2026 EcoInsight AI &nbsp;·&nbsp;{' '}
+                    © 2026 Eko by EcoInsight &nbsp;·&nbsp;{' '}
                     <a href="mailto:support@ecoinsight.online" className="cs-footer-link">
                         support@ecoinsight.online
                     </a>

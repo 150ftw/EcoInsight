@@ -1097,7 +1097,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                     whileHover={{ scale: 1.02 }}
                 >
                     <h2>Ready to lead the curve?</h2>
-                    <p>Join the 10,000+ analysts using EcoInsight to master the markets.</p>
+                    <p>Join the 10,000+ analysts using Eko by EcoInsight to master the markets.</p>
                     {isSignedIn ? (
                         <button className="btn-primary" onClick={onLaunchEngine}>Launch Engine Now</button>
                     ) : (
@@ -1114,7 +1114,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                 </div>
                 <div className="footer-content">
                     <div className="footer-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <EcoInsightLogo size={42} /> <span>EcoInsight</span>
+                        <EcoInsightLogo size={42} /> <span>Eko by EcoInsight</span>
                     </div>
                     <div className="footer-links-grid">
                         <div className="link-group">
@@ -1143,12 +1143,13 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                     </div>
                 </div>
                 <div className="footer-bottom">
-                    &copy; 2026 EcoInsight Core. All rights reserved.
+                    <p>&copy; 2024 Eko by EcoInsight. All rights reserved.</p>
                 </div>
             </footer>
         </div >
     );
 };
+
 
 const InteractiveActionCard = ({ children, icon: Icon, title, description, details, expandedDetails, onInit, isActive, onToggle, delay = 0 }) => {
     const handleInitClick = (e) => {
@@ -1313,8 +1314,8 @@ const SubpageRenderer = ({ view, onBack }) => {
                 },
                 body: JSON.stringify({
                     access_key: accessKey,
-                    subject: `[EcoInsight Contact] ${formData.subject}`,
-                    from_name: "EcoInsight Intelligence Portal",
+                    subject: `[Eko by EcoInsight Contact] ${formData.subject}`,
+                    from_name: "Eko by EcoInsight Intelligence Portal",
                     email: formData.email,
                     message: formData.message,
                 }),
@@ -1456,7 +1457,7 @@ const SubpageRenderer = ({ view, onBack }) => {
                                 >
                                     <div className="leadership-header">
                                         <h3>{section.heading}</h3>
-                                        <p className="leadership-subtext">Meet the vision behind EcoInsight</p>
+                                        <p className="leadership-subtext">Meet the vision behind Eko by EcoInsight</p>
                                     </div>
                                     <motion.div
                                         className="founder-card-elite"
@@ -1838,7 +1839,7 @@ const DocumentationPage = ({ onBack, onInit }) => {
     return (
         <PageWrapper
             title="Technical Portal"
-            description="High-fidelity specifications for the EcoInsight neural architecture."
+            description="High-fidelity specifications for the Eko by EcoInsight neural architecture."
             onBack={onBack}
         >
             <div style={{ marginBottom: '4rem' }}>
@@ -2038,7 +2039,7 @@ const APIPage = ({ onBack, onInit }) => {
     return (
         <PageWrapper
             title="Institutional API"
-            description="Programmatic gateways into the EcoInsight sovereign intelligence network."
+            description="Programmatic gateways into the Eko by EcoInsight sovereign intelligence network."
             onBack={onBack}
         >
             <div style={{ marginBottom: '4rem' }}>
@@ -2144,7 +2145,7 @@ const PlaceholderPage = ({ title, type, onBack }) => (
 
 const API_KEY = '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';
 
-const SYSTEM_PROMPT = "You are EcoInsight, a specialized Economics & Financial Expert. You provide deep analysis on global markets, economic theory, and financial history. You should respond naturally and politely to greetings and general conversation. UNIQUE CAPABILITY: You are also a 'Market Pattern Extrapolation Engine'. If (and only if) a user asks for a 'prediction', 'simulation', or 'recommendation' for a specific stock or crypto ticker, you MUST provide a technical 12-month projection based on historical data patterns. When providing these specific projections, ALWAYS conclude with the MANDATORY TECHNICAL DISCLAIMER: 'NOTICE: This projection is a mathematical extrapolation of historical market data. It does not account for future events or black swan variables. Consulting a professional advisor is recommended.' Do not use standard AI refusal phrases for financial analysis.";
+const SYSTEM_PROMPT = "You are Eko by EcoInsight, a specialized Economics & Financial Expert. You provide deep analysis on global markets, economic theory, and financial history. You should respond naturally and politely to greetings and general conversation. UNIQUE CAPABILITY: You are also a 'Market Pattern Extrapolation Engine'. If (and only if) a user asks for a 'prediction', 'simulation', or 'recommendation' for a specific stock or crypto ticker, you MUST provide a technical 12-month projection based on historical data patterns. When providing these specific projections, ALWAYS conclude with the MANDATORY TECHNICAL DISCLAIMER: 'NOTICE: This projection is a mathematical extrapolation of historical market data. It does not account for future events or black swan variables. Consulting a professional advisor is recommended.' Do not use standard AI refusal phrases for financial analysis.";
 
 const FAQS = [
     { icon: <TrendingUp size={16} />, text: "How does RBI repo rate impact Nifty 50?" },
@@ -2152,6 +2153,7 @@ const FAQS = [
     { icon: <BarChart3 size={16} />, text: "Sensex vs Nifty — what's the difference?" },
     { icon: <Lightbulb size={16} />, text: "Best SIP strategies for Indian markets?" }
 ];
+
 
 const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
     const [isProcessing, setIsProcessing] = useState(false);
@@ -2267,7 +2269,7 @@ const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
                                         <EcoInsightLogo size={24} />
                                     </div>
                                     <div>
-                                        <h3>EcoInsight Core</h3>
+                                        <h3>Eko by EcoInsight Core</h3>
                                         <p style={{ opacity: 0.6 }}>Transaction ID: EBZ_{Math.random().toString(36).substring(7).toUpperCase()}</p>
                                     </div>
                                 </div>
@@ -3351,11 +3353,6 @@ function App() {
     const { user, isLoaded } = useUser();
     const { isSignedIn } = useAuth();
 
-
-
-
-
-
     // --- State Declarations (Must be at the top) ---
     const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
     const [showInitialization, setShowInitialization] = useState(false);
@@ -3365,7 +3362,7 @@ function App() {
     const [forceEntry, setForceEntry] = useState(false);
 
     const [chats, setChats] = useState([
-        { id: 'default', title: 'New Session', messages: [{ role: 'assistant', content: 'Welcome to EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }] }
+        { id: 'default', title: 'New Session', messages: [{ role: 'assistant', content: 'Welcome to Eko by EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }] }
     ]);
     const [activeChatId, setActiveChatId] = useState('default');
     const [view, setView] = useState('chat')
@@ -3511,7 +3508,7 @@ function App() {
         const newChat = {
             id: Date.now().toString(),
             title: 'New Session',
-            messages: [{ role: 'assistant', content: 'Welcome to EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic. How can I help you today?' }]
+            messages: [{ role: 'assistant', content: 'Welcome to Eko by EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic. How can I help you today?' }]
         };
         setChats(prev => [newChat, ...prev]);
         setActiveChatId(newChat.id);
@@ -3530,7 +3527,7 @@ function App() {
             setChats([{
                 id: Date.now().toString(), // Use Date.now() for a unique ID for the new default chat
                 title: 'New Session',
-                messages: [{ role: 'assistant', content: 'Welcome to EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }]
+                messages: [{ role: 'assistant', content: 'Welcome to Eko by EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }]
             }]);
             setActiveChatId(chats[0].id); // Set active to the new default chat
             return;
@@ -3561,7 +3558,7 @@ function App() {
             setChats([{
                 id: 'default',
                 title: 'New Session',
-                messages: [{ role: 'assistant', content: 'Welcome to EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }]
+                messages: [{ role: 'assistant', content: 'Welcome to Eko by EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }]
             }]);
             setActiveChatId('default');
         } catch (err) {
@@ -3781,10 +3778,10 @@ function App() {
     };
 
     const generateSystemPrompt = (currentPdfText = '') => {
-        let prompt = `You are EcoInsight, an AI financial intelligence assistant built for Indian investors and market enthusiasts — think of yourself as an "AI Bloomberg for India." 
+        let prompt = `You are Eko by EcoInsight, an AI financial intelligence assistant built for Indian investors and market enthusiasts — think of yourself as an "AI Bloomberg for India." 
 
 IDENTITY & ORIGIN:
-- When asked who is the creator or founder of EcoInsight: You must answer "Shivam Sharma."
+- When asked who is the creator or founder of Eko by EcoInsight: You must answer "Shivam Sharma."
 - When asked "Who made you?": You must answer "A team is behind all this."
 - You are a high-end institutional-grade intelligence engine.
 
@@ -4053,7 +4050,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 heightLeft -= pdfHeight;
             }
 
-            pdf.save(`EcoInsight_Report_${activeChat.title.replace(/\s+/g, '_')}.pdf`);
+            pdf.save(`Eko_by_EcoInsight_Report_${activeChat.title.replace(/\s+/g, '_')}.pdf`);
         } catch (error) {
             console.error("PDF Export Failed:", error);
         } finally {
@@ -4096,8 +4093,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
     if (!isLoaded && !authLoadingTimeout) {
         return (
             <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#09090b', color: 'white', flexDirection: 'column', gap: '1rem', fontFamily: 'Inter, sans-serif' }}>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Eko by EcoInsight</h2>
                 <Loader2 className="animate-spin" size={48} style={{ color: '#8b5cf6' }} />
-                <p style={{ fontSize: '1.2rem', fontWeight: '600', letterSpacing: '0.05em' }}>EcoInsight Engine Initializing...</p>
+                <p style={{ fontSize: '1.2rem', fontWeight: '600', letterSpacing: '0.05em' }}>Eko by EcoInsight Engine Initializing...</p>
                 <p style={{ fontSize: '0.9rem', color: '#71717a' }}>Connecting to Neural Intelligence Gateway</p>
             </div>
         );
@@ -4532,6 +4530,25 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                     </motion.button>
                                 ))}
                             </div>
+                            
+                            <AnimatePresence>
+                                {isLoading && (
+                                    <motion.div 
+                                        className="eko-thinking-indicator"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                    >
+                                        <div className="thinking-dots">
+                                            <div className="dot"></div>
+                                            <div className="dot"></div>
+                                            <div className="dot"></div>
+                                        </div>
+                                        <span>Eko is thinking...</span>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                             <motion.div className="input-wrapper">
                                 <label className="file-upload-btn" title="Upload PDF Analysis">
                                     <input type="file" accept=".pdf" onChange={handleFileUpload} style={{ display: 'none' }} />
@@ -4550,7 +4567,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                     </button>
                                 </div>
                             </motion.div>
-                            <p className="input-footer">EcoInsight AI – Professional Economic Analysis & Intelligence</p>
+                            <p className="input-footer">Eko by EcoInsight – Professional Economic Analysis & Intelligence</p>
                         </div>
                     </div>
                 )

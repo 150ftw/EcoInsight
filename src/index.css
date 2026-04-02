@@ -2973,3 +2973,89 @@ html {
         filter: grayscale(1) brightness(0) !important;
     }
 }
+
+/* Eko Thinking Indicator */
+.eko-thinking-indicator {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background: rgba(139, 92, 246, 0.08); /* Transparent purple tint */
+    backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    color: var(--accent-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 10;
+    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    letter-spacing: 0.02em;
+}
+
+.thinking-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.thinking-dots .dot {
+    width: 5px;
+    height: 5px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    animation: eko-dot-pulse 1.4s infinite ease-in-out both;
+}
+
+.thinking-dots .dot:nth-child(1) { animation-delay: -0.32s; }
+.thinking-dots .dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes eko-dot-pulse {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* Eko Thinking Indicator */
+.eko-thinking-indicator {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background: rgba(139, 92, 246, 0.08);
+    backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    color: var(--accent-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 10;
+    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    letter-spacing: 0.02em;
+}
+
+.thinking-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.thinking-dots .dot {
+    width: 5px;
+    height: 5px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    animation: eko-dot-pulse 1.4s infinite ease-in-out both;
+}
+
+.thinking-dots .dot:nth-child(1) { animation-delay: -0.32s; }
+.thinking-dots .dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes eko-dot-pulse {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+}
