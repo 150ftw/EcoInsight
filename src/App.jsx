@@ -3906,7 +3906,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         const textToSend = customText || input
         if (!textToSend.trim() || isLoading) return
 
-
+        setIsLoading(true)
         const userMessage = { role: 'user', content: textToSend }
 
         // Update title if it's the first user message
@@ -3918,7 +3918,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         setChats(prev => prev.map(c => c.id === activeChatId ? {
             ...c,
             title: newTitle,
-            messages: [...c.messages, userMessage]
+            messages: [...c.messages, userMessage, { role: 'assistant', content: '' }]
         } : c));
 
         if (!customText) setInput('')
@@ -3933,7 +3933,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             setProfile(prev => ({ ...prev, credits: Math.max(0, prev.credits - 1) }));
         }
 
-        setIsLoading(true)
 
         try {
             // Fetch live market data, on-demand stock data, AND web search results in parallel
@@ -3971,11 +3970,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             ];
 
 
-            // Add placeholder for assistant
-            setChats(prev => prev.map(c => c.id === activeChatId ? {
-                ...c,
-                messages: [...c.messages, { role: 'assistant', content: '' }]
-            } : c));
 
             let assistantContent = '';
             await streamMessage(chatMessages, API_KEY, (chunk) => {
@@ -4516,7 +4510,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             {isLoading && messages.length > 0 && messages[messages.length - 1].content === '' && (
                                 <motion.div className="message-wrapper assistant" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                     <div className="message-icon"><Loader2 className="animate-spin" size={18} /></div>
-                                    <div className="message-content"><span className="typing-indicator">EcoInsight is analyzing...</span></div>
+                                    <div className="message-content"><span className="typing-indicator">Eko is analyzing...</span></div>
                                 </motion.div>
                             )}
                             <div ref={messagesEndRef} />
