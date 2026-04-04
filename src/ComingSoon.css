@@ -104,14 +104,14 @@
 
 /* ---------- Headline ---------- */
 .cs-headline {
-    font-size: clamp(2.2rem, 10vw, 5rem);
+    font-size: clamp(2.2rem, 8vw, 5rem);
     font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -1.5px;
-    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 2rem;
     position: relative;
     width: 100%;
-    max-width: 100%;
+    max-width: 850px;
 }
 
 .cs-headline-text {
@@ -451,59 +451,57 @@
     margin-bottom: 2.5rem;
 }
 
-/* ---------- Responsive: Mobile ---------- */
-@media (max-width: 640px) {
+/* ---------- Responsive: Laptop & Large Tablets (1024px - 1280px) ---------- */
+@media (max-width: 1280px) {
     .cs-content {
-        padding: 2.5rem 1.5rem 2rem;
+        padding: 4rem 2rem;
     }
-
-    .cs-logo-wrapper {
+    
+    .cs-headline {
         margin-bottom: 1.5rem;
     }
+}
 
-    .cs-logo-container {
-        width: 64px;
-        height: 64px;
-        border-radius: 18px;
+/* ---------- Responsive: iPad Landscape & Small Laptops (1024px) ---------- */
+@media (max-width: 1024px) {
+    .cs-content {
+        padding: 3rem 1.5rem;
     }
 
     .cs-headline {
-        font-size: clamp(2.2rem, 12vw, 3.5rem);
-        letter-spacing: -1px;
-        margin-bottom: 1rem;
-    }
-
-    .cs-tagline {
-        font-size: 0.9rem;
-        margin-bottom: 1.5rem;
-        max-width: 100%;
-    }
-
-    .cs-status-bar {
-        padding: 0.5rem 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .cs-status-text {
-        font-size: 0.65rem;
-        letter-spacing: 1px;
+        max-width: 700px;
     }
 
     .cs-waitlist-live {
-        max-width: 100%;
-        margin-bottom: 1.5rem;
+        max-width: 520px;
+    }
+}
+
+/* ---------- Responsive: iPad Portrait & Large Mobile (768px) ---------- */
+@media (max-width: 768px) {
+    .cs-content {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .cs-headline {
+        font-size: clamp(2.2rem, 10vw, 3.5rem);
+        margin-bottom: 1.25rem;
+    }
+
+    .cs-tagline {
+        font-size: 1.05rem;
+        margin-bottom: 2rem;
+        max-width: 500px;
     }
 
     .cs-waitlist-card {
-        padding: 1rem 1.25rem;
-        border-radius: 16px;
+        padding: 1.25rem;
     }
 
     .cs-waitlist-content {
         flex-direction: column;
-        align-items: center;
+        gap: 1.25rem;
         text-align: center;
-        gap: 1rem;
     }
 
     .cs-waitlist-header {
@@ -511,57 +509,82 @@
         text-align: center;
     }
 
-    .cs-waitlist-text {
-        white-space: normal;
-        font-size: 0.88rem;
-    }
-
     .cs-waitlist-link {
         width: 100%;
         justify-content: center;
-        padding: 0.6rem 1.25rem;
+    }
+
+    .cs-notify-form {
+        max-width: 400px;
+    }
+
+    .cs-features {
+        gap: 0.75rem;
+        max-width: 500px;
+    }
+
+    .cs-chip {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cs-content {
+        padding: 2rem 1rem;
+    }
+
+    .cs-logo-wrapper {
+        margin-bottom: 2rem;
+    }
+
+    .cs-headline {
+        font-size: 2.1rem;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+    }
+
+    .cs-tagline {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        padding: 0 0.5rem;
     }
 
     .cs-notify-form {
         flex-direction: column;
+        gap: 0.75rem;
         max-width: 100%;
-        gap: 0.6rem;
+        padding: 0 0.5rem;
     }
 
     .cs-email-input {
         width: 100%;
         font-size: 0.9rem;
-        padding: 0.8rem 1.25rem;
     }
 
     .cs-notify-btn {
         width: 100%;
-        text-align: center;
-        padding: 0.6rem 1.25rem;
+        padding: 0.85rem;
     }
 
     .cs-features {
-        gap: 0.75rem;
-        margin: 2rem auto;
-        padding: 0 1rem;
-        box-sizing: border-box;
+        margin-top: 2rem;
+        gap: 0.5rem;
     }
 
     .cs-chip {
-        font-size: 0.75rem;
-        padding: 0.6rem 1rem;
-        flex: 1 1 calc(50% - 1rem);
-        min-width: 140px;
-        justify-content: center;
-        text-align: center;
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 120px;
+        font-size: 0.7rem;
+        padding: 0.4rem 0.75rem;
     }
-
+    
     .cs-footer {
-        padding: 1rem 1.5rem;
+        padding: 1.5rem 1rem;
     }
-
-    .cs-submitted-msg {
-        margin-bottom: 1.5rem;
+    
+    .cs-footer-text {
+        font-size: 0.7rem;
     }
 }
 
@@ -730,10 +753,11 @@
     font-weight: 500;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .cs-popup-card {
         padding: 2.5rem 1.5rem 2rem;
         border-radius: 24px;
+        max-width: 90%;
     }
 
     .cs-popup-title {
@@ -742,6 +766,12 @@
 
     .cs-popup-text {
         font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .cs-popup-icon-container {
+        width: 50px;
+        height: 50px;
     }
 }
 
