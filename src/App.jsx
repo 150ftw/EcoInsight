@@ -3395,6 +3395,7 @@ function App() {
 
     const messagesEndRef = useRef(null)
     const userScrolledUp = useRef(false)
+    const [showStarFly, setShowStarFly] = useState(false);
 
     // Scroll to top on view change
     useEffect(() => {
@@ -3926,6 +3927,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         setIsLoading(true)
         userScrolledUp.current = false;
+
+        // Trigger the cinematic star animation on the very first user query
+        if (activeChat.messages.length === 1) {
+            setShowStarFly(true);
+            setTimeout(() => setShowStarFly(false), 2600);
+        }
         const userMessage = { role: 'user', content: textToSend }
 
         // Update title if it's the first user message
@@ -4866,6 +4873,37 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     setPendingScrollToPricing(true);
                 }}
             />
+
+            {/* Cinematic star fly animation */}
+            <AnimatePresence>
+                {showStarFly && (
+                    <motion.div
+                        className="star-fly-overlay"
+                        initial={false}
+                    >
+                        <motion.div
+                            className="star-fly-icon"
+                            initial={{ 
+                                x: 'calc(50vw - 24px)', 
+                                y: 'calc(50vh - 120px)', 
+                                scale: 2.2, 
+                                opacity: 1, 
+                                rotate: 0 
+                            }}
+                            animate={[
+                                { x: 'calc(50vw + 160px)', y: 'calc(50vh - 260px)', scale: 1.8, rotate: 30, opacity: 1, transition: { duration: 0.45, ease: [0.34,1.56,0.64,1] } },
+                                { x: 'calc(50vw - 220px)', y: 'calc(50vh - 200px)', scale: 1.5, rotate: -20, opacity: 1, transition: { duration: 0.4, ease: [0.16,1,0.3,1] } },
+                                { x: 'calc(50vw + 80px)', y: 'calc(40vh + 60px)', scale: 1.2, rotate: 15, opacity: 1, transition: { duration: 0.38, ease: [0.16,1,0.3,1] } },
+                                { x: 380, y: 'calc(100vh - 200px)', scale: 0.85, rotate: -10, opacity: 1, transition: { duration: 0.5, ease: [0.16,1,0.3,1] } },
+                                { x: 310, y: 'calc(100vh - 170px)', scale: 0.55, rotate: 0, opacity: 0, transition: { duration: 0.35, ease: 'easeIn' } },
+                            ]}
+                            exit={{ opacity: 0 }}
+                        >
+                            <EkoSparkle size={48} />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 };
