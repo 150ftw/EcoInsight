@@ -5042,8 +5042,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         <motion.div
                             className="star-fly-icon"
                             initial={{ 
-                                x: 'calc(50vw - 32px)', 
-                                y: 'calc(50vh - 120px)', 
+                                x: isMobile ? 'calc(50vw - 32px)' : 'calc((100vw + 280px) / 2 - 32px)', 
+                                y: 'calc(35vh - 32px)', 
                                 scale: 3, 
                                 opacity: 0, 
                                 rotate: -15 
@@ -5052,8 +5052,14 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 opacity: [0, 1, 1, 0.6, 0],
                                 scale: [3, 2.5, 2.8, 0.6, 0.2],
                                 rotate: [-15, 0, 0, 360, 360],
-                                x: ['calc(50vw - 32px)', 'calc(50vw - 32px)', 'calc(50vw - 32px)', 380, 380],
-                                y: ['calc(50vh - 120px)', 'calc(50vh - 120px)', 'calc(50vh - 120px)', 'calc(100vh - 200px)', 'calc(100vh - 200px)']
+                                x: [
+                                    isMobile ? 'calc(50vw - 32px)' : 'calc((100vw + 280px) / 2 - 32px)',
+                                    isMobile ? 'calc(50vw - 32px)' : 'calc((100vw + 280px) / 2 - 32px)',
+                                    isMobile ? 'calc(50vw - 32px)' : 'calc((100vw + 280px) / 2 - 32px)',
+                                    isMobile ? 'calc(50vw - 42px)' : 'calc((100vw + 280px) / 2 - 42px)',
+                                    isMobile ? 'calc(50vw - 42px)' : 'calc((100vw + 280px) / 2 - 42px)'
+                                ],
+                                y: ['calc(35vh - 32px)', 'calc(35vh - 32px)', 'calc(35vh - 32px)', 'calc(100vh - 180px)', 'calc(100vh - 180px)']
                             }}
                             transition={{
                                 duration: 2,

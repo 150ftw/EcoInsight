@@ -693,20 +693,16 @@ main {
     z-index: 10000;
     pointer-events: none;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: background-color 0.5s ease;
 }
 
 .star-fly-icon {
     position: absolute;
+    top: 0;
+    left: 0;
     filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.8))
             drop-shadow(0 0 50px rgba(139, 92, 246, 0.4));
     will-change: transform, opacity;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .star-draw-glow {
