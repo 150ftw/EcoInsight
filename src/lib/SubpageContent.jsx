@@ -106,11 +106,11 @@ export const SUBPAGE_DATA = {
     'about-us': {
         icon: <Info size={32} />,
         title: "About Us",
-        description: "The mission behind the world's most advanced economic intelligence platform.",
+        description: "The mission behind India's most advanced economic intelligence platform.",
         sections: [
             {
                 heading: "The Vision",
-                content: "To democratize elite-level economic intelligence through the power of specialized, transparent AI. We believe clarity is the foundation of global prosperity."
+                content: "To democratize elite-level economic intelligence for every Indian investor through the power of specialized, transparent AI. We believe clarity is the foundation of Bharat's prosperity."
             },
             {
                 heading: "Leadership",
@@ -129,7 +129,7 @@ export const SUBPAGE_DATA = {
             },
             {
                 heading: "The Team",
-                content: "A global collective of economists, neural network engineers, and product designers dedicated to the pursuit of analytical truth in an era of noise."
+                content: "A passionate collective of Indian economists, neural network engineers, and product designers dedicated to making Bharat's investment landscape accessible and transparent."
             }
         ]
     },
@@ -148,7 +148,7 @@ export const SUBPAGE_DATA = {
             },
             {
                 heading: "Benefits",
-                content: "Competitive equity packages, global remote flexibility, and access to the world's most advanced proprietary economic data sets."
+                content: "Competitive equity packages, remote flexibility, and access to India's most advanced proprietary economic data sets covering NSE, BSE, and macroeconomic indicators."
             },
             {
                 heading: "Internship Program",
@@ -159,11 +159,11 @@ export const SUBPAGE_DATA = {
     'partners': {
         icon: <Users size={32} />,
         title: "Partners",
-        description: "Scaling intelligence through strategic global alliances.",
+        description: "Scaling intelligence through strategic Bharat-focused alliances.",
         sections: [
             {
                 heading: "Institutional Access",
-                content: "Partnering with global banks, sovereign wealth funds, and research institutes for exclusive data pipeline integration and custom model fine-tuning."
+                content: "Partnering with Indian banks, NBFCs, and research institutes for exclusive data pipeline integration and custom model fine-tuning for the Indian market."
             },
             {
                 heading: "Technology Partners",
@@ -171,7 +171,7 @@ export const SUBPAGE_DATA = {
             },
             {
                 heading: "Affiliate Ecosystem",
-                content: "Our certified consultants help enterprises integrate Eko by EcoInsight into their existing decision-making workflows. Join our global network of experts."
+                content: "Our certified consultants help enterprises integrate Eko by EcoInsight into their existing decision-making workflows. Join our growing network of Indian economic experts."
             },
             {
                 heading: "Research Grants",
@@ -194,7 +194,7 @@ export const SUBPAGE_DATA = {
             },
             {
                 heading: "Community Growth",
-                content: "Top referrers are invited to our annual 'Insight Summit'—an exclusive gathering of the world's leading economic minds."
+                content: "Top referrers are invited to our annual 'Insight Summit'—an exclusive gathering of India's leading economic minds."
             }
         ]
     },
@@ -210,8 +210,8 @@ export const SUBPAGE_DATA = {
                 content: "All inquiries are triaged by our automated sorting system. Priority 1 (Enterprise) responses are guaranteed within 2 hours."
             },
             {
-                heading: "Global Offices",
-                content: "Our physical presence spans across London, New York, Singapore, and Zurich to ensure 24/7 coverage for the global market."
+                heading: "India Offices",
+                content: "Our presence spans across Mumbai, Bengaluru, Delhi, and Hyderabad to ensure coverage across India's key financial markets."
             }
         ]
     },
@@ -235,8 +235,8 @@ export const SUBPAGE_DATA = {
                 content: "You retain the right to purge all your interaction history from our primary and secondary clusters at any time with a single click."
             },
             {
-                heading: "GDPR & CCPA Compliance",
-                content: "We adhere to the world's strictest data protection regulations, ensuring your information is handled with the highest level of care."
+                heading: "DPDP & SEBI Compliance",
+                content: "We adhere to India's DPDP Act and leading data protection standards, ensuring your information is handled with the highest level of care."
             }
         ]
     },

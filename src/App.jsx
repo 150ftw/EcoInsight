@@ -509,7 +509,7 @@ const DataDynamicsCard = () => {
                         Macro Dynamics
                     </h3>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '2rem' }}>
-                        Trace geopolitical events to their fiscal impacts instantly. The global network is always listening.
+                        Trace macroeconomic events to their fiscal impact on India instantly. The Bharat economy is always in focus.
                     </p>
 
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
@@ -923,12 +923,12 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                         animate={{ opacity: 1, scale: 1 }}
                         className="hero-badge"
                     >
-                        <Sparkles size={14} /> Intelligence for the Global Markets
+                        <Sparkles size={14} /> Intelligence for Bharat's Markets
                     </motion.div>
                     <h1>
                         {splitText("Master the ")}
                         <span className="text-gradient">{splitText("Economic")}</span>
-                        {splitText(" Pulse of the World")}
+                        {splitText(" Pulse of Bharat")}
                     </h1>
                     <motion.p
                         initial={{ opacity: 1, y: 0 }}
@@ -2486,7 +2486,7 @@ const AIEconomicPulse = () => {
                         <Activity className="text-accent" size={24} /> AI Economic Pulse
                     </h3>
                     <p style={{ color: '#a1a1aa', fontSize: '0.9rem', margin: 0, maxWidth: '400px' }}>
-                        Real-time neural synthesis of global macroeconomic stability, aggregating millions of data points into actionable metrics.
+                        Real-time neural synthesis of India's macroeconomic stability, aggregating Nifty, RBI, CPI, and sectoral data into actionable metrics.
                     </p>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
@@ -2500,9 +2500,9 @@ const AIEconomicPulse = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', position: 'relative', zIndex: 10 }}>
                 {[
                     { label: 'Inflation Trajectory', value: '2.4%', target: 'Target: 2.0%', icon: <TrendingUp size={20} />, color: '#f59e0b', desc: 'Core PCE stabilizing. Services inflation remains sticky but clear disinflationary trend intact.', chart: [40, 60, 45, 70, 50, 80, 65] },
-                    { label: 'Fed Funds Rate', value: '5.25%', target: 'Terminal rate reached', icon: <BarChart3 size={20} />, color: '#3b82f6', desc: 'Policy remains restrictive. Swaps market pricing in 3 rate cuts by end of fiscal year.', chart: [20, 30, 50, 80, 100, 100, 100] },
-                    { label: 'Global GDP Est.', value: '+3.1%', target: 'YoY Projection', icon: <Globe size={20} />, color: '#10b981', desc: 'US exceptionalism driving global averages up, offset by structural weakness in European manufacturing.', chart: [30, 40, 35, 55, 50, 75, 80] },
-                    { label: 'Market Sentiment', value: 'Bullish', target: 'Fear & Greed: 72', icon: <Sparkles size={20} />, color: '#d946ef', desc: 'Liquidity conditions favorable. Tech sector earnings driving broad index multiples higher.', chart: [50, 40, 60, 55, 70, 85, 90] }
+                    { label: 'Repo Rate (RBI)', value: '6.50%', target: 'Pause maintained', icon: <BarChart3 size={20} />, color: '#3b82f6', desc: 'RBI remains watchful. Markets pricing in 1-2 rate cuts by end of fiscal year amid cooling CPI.', chart: [20, 30, 50, 80, 100, 100, 100] },
+                    { label: 'India GDP Est.', value: '+6.8%', target: 'YoY Projection', icon: <Globe size={20} />, color: '#10b981', desc: 'India remains fastest growing major economy. Domestic consumption and capex driving momentum.', chart: [30, 40, 35, 55, 50, 75, 80] },
+                    { label: 'Market Sentiment', value: 'Bullish', target: 'Fear & Greed: 72', icon: <Sparkles size={20} />, color: '#d946ef', desc: 'FII inflows positive. Nifty sector rotation into financials and infra driving broad index higher.', chart: [50, 40, 60, 55, 70, 85, 90] }
                 ].map((stat, i) => (
                     <div key={i} style={{ padding: '1.5rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid rgba(255, 255, 255, 0.03)', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -4147,7 +4147,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     <div className="view-content" key={view}>
                         <div className="view-header">
                             <h1>Economic Trends & Market Data</h1>
-                            <p>Real-time insights into global economic shifts.</p>
+                            <p>Real-time insights into India's economic shifts and Bharat's growth story.</p>
                         </div>
                         <div className="trends-grid">
                             <div className="trend-card">
@@ -4157,13 +4157,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             </div>
                             <div className="trend-card">
                                 <div className="trend-icon"><Globe size={24} /></div>
-                                <h3>Global GDP Growth</h3>
-                                <p>Emerging markets leading with 4.5% year-on-year growth.</p>
+                                <h3>India GDP Growth</h3>
+                                <p>India projected to grow at 6.8% — fastest among major economies in 2026.</p>
                             </div>
                             <div className="trend-card">
                                 <div className="trend-icon"><BarChart3 size={24} /></div>
                                 <h3>Interest Rate Trajectory</h3>
-                                <p>Central banks likely to initiate gradual cuts starting mid-year.</p>
+                                <p>RBI likely to initiate gradual cuts as CPI cools toward the 4% target.</p>
                             </div>
                         </div>
                     </div>
@@ -4203,7 +4203,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     <div className="view-content" key={view} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                         <div className="view-header">
                             <h1>Market News Analyzer</h1>
-                            <p>Real-time sentiment extraction from global financial headlines.</p>
+                            <p>Real-time sentiment extraction from India's financial headlines and market wires.</p>
                         </div>
                         <AIMarketNewsAnalyzer />
                     </div>
