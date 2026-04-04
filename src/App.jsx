@@ -3402,6 +3402,8 @@ function App() {
             window.scrollTo(0, 0);
             const allElements = document.querySelectorAll('*');
             for (let i = 0; i < allElements.length; i++) {
+                // Skip the chat messages container — users must be able to scroll within it
+                if (allElements[i].classList.contains('messages-list')) continue;
                 if (allElements[i].scrollTop > 0) {
                     allElements[i].scrollTop = 0;
                 }
