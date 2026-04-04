@@ -10,7 +10,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Ensure content starts from top on small screens */
+    padding: 2rem 1rem; /* Safe padding for all devices */
     overflow-x: hidden;
     overflow-y: auto;
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -42,12 +43,11 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 2rem;
+    padding: 0; /* Padding handled by root */
     max-width: 800px;
     width: 100%;
     box-sizing: border-box;
-    flex: 1;
-    justify-content: center;
+    margin: auto 0; /* Expert centering: stays centered if small, scrollable from top if large */
 }
 
 /* ---------- Logo ---------- */
