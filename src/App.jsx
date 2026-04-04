@@ -4492,21 +4492,48 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 {messages.length === 1 ? (
                                     <motion.div 
                                         className="empty-chat-hero"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
+                                        initial="hidden"
+                                        animate="visible"
+                                        variants={{
+                                            hidden: { opacity: 0 },
+                                            visible: { 
+                                                opacity: 1, 
+                                                transition: { staggerChildren: 0.1, delayChildren: 0.05 } 
+                                            }
+                                        }}
                                     >
-                                        <div className="empty-chat-greeting">
+                                        <motion.div 
+                                            className="empty-chat-greeting"
+                                            variants={{
+                                                hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                                visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                            }}
+                                        >
                                             <EkoSparkle size={36} /> 
                                             <span className="greeting-name">Hi {profile?.name?.split(' ')[0] || 'There'}</span>
-                                        </div>
-                                        <div className="empty-chat-headline">Where should we start?</div>
-                                        <div className="suggestion-chips">
+                                        </motion.div>
+                                        <motion.div 
+                                            className="empty-chat-headline"
+                                            variants={{
+                                                hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                                visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                            }}
+                                        >
+                                            Where should we start?
+                                        </motion.div>
+                                        <motion.div 
+                                            className="suggestion-chips"
+                                            variants={{
+                                                hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                                visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                            }}
+                                        >
                                             {FAQS.map((faq, idx) => (
                                                 <button key={idx} className="suggestion-chip" onClick={() => handleSend(faq.text)} disabled={isLoading}>
                                                     {faq.icon} <span>{faq.text}</span>
                                                 </button>
                                             ))}
-                                        </div>
+                                        </motion.div>
                                     </motion.div>
                                 ) : (
                                     messages.map((msg, i) => (
