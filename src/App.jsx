@@ -37,7 +37,7 @@ import { SUBPAGE_DATA } from './lib/SubpageContent'
 
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
-const EkoSparkle = ({ size = 24, className = "", animate = false }) => {
+const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = false }) => {
     const id = useId();
     const gradientId = `eko_gradient_${id.replace(/:/g, '')}`;
     
@@ -52,12 +52,19 @@ const EkoSparkle = ({ size = 24, className = "", animate = false }) => {
             </defs>
             <motion.path 
                 d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                fill={`url(#${gradientId})`}
-                stroke="rgba(255,255,255,0.4)"
-                strokeWidth={animate ? "0.5" : "0"}
+                fill="transparent"
+                stroke={cinematic ? `url(#${gradientId})` : "rgba(255,255,255,0.4)"}
+                strokeWidth={animate ? (cinematic ? "1" : "0.5") : "0"}
                 initial={animate ? { pathLength: 0, opacity: 0 } : {}}
                 animate={animate ? { pathLength: 1, opacity: 1 } : {}}
-                transition={animate ? { duration: 1.2, ease: "easeInOut" } : {}}
+                transition={animate ? { duration: cinematic ? 2.5 : 1.2, ease: "easeInOut" } : {}}
+            />
+            <motion.path 
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                fill={`url(#${gradientId})`}
+                initial={animate ? { opacity: 0 } : {}}
+                animate={animate ? { opacity: 1 } : {}}
+                transition={animate ? { duration: 0.8, delay: cinematic ? 2.5 : 0.4, ease: "easeIn" } : {}}
             />
         </svg>
     )
@@ -4065,9 +4072,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         setIsNeuralSearching(true)
         userScrolledUp.current = false;
 
-        // Trigger the cinematic star animation on EVERY query for a premium branded feel
-        // This coordinates with the showStarFly overlay which we'll update
-        setShowStarFly(true);
+        const isFirstQuery = activeChat.messages.length === 1;
+
+        if (isFirstQuery) {
+            // Trigger the cinematic star animation only on the first query for a premium branded feel
+            setShowStarFly(true);
+        }
+        
         const userMessage = { role: 'user', content: textToSend }
 
         // Update title if it's the first user message
@@ -4133,10 +4144,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
 
 
-            // Wait for the cinematic star animation to complete its "drawing" and "descent" phase (~2s)
-            // before showing the thinking indicator or starting the stream
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            setShowStarFly(false);
+            if (isFirstQuery) {
+                // Wait for the cinematic star animation to complete its "drawing" and "descent" phase (~3.5s)
+                // before showing the thinking indicator or starting the stream
+                await new Promise(resolve => setTimeout(resolve, 3500));
+                setShowStarFly(false);
+            }
             setIsNeuralSearching(false);
 
             let assistantContent = '';
@@ -5046,8 +5059,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             }}
                             animate={{
                                 opacity: [0, 1, 1, 0.6, 0],
-                                scale: [3, 2.5, 2.8, 0.6, 0.2],
-                                rotate: [-15, 0, 0, 360, 360],
+                                scale: [3, 2.8, 3, 0.6, 0.2],
+                                rotate: [-15, -10, 0, 360, 360],
                                 x: [
                                     0, 0, 0, 
                                     isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 60px)',
@@ -5055,19 +5068,19 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 ],
                                 y: [
                                     '-12vh', 
-                                    '-12vh', 
+                                    '-10vh', 
                                     '-12vh', 
                                     '35vh', 
                                     '35vh'
                                 ]
                             }}
                             transition={{
-                                duration: 2,
-                                times: [0, 0.3, 0.5, 0.8, 1],
+                                duration: 3.5,
+                                times: [0, 0.3, 0.7, 0.9, 1],
                                 ease: "easeInOut"
                             }}
                         >
-                            <EkoSparkle size={64} animate={true} />
+                            <EkoSparkle size={64} animate={true} cinematic={true} />
                             <div className="star-draw-glow" />
                         </motion.div>
                     </motion.div>

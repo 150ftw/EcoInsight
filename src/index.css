@@ -694,12 +694,13 @@ main {
     pointer-events: none;
     overflow: hidden;
     background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .star-fly-icon {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
     filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.8))
             drop-shadow(0 0 50px rgba(139, 92, 246, 0.4));
     will-change: transform, opacity;
