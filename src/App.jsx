@@ -37,6 +37,19 @@ import { SUBPAGE_DATA } from './lib/SubpageContent'
 
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
+const EkoSparkle = ({ size = 24, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path d="M11.666 0.166687C11.8327 5.83335 16.166 10.1667 21.8327 10.3334C16.166 10.5 11.8327 14.8334 11.666 20.5C11.5 14.8334 7.16602 10.5 1.49935 10.3334C7.16602 10.1667 11.5 5.83335 11.666 0.166687Z" fill="url(#gemini_gradient)"/>
+        <defs>
+            <linearGradient id="gemini_gradient" x1="1.49935" y1="10.3334" x2="21.8327" y2="10.3334" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#4385f5" />
+                <stop offset="0.33" stopColor="#ea4335" />
+                <stop offset="0.67" stopColor="#fbbc04" />
+                <stop offset="1" stopColor="#34a853" />
+            </linearGradient>
+        </defs>
+    </svg>
+)
 
 const EcoInsightLogo = ({ size = 24, className = "" }) => {
     const id = useId();
@@ -3371,6 +3384,7 @@ function App() {
     const [isLoading, setIsLoading] = useState(false)
     const [authLoadingTimeout, setAuthLoadingTimeout] = useState(false)
     const [showCreditModal, setShowCreditModal] = useState(false);
+    const [modalType, setModalType] = useState('credits');
     const [pendingScrollToPricing, setPendingScrollToPricing] = useState(false);
 
 
@@ -3510,7 +3524,7 @@ function App() {
             title: 'New Session',
             messages: [{ role: 'assistant', content: 'Welcome to Eko by EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic. How can I help you today?' }]
         };
-        setChats(prev => [newChat, ...prev]);
+        setChats(prev => [newChat, ...prev.filter(c => c.messages.length > 1)]);
         setActiveChatId(newChat.id);
         setView('chat');
     };
@@ -3928,6 +3942,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         // Credit Enforcement
         if (profile.tier === 'Free') {
             if (profile.credits <= 0) {
+                setModalType('credits');
                 setShowCreditModal(true);
                 return;
             }
@@ -4475,7 +4490,27 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             {/* Spacer pushes messages down when few, collapses when many */}
                             <div style={{ flex: 1 }} />
                             <AnimatePresence initial={false}>
-                                {messages.map((msg, i) => (
+                                {messages.length === 1 ? (
+                                    <motion.div 
+                                        className="empty-chat-hero"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                    >
+                                        <div className="empty-chat-greeting">
+                                            <EkoSparkle size={36} /> 
+                                            <span className="greeting-name">Hi {profile?.name?.split(' ')[0] || 'There'}</span>
+                                        </div>
+                                        <div className="empty-chat-headline">Where should we start?</div>
+                                        <div className="suggestion-chips">
+                                            {FAQS.map((faq, idx) => (
+                                                <button key={idx} className="suggestion-chip" onClick={() => handleSend(faq.text)} disabled={isLoading}>
+                                                    {faq.icon} <span>{faq.text}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                    messages.map((msg, i) => (
                                     <motion.div
                                         key={i}
                                         className={`message-wrapper ${msg.role}`}
@@ -4484,7 +4519,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         transition={{ duration: 0.3 }}
                                     >
                                         <div className="message-icon">
-                                            {msg.role === 'assistant' ? <EcoInsightLogo size={18} /> : <User size={18} />}
+                                            {msg.role === 'assistant' ? <EkoSparkle size={20} /> : <User size={18} />}
                                         </div>
                                         <div className="message-container">
                                             <div className="message-content">
@@ -4507,7 +4542,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                             </div>
                                         </div>
                                     </motion.div>
-                                ))}
+                                    ))
+                                )}
                             </AnimatePresence>
                             {isLoading && messages.length > 0 && messages[messages.length - 1].content === '' && (
                                 <motion.div className="message-wrapper assistant" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -4519,13 +4555,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </div>
 
                         <div className="input-container">
-                            <div className="faq-grid">
-                                {FAQS.map((faq, idx) => (
-                                    <motion.button key={idx} className="faq-button" whileHover={{ scale: 1.02 }} onClick={() => handleSend(faq.text)} disabled={isLoading}>
-                                        {faq.icon} <span>{faq.text}</span>
-                                    </motion.button>
-                                ))}
-                            </div>
+
                             
                             <AnimatePresence>
                                 {isLoading && (
@@ -4681,7 +4711,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         <div className="sidebar-section history-section">
                             <span className="section-label">Chat History</span>
                             <div className="history-list">
-                                {chats.filter(c => c.id !== activeChatId).map(chat => (
+                                {chats.filter(c => c.id !== activeChatId && c.messages.length > 1).map(chat => (
                                     <div key={chat.id} className="history-item-wrapper">
                                         <button
                                             className="nav-item history-item"
@@ -4725,12 +4755,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         style={{ overflow: 'hidden' }}
                                     >
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => setShowCreditModal(true)}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoTrendsIcon size={16} /> Market Trends</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => setShowCreditModal(true)}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoPulseIcon size={16} /> Economic Pulse</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => setShowCreditModal(true)}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoSimplifyIcon size={16} /> ELI5 Economics</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => setShowCreditModal(true)}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoSimulatorIcon size={16} /> What-If Simulator</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => setShowCreditModal(true)}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoNewsIcon size={16} /> News Analyzer</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => setShowCreditModal(true)}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoPredictorIcon size={16} /> Event Predictor</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoTrendsIcon size={16} /> Market Trends</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoPulseIcon size={16} /> Economic Pulse</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoSimplifyIcon size={16} /> ELI5 Economics</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoSimulatorIcon size={16} /> What-If Simulator</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoNewsIcon size={16} /> News Analyzer</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoPredictorIcon size={16} /> Event Predictor</div> <Lock size={12} color="#a78bfa" /></button>
                                         </div>
                                     </motion.div>
                                 )}
@@ -4791,6 +4821,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
             <CreditModal
                 isOpen={showCreditModal}
+                type={modalType}
                 onClose={() => setShowCreditModal(false)}
                 lastRechargeDate={profile.lastRechargeDate}
                 onUpgrade={() => {
