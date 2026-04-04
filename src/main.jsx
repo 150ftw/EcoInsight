@@ -55,7 +55,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 }
             }}
         >
-            <ComingSoon />
+            <App />
         </ClerkProvider>
     </React.StrictMode>,
 )
