@@ -4064,7 +4064,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         setIsLoading(true)
         setIsNeuralSearching(true)
         userScrolledUp.current = false;
-        console.log("DEBUG: handleSend started. showStarFly setting to true.");
 
         // Trigger the cinematic star animation on EVERY query for a premium branded feel
         // This coordinates with the showStarFly overlay which we'll update
@@ -4136,9 +4135,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
             // Wait for the cinematic star animation to complete its "drawing" and "descent" phase (~2s)
             // before showing the thinking indicator or starting the stream
-            console.log("DEBUG: Waiting for cinematic intro...");
             await new Promise(resolve => setTimeout(resolve, 2000));
-            console.log("DEBUG: Cinematic intro complete. Starting stream.");
             setShowStarFly(false);
             setIsNeuralSearching(false);
 
@@ -5034,7 +5031,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 {showStarFly && (
                     <motion.div
                         className="star-fly-overlay"
-                        onAnimationStart={() => console.log("DEBUG: Star fly overlay animation started")}
                         initial={{ backgroundColor: 'rgba(0,0,0,0)' }}
                         animate={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
                         exit={{ backgroundColor: 'rgba(0,0,0,0)', transition: { delay: 0.5 } }}
@@ -5042,8 +5038,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         <motion.div
                             className="star-fly-icon"
                             initial={{ 
-                                x: isMobile ? 'calc(50vw - 32px)' : 'calc((100vw + 280px) / 2 - 32px)', 
-                                y: 'calc(35vh - 32px)', 
+                                x: isMobile ? 'calc(50vw - 96px)' : 'calc((100vw + 280px) / 2 - 96px)', 
+                                y: 'calc(40vh - 96px)', 
                                 scale: 3, 
                                 opacity: 0, 
                                 rotate: -15 
@@ -5053,13 +5049,19 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 scale: [3, 2.5, 2.8, 0.6, 0.2],
                                 rotate: [-15, 0, 0, 360, 360],
                                 x: [
-                                    isMobile ? 'calc(50vw - 32px)' : 'calc((100vw + 280px) / 2 - 32px)',
-                                    isMobile ? 'calc(50vw - 32px)' : 'calc((100vw + 280px) / 2 - 32px)',
-                                    isMobile ? 'calc(50vw - 32px)' : 'calc((100vw + 280px) / 2 - 32px)',
-                                    isMobile ? 'calc(50vw - 42px)' : 'calc((100vw + 280px) / 2 - 42px)',
-                                    isMobile ? 'calc(50vw - 42px)' : 'calc((100vw + 280px) / 2 - 42px)'
+                                    isMobile ? 'calc(50vw - 96px)' : 'calc((100vw + 280px) / 2 - 96px)',
+                                    isMobile ? 'calc(50vw - 96px)' : 'calc((100vw + 280px) / 2 - 96px)',
+                                    isMobile ? 'calc(50vw - 96px)' : 'calc((100vw + 280px) / 2 - 96px)',
+                                    isMobile ? 'calc(20px)' : 'calc(280px + 40px)',
+                                    isMobile ? 'calc(20px)' : 'calc(280px + 40px)'
                                 ],
-                                y: ['calc(35vh - 32px)', 'calc(35vh - 32px)', 'calc(35vh - 32px)', 'calc(100vh - 180px)', 'calc(100vh - 180px)']
+                                y: [
+                                    'calc(40vh - 96px)', 
+                                    'calc(40vh - 96px)', 
+                                    'calc(40vh - 96px)', 
+                                    'calc(100vh - 180px)', 
+                                    'calc(100vh - 180px)'
+                                ]
                             }}
                             transition={{
                                 duration: 2,
