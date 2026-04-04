@@ -928,7 +928,16 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                     <h1>
                         {splitText("Master the ")}
                         <span className="text-gradient">{splitText("Economic")}</span>
-                        {splitText(" Pulse of Bharat")}
+                        {splitText(" Pulse of ")}
+                        <span style={{
+                            background: 'linear-gradient(90deg, #FF9933 0%, #FF9933 30%, #ffffff 50%, #138808 70%, #138808 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text',
+                            display: 'inline',
+                            textShadow: 'none',
+                            filter: 'drop-shadow(0 0 18px rgba(255, 153, 51, 0.4))'
+                        }}>Bharat</span>
                     </h1>
                     <motion.p
                         initial={{ opacity: 1, y: 0 }}
