@@ -667,25 +667,58 @@ const REVIEWS = [
 
 const ReviewsSection = () => {
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedRating, setSelectedRating] = useState(null); // null means all
     const reviewsPerPage = 6;
-    const totalRatings = 211;
-    const averageRating = 4.8;
+
+    // Dynamic stats from REVIEWS array
+    const ratingStats = useMemo(() => {
+        const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        REVIEWS.forEach(r => {
+            if (counts[r.rating] !== undefined) counts[r.rating]++;
+        });
+        
+        const stats = [5, 4, 3, 2, 1].map(stars => ({
+            stars,
+            count: counts[stars],
+            percent: REVIEWS.length > 0 ? Math.round((counts[stars] / REVIEWS.length) * 100) : 0
+        }));
+        
+        const totalValue = REVIEWS.reduce((acc, r) => acc + r.rating, 0);
+        const avg = REVIEWS.length > 0 ? (totalValue / REVIEWS.length).toFixed(1) : "0.0";
+        
+        return { stats, avg, total: REVIEWS.length };
+    }, []);
     
+    // Filter logic
+    const filteredReviews = useMemo(() => {
+        return selectedRating 
+            ? REVIEWS.filter(r => r.rating === selectedRating)
+            : REVIEWS;
+    }, [selectedRating]);
+
+    const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
     const indexOfLastReview = currentPage * reviewsPerPage;
     const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
-    const currentReviews = REVIEWS.slice(indexOfFirstReview, indexOfLastReview);
-    const totalPages = Math.ceil(REVIEWS.length / reviewsPerPage);
+    const currentReviews = filteredReviews.slice(indexOfFirstReview, indexOfLastReview);
 
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
-        // Removed scrollIntoView to prevent disruptive jumps
+    };
+
+    const handleFilter = (stars) => {
+        if (selectedRating === stars) {
+            setSelectedRating(null); // Toggle off if clicked again
+        } else {
+            setSelectedRating(stars);
+        }
+        setCurrentPage(1); // Reset to first page on filter change
     };
     
     return (
         <section id="reviews" className="reviews-section">
             <div className="section-title">
                 <h2>The Analyst Consensus</h2>
-                <p>Trusted by elite researchers and global market participants</p>
+                <p>Trusted by elite researchers and Bharat's market participants</p>
             </div>
 
             <div className="reviews-overview" style={{ 
@@ -693,42 +726,84 @@ const ReviewsSection = () => {
                 flexDirection: 'column', 
                 alignItems: 'center', 
                 justifyContent: 'center',
-                marginBottom: '2rem',
-                scale: '0.85' // Subtle downscale to prevent "zoomed in" feel
+                marginBottom: '2.5rem',
+                scale: '0.85'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.25rem' }}>
-                    <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'white' }}>{averageRating}</span>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ display: 'flex', gap: '2px' }}>
-                            {[1, 2, 3, 4, 5].map(s => (
-                                <Star key={s} size={16} fill="#f59e0b" color="#f59e0b" />
-                            ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'white' }}>{ratingStats.total > 0 ? ratingStats.avg : "5.0"}</span>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', gap: '2px' }}>
+                                {[1, 2, 3, 4, 5].map(s => (
+                                    <Star 
+                                        key={s} 
+                                        size={16} 
+                                        fill={s <= Math.round(parseFloat(ratingStats.avg)) ? "#f59e0b" : "transparent"} 
+                                        color="#f59e0b" 
+                                    />
+                                ))}
+                            </div>
+                            <span style={{ color: '#a1a1aa', fontSize: '0.8rem', marginTop: '2px' }}>
+                                Based on {ratingStats.total} verified reviews
+                            </span>
                         </div>
-                        <span style={{ color: '#a1a1aa', fontSize: '0.8rem', marginTop: '2px' }}>Based on {totalRatings} global ratings</span>
                     </div>
+                    
+                    {selectedRating && (
+                        <motion.button
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            onClick={() => setSelectedRating(null)}
+                            style={{
+                                background: 'rgba(139, 92, 246, 0.1)',
+                                border: '1px solid rgba(139, 92, 246, 0.2)',
+                                color: '#a78bfa',
+                                padding: '4px 12px',
+                                borderRadius: '20px',
+                                fontSize: '0.75rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}
+                        >
+                            Clear Filter <X size={12} />
+                        </motion.button>
+                    )}
                 </div>
                 
-                <div style={{ width: '100%', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    {[
-                        { stars: 5, count: 180, percent: 85 },
-                        { stars: 4, count: 20, percent: 10 },
-                        { stars: 3, count: 11, percent: 5 },
-                        { stars: 2, count: 0, percent: 0 },
-                        { stars: 1, count: 0, percent: 0 }
-                    ].map(row => (
-                        <div key={row.stars} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ color: '#a1a1aa', fontSize: '0.75rem', minWidth: '40px' }}>{row.stars} stars</span>
-                            <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {ratingStats.stats.map(row => (
+                        <motion.div 
+                            key={row.stars}
+                            whileHover={{ x: 5 }}
+                            onClick={() => handleFilter(row.stars)}
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '12px',
+                                cursor: 'pointer',
+                                opacity: (selectedRating && selectedRating !== row.stars) ? 0.4 : 1,
+                                transition: 'opacity 0.2s ease',
+                                background: selectedRating === row.stars ? 'rgba(255,255,255,0.03)' : 'transparent',
+                                padding: '4px 8px',
+                                borderRadius: '8px'
+                            }}
+                        >
+                            <span style={{ color: '#a1a1aa', fontSize: '0.75rem', minWidth: '45px' }}>{row.stars} stars</span>
+                            <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
                                 <motion.div 
                                     initial={{ width: 0 }}
-                                    whileInView={{ width: `${row.percent}%` }}
-                                    viewport={{ once: true }}
+                                    animate={{ width: `${row.percent}%` }}
                                     transition={{ duration: 1, ease: 'easeOut' }}
-                                    style={{ height: '100%', background: row.stars >= 4 ? '#8b5cf6' : '#f59e0b' }} 
+                                    style={{ 
+                                        height: '100%', 
+                                        background: row.stars >= 4 ? '#8b5cf6' : (row.stars === 3 ? '#f59e0b' : '#3f3f46') 
+                                    }} 
                                 />
                             </div>
-                            <span style={{ color: '#71717a', fontSize: '0.75rem', minWidth: '30px', textAlign: 'right' }}>{row.count}</span>
-                        </div>
+                            <span style={{ color: '#71717a', fontSize: '0.75rem', minWidth: '35px', textAlign: 'right' }}>{row.percent}%</span>
+                        </motion.div>
                     ))}
                 </div>
             </div>
