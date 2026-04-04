@@ -3394,6 +3394,7 @@ function App() {
     const [isExporting, setIsExporting] = useState(false);
 
     const messagesEndRef = useRef(null)
+    const userScrolledUp = useRef(false)
 
     // Scroll to top on view change
     useEffect(() => {
@@ -3759,10 +3760,10 @@ function App() {
     }, [appSection, pendingScrollToPricing]);
 
     const scrollToBottom = () => {
-        if (view === 'chat') {
+        if (view === 'chat' && !userScrolledUp.current) {
             setTimeout(() => {
                 const messagesList = document.querySelector('.messages-list');
-                if (messagesList) {
+                if (messagesList && !userScrolledUp.current) {
                     messagesList.scrollTop = messagesList.scrollHeight;
                 }
             }, 100);
@@ -3922,6 +3923,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         if (!textToSend.trim() || isLoading) return
 
         setIsLoading(true)
+        userScrolledUp.current = false;
         const userMessage = { role: 'user', content: textToSend }
 
         // Update title if it's the first user message
@@ -4485,7 +4487,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             default:
                 return (
                     <div key={view} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-                        <div className="messages-list">
+                        <div 
+                            className="messages-list"
+                            onScroll={(e) => {
+                                const { scrollTop, scrollHeight, clientHeight } = e.target;
+                                userScrolledUp.current = scrollHeight - (scrollTop + clientHeight) > 100;
+                            }}
+                        >
                             {/* Spacer pushes messages down when few, collapses when many */}
                             <div style={{ flex: 1 }} />
                             {messages.length === 1 ? (
