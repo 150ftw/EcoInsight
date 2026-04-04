@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useId } from 'react'
+import React, { useState, useMemo, useId, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, X, Sparkles, Bell } from 'lucide-react'
 import './ComingSoon.css'
 
 /* ---------- Inline Logo (matches existing EcoInsight branding) ---------- */
@@ -100,6 +100,23 @@ const FEATURES = [
 export default function ComingSoon() {
     const [email, setEmail] = useState('')
     const [submitted, setSubmitted] = useState(false)
+    const [showWaitlistPopup, setShowWaitlistPopup] = useState(false)
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            // Only show if not already submitted or if it's the first time
+            const hasSeenPopup = sessionStorage.getItem('ecoinsight_waitlist_popup_seen');
+            if (!hasSeenPopup) {
+                setShowWaitlistPopup(true);
+            }
+        }, 5000)
+        return () => clearTimeout(timer)
+    }, [])
+
+    const handleClosePopup = () => {
+        setShowWaitlistPopup(false);
+        sessionStorage.setItem('ecoinsight_waitlist_popup_seen', 'true');
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -125,36 +142,12 @@ export default function ComingSoon() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-                {/* Logo */}
-                <div className="cs-logo-wrapper">
-                    <div className="cs-logo-glow" />
-                    <motion.div
-                        className="cs-logo-container"
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                    >
-                        <CSLogo size={44} />
-                    </motion.div>
-                </div>
-
-                {/* Brand */}
-                <motion.div
-                    className="cs-brand"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                >
-                    <span className="cs-brand-name">Eko by EcoInsight</span>
-                    <span className="cs-ai-badge">AI</span>
-                </motion.div>
-
                 {/* Headline */}
                 <motion.h1
                     className="cs-headline"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.7 }}
+                    transition={{ delay: 0.2, duration: 0.7 }}
                 >
                     <span className="cs-headline-text">Launching Soon</span>
                 </motion.h1>
@@ -164,7 +157,7 @@ export default function ComingSoon() {
                     className="cs-tagline"
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.55, duration: 0.6 }}
+                    transition={{ delay: 0.4, duration: 0.6 }}
                 >
                     <strong>AI-Powered Economic Intelligence</strong> for Indian Investors.
                     Real-time market analysis, policy simulations, and neural insights with Eko — all in one premium platform.
@@ -175,36 +168,10 @@ export default function ComingSoon() {
                     className="cs-status-bar"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.7 }}
+                    transition={{ delay: 0.5 }}
                 >
                     <div className="cs-status-dot" />
                     <span className="cs-status-text">Building something extraordinary</span>
-                </motion.div>
-
-                {/* Waitlist Live Section */}
-                <motion.div
-                    className="cs-waitlist-live"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 }}
-                >
-                    <div className="cs-waitlist-card">
-                        <div className="cs-waitlist-content">
-                            <div className="cs-waitlist-header">
-                                <span className="cs-waitlist-badge">LIVE NOW</span>
-                                <p className="cs-waitlist-text">The official waitlist is now live!</p>
-                            </div>
-                            <a 
-                                href="https://www.joinecoinsight.dev" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="cs-waitlist-link"
-                            >
-                                <span>Join Waitlist</span>
-                                <ExternalLink size={14} />
-                            </a>
-                        </div>
-                    </div>
                 </motion.div>
 
                 {/* Email CTA */}
@@ -278,6 +245,63 @@ export default function ComingSoon() {
                     </a>
                 </p>
             </div>
+
+            {/* Waitlist Popup Overlay */}
+            <AnimatePresence>
+                {showWaitlistPopup && (
+                    <motion.div 
+                        className="cs-popup-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div 
+                            className="cs-popup-card"
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                        >
+                            <button 
+                                className="cs-popup-close"
+                                onClick={handleClosePopup}
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <div className="cs-popup-glow" />
+                            
+                            <div className="cs-popup-header">
+                                <div className="cs-popup-icon-container">
+                                    <Sparkles className="cs-popup-icon" size={24} />
+                                </div>
+                                <span className="cs-popup-badge">Early Access</span>
+                            </div>
+
+                            <h2 className="cs-popup-title">Official Waitlist is Live</h2>
+                            
+                            <p className="cs-popup-text">
+                                Be the first to experience Bharat's most advanced economic intelligence engine. 
+                                Join <strong>1,000+</strong> institutional researchers and elite traders.
+                            </p>
+
+                            <div className="cs-popup-cta-container">
+                                <a 
+                                    href="https://www.joinecoinsight.dev" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="cs-popup-btn"
+                                    onClick={handleClosePopup}
+                                >
+                                    <span>Secure Your Spot</span>
+                                    <ExternalLink size={16} />
+                                </a>
+                                <p className="cs-popup-note">Join 1,240+ people on the list</p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
