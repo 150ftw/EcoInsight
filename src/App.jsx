@@ -70,6 +70,64 @@ const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = fa
     )
 }
 
+
+const ThinkingIndicator = () => (
+    <motion.div 
+        className="message-wrapper assistant" 
+        initial={{ opacity: 0, y: 10 }} 
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, transition: { duration: 0.6 } }}
+    >
+        <div className="message-icon" style={{ position: 'relative' }}>
+            {/* The regular star that is showing during loading */}
+            <motion.div 
+                animate={{ opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+                <EkoSparkle size={18} animate={true} />
+            </motion.div>
+            
+            {/* The absolute-positioned explosion that only occurs on exit */}
+            <motion.div 
+                style={{ position: 'absolute', inset: -20, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0 }}
+                exit={{ opacity: 1 }}
+            >
+                {Array.from({ length: 12 }).map((_, i) => {
+                    const angle = (i / 12) * 360;
+                    return (
+                        <motion.div
+                            key={i}
+                            initial={{ x: 0, y: 0, scale: 0 }}
+                            exit={{ 
+                                x: Math.cos(angle * Math.PI / 180) * 40, 
+                                y: Math.sin(angle * Math.PI / 180) * 40, 
+                                scale: [0, 1.5, 0],
+                                opacity: [1, 1, 0]
+                            }}
+                            transition={{ duration: 0.7, ease: "easeOut" }}
+                            style={{
+                                position: 'absolute',
+                                width: 3,
+                                height: 3,
+                                borderRadius: '50%',
+                                backgroundColor: '#c084fc',
+                                boxShadow: '0 0 6px #c084fc'
+                            }}
+                        />
+                    );
+                })}
+            </motion.div>
+        </div>
+        <div className="message-content">
+            <motion.span className="typing-indicator" exit={{ opacity: 0 }}>Eko is analyzing...</motion.span>
+        </div>
+    </motion.div>
+);
+
 const EcoInsightLogo = ({ size = 24, className = "" }) => {
     const id = useId();
     const gradientId = `logoGradientMain-${id.replace(/:/g, '')}`;
@@ -4145,9 +4203,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
 
             if (isFirstQuery) {
-                // Wait for the cinematic star animation to complete its "drawing" and "descent" phase (~3.5s)
+                // Wait for the cinematic star animation to complete its "drawing", "rotating", and "descent" phase (~4.5s)
                 // before showing the thinking indicator or starting the stream
-                await new Promise(resolve => setTimeout(resolve, 3500));
+                await new Promise(resolve => setTimeout(resolve, 4500));
                 setShowStarFly(false);
             }
             setIsNeuralSearching(false);
@@ -4746,42 +4804,18 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         })}
                                     </AnimatePresence>
                                 )}
-                            {isLoading && messages.length > 0 && messages[messages.length - 1].content === '' && (
-                                <motion.div className="message-wrapper assistant" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                    <div className="message-icon"><Loader2 className="animate-spin" size={18} /></div>
-                                    <div className="message-content"><span className="typing-indicator">Eko is analyzing...</span></div>
-                                </motion.div>
-                            )}
+                            <AnimatePresence>
+                                {isLoading && messages.length > 0 && messages[messages.length - 1].content === '' && (
+                                    <ThinkingIndicator key="thinking-indicator" />
+                                )}
+                            </AnimatePresence>
                             <div ref={messagesEndRef} />
                         </div>
 
                         <div className="input-container">
 
                             
-                            <AnimatePresence>
-                                {isLoading && (
-                                    <motion.div 
-                                        className="eko-thinking-indicator"
-                                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                                    >
-                                        <div className="thinking-icon-stage">
-                                            <EkoSparkle size={20} animate={true} />
-                                            <div className="neural-pulse-ring" />
-                                        </div>
-                                        <div className="thinking-content-stage">
-                                            <span className="thinking-label">Neural Engine Searching</span>
-                                            <div className="thinking-dots">
-                                                <div className="dot"></div>
-                                                <div className="dot"></div>
-                                                <div className="dot"></div>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            {/* Legacy eko-thinking-indicator removed to consolidate loading into the chat stream */}
 
                             <motion.div className="input-wrapper">
                                 <label className="file-upload-btn" title="Upload PDF Analysis">
@@ -5058,25 +5092,26 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 rotate: -15 
                             }}
                             animate={{
-                                opacity: [0, 1, 1, 0.6, 0],
-                                scale: [3, 2.8, 3, 0.6, 0.2],
-                                rotate: [-15, -10, 0, 360, 360],
+                                opacity: [0, 1, 1, 1, 0.6, 0],
+                                scale: [3, 2.8, 2.8, 2.8, 0.6, 0.2],
+                                rotate: [0, 45, 90, 720, 1440, 2160], // Drawing phase (slow), then accelerated spin
                                 x: [
-                                    0, 0, 0, 
-                                    isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 60px)',
-                                    isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 60px)'
+                                    0, 0, 0, 0,
+                                    isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 100px)',
+                                    isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 100px)'
                                 ],
                                 y: [
                                     '-12vh', 
                                     '-10vh', 
                                     '-12vh', 
-                                    '35vh', 
-                                    '35vh'
+                                    '-12vh',
+                                    '38vh', 
+                                    '38vh'
                                 ]
                             }}
                             transition={{
-                                duration: 3.5,
-                                times: [0, 0.3, 0.7, 0.9, 1],
+                                duration: 4.5, // Increased total duration for better pacing
+                                times: [0, 0.2, 0.55, 0.75, 0.95, 1],
                                 ease: "easeInOut"
                             }}
                         >
