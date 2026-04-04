@@ -4064,6 +4064,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         setIsLoading(true)
         setIsNeuralSearching(true)
         userScrolledUp.current = false;
+        console.log("DEBUG: handleSend started. showStarFly setting to true.");
 
         // Trigger the cinematic star animation on EVERY query for a premium branded feel
         // This coordinates with the showStarFly overlay which we'll update
@@ -4135,7 +4136,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
             // Wait for the cinematic star animation to complete its "drawing" and "descent" phase (~2s)
             // before showing the thinking indicator or starting the stream
+            console.log("DEBUG: Waiting for cinematic intro...");
             await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log("DEBUG: Cinematic intro complete. Starting stream.");
             setShowStarFly(false);
             setIsNeuralSearching(false);
 
@@ -5031,6 +5034,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 {showStarFly && (
                     <motion.div
                         className="star-fly-overlay"
+                        onAnimationStart={() => console.log("DEBUG: Star fly overlay animation started")}
                         initial={{ backgroundColor: 'rgba(0,0,0,0)' }}
                         animate={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
                         exit={{ backgroundColor: 'rgba(0,0,0,0)', transition: { delay: 0.5 } }}
@@ -5044,16 +5048,18 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 opacity: 0, 
                                 rotate: -15 
                             }}
-                            animate={[
-                                // Stage 1: Drawing (Centered)
-                                { opacity: 1, scale: 2.5, rotate: 0, transition: { duration: 0.6, ease: "easeOut" } },
-                                // Stage 2: Glow/Pulse in center
-                                { scale: 2.8, transition: { duration: 0.4, repeat: 1, repeatType: 'reverse' } },
-                                // Stage 3: Descent to input area
-                                { x: 380, y: 'calc(100vh - 200px)', scale: 0.6, rotate: 360, opacity: 0.6, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
-                                // Stage 4: Fade into the thinking indicator
-                                { opacity: 0, scale: 0.2, transition: { duration: 0.4, ease: "easeIn" } }
-                            ]}
+                            animate={{
+                                opacity: [0, 1, 1, 0.6, 0],
+                                scale: [3, 2.5, 2.8, 0.6, 0.2],
+                                rotate: [-15, 0, 0, 360, 360],
+                                x: ['calc(50vw - 32px)', 'calc(50vw - 32px)', 'calc(50vw - 32px)', 380, 380],
+                                y: ['calc(50vh - 120px)', 'calc(50vh - 120px)', 'calc(50vh - 120px)', 'calc(100vh - 200px)', 'calc(100vh - 200px)']
+                            }}
+                            transition={{
+                                duration: 2,
+                                times: [0, 0.3, 0.5, 0.8, 1],
+                                ease: "easeInOut"
+                            }}
                         >
                             <EkoSparkle size={64} animate={true} />
                             <div className="star-draw-glow" />
