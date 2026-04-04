@@ -716,9 +716,39 @@ const ReviewsSection = () => {
     
     return (
         <section id="reviews" className="reviews-section">
-            <div className="section-title">
-                <h2>The Analyst Consensus</h2>
-                <p>Trusted by elite researchers and Bharat's market participants</p>
+            <div className="section-title" style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    gap: '1rem', 
+                    marginBottom: '0.75rem',
+                    flexWrap: 'wrap'
+                }}>
+                    <h2 style={{ margin: 0, fontSize: '2.25rem', fontWeight: 800 }}>The Analyst Consensus</h2>
+                    <span style={{ 
+                        fontSize: '0.65rem', 
+                        fontWeight: 800, 
+                        background: 'rgba(139, 92, 246, 0.15)', 
+                        color: '#a78bfa', 
+                        padding: '4px 10px', 
+                        borderRadius: '6px', 
+                        letterSpacing: '1.2px',
+                        border: '1px solid rgba(139, 92, 246, 0.3)',
+                        textTransform: 'uppercase',
+                        height: 'fit-content',
+                        alignSelf: 'center'
+                    }}>Alpha Stage</span>
+                </div>
+                <p style={{ 
+                    margin: '0 auto', 
+                    color: 'var(--text-secondary)', 
+                    fontSize: '1rem',
+                    maxWidth: '600px',
+                    lineHeight: '1.6'
+                }}>
+                    Trusted by elite researchers and Bharat's market participants during our initial pilot phase.
+                </p>
             </div>
 
             <div className="reviews-overview" style={{ 
