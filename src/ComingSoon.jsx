@@ -163,12 +163,38 @@ export default function ComingSoon() {
                     Real-time market analysis, policy simulations, and neural insights with Eko — all in one premium platform.
                 </motion.p>
 
+                {/* Waitlist Live Section (Restored as fallback) */}
+                <motion.div
+                    className="cs-waitlist-live"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                >
+                    <div className="cs-waitlist-card">
+                        <div className="cs-waitlist-content">
+                            <div className="cs-waitlist-header">
+                                <span className="cs-waitlist-badge">LIVE NOW</span>
+                                <p className="cs-waitlist-text">The official waitlist is now live!</p>
+                            </div>
+                            <a 
+                                href="https://www.joinecoinsight.dev" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="cs-waitlist-link"
+                            >
+                                <span>Join Waitlist</span>
+                                <ExternalLink size={14} />
+                            </a>
+                        </div>
+                    </div>
+                </motion.div>
+
                 {/* Status */}
                 <motion.div
                     className="cs-status-bar"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 }}
+                    transition={{ delay: 0.6 }}
                 >
                     <div className="cs-status-dot" />
                     <span className="cs-status-text">Building something extraordinary</span>

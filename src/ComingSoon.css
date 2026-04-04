@@ -568,28 +568,34 @@
 /* ---------- Waitlist Popup Styling ---------- */
 .cs-popup-overlay {
     position: fixed;
-    inset: 0;
-    z-index: 100000;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 200000;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: 1.5rem;
+    pointer-events: auto;
 }
 
 .cs-popup-card {
     position: relative;
     width: 100%;
-    max-width: 480px;
-    background: rgba(15, 15, 18, 0.85);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    border-radius: 32px;
-    padding: 3rem 2.5rem 2.5rem;
-    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7);
+    max-width: 440px;
+    background: rgba(10, 10, 12, 0.95);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 28px;
+    padding: 3rem 2rem 2.5rem;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8),
+                0 0 40px rgba(139, 92, 246, 0.1);
     overflow: hidden;
     text-align: center;
+    margin: auto; /* Force centering in flex */
 }
 
 .cs-popup-close {
