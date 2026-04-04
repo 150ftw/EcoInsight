@@ -4488,8 +4488,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         <div className="messages-list">
                             {/* Spacer pushes messages down when few, collapses when many */}
                             <div style={{ flex: 1 }} />
-                            <AnimatePresence initial={false}>
-                                {messages.length === 1 ? (
+                            {messages.length === 1 ? (
                                     <motion.div 
                                         className="empty-chat-hero"
                                         initial="hidden"
@@ -4536,41 +4535,42 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         </motion.div>
                                     </motion.div>
                                 ) : (
-                                    messages.map((msg, i) => (
-                                    <motion.div
-                                        key={i}
-                                        className={`message-wrapper ${msg.role}`}
-                                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <div className="message-icon">
-                                            {msg.role === 'assistant' ? <EkoSparkle size={20} /> : <User size={18} />}
-                                        </div>
-                                        <div className="message-container">
-                                            <div className="message-content">
-                                                {parseChartBlocks(msg.content).map((block, bIdx) => (
-                                                    block.type === 'chart'
-                                                        ? <EcoChartRenderer key={bIdx} config={block.content} />
-                                                        : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
-                                                ))}
+                                    <AnimatePresence initial={false}>
+                                        {messages.map((msg, i) => (
+                                        <motion.div
+                                            key={i}
+                                            className={`message-wrapper ${msg.role}`}
+                                            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            <div className="message-icon">
+                                                {msg.role === 'assistant' ? <EkoSparkle size={20} /> : <User size={18} />}
                                             </div>
-                                            <div className="message-actions">
-                                                {msg.role === 'assistant' && msg.content && (
-                                                    <>
-                                                        <button className="action-btn" title="Copy"><Copy size={14} /></button>
-                                                        <button className="action-btn" title="Regenerate"><RefreshCw size={14} /></button>
-                                                    </>
-                                                )}
-                                                <button className="action-btn danger-hover" title="Delete Message" onClick={() => deleteMessage(i)}>
-                                                    <Trash2 size={12} />
-                                                </button>
+                                            <div className="message-container">
+                                                <div className="message-content">
+                                                    {parseChartBlocks(msg.content).map((block, bIdx) => (
+                                                        block.type === 'chart'
+                                                            ? <EcoChartRenderer key={bIdx} config={block.content} />
+                                                            : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
+                                                    ))}
+                                                </div>
+                                                <div className="message-actions">
+                                                    {msg.role === 'assistant' && msg.content && (
+                                                        <>
+                                                            <button className="action-btn" title="Copy"><Copy size={14} /></button>
+                                                            <button className="action-btn" title="Regenerate"><RefreshCw size={14} /></button>
+                                                        </>
+                                                    )}
+                                                    <button className="action-btn danger-hover" title="Delete Message" onClick={() => deleteMessage(i)}>
+                                                        <Trash2 size={12} />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
-                                    ))
+                                        </motion.div>
+                                        ))}
+                                    </AnimatePresence>
                                 )}
-                            </AnimatePresence>
                             {isLoading && messages.length > 0 && messages[messages.length - 1].content === '' && (
                                 <motion.div className="message-wrapper assistant" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                     <div className="message-icon"><Loader2 className="animate-spin" size={18} /></div>
