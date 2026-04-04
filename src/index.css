@@ -689,27 +689,17 @@ main {
 /* Cinematic 5-Edge Star Overlay */
 .star-fly-overlay {
     position: fixed;
-    top: 0;
-    left: 280px; /* Sidebar width on desktop */
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 10000;
     pointer-events: none;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.5s ease;
-}
-
-@media (max-width: 1024px) {
-    .star-fly-overlay {
-        left: 0;
-    }
+    background: transparent;
 }
 
 .star-fly-icon {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.8))
             drop-shadow(0 0 50px rgba(139, 92, 246, 0.4));
     will-change: transform, opacity;

@@ -5038,8 +5038,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         <motion.div
                             className="star-fly-icon"
                             initial={{ 
-                                x: 0, 
-                                y: '-15vh', 
+                                x: isMobile ? 'calc(50vw - 96px)' : 'calc((100vw + 280px) / 2 - 96px)', 
+                                y: 'calc(40vh - 96px)', 
                                 scale: 3, 
                                 opacity: 0, 
                                 rotate: -15 
@@ -5049,16 +5049,18 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 scale: [3, 2.5, 2.8, 0.6, 0.2],
                                 rotate: [-15, 0, 0, 360, 360],
                                 x: [
-                                    0, 0, 0, 
-                                    isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 60px)',
-                                    isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 60px)'
+                                    isMobile ? 'calc(50vw - 96px)' : 'calc((100vw + 280px) / 2 - 96px)',
+                                    isMobile ? 'calc(50vw - 96px)' : 'calc((100vw + 280px) / 2 - 96px)',
+                                    isMobile ? 'calc(50vw - 96px)' : 'calc((100vw + 280px) / 2 - 96px)',
+                                    isMobile ? '20px' : 'calc(280px + 40px)',
+                                    isMobile ? '20px' : 'calc(280px + 40px)'
                                 ],
                                 y: [
-                                    '-15vh', 
-                                    '-15vh', 
-                                    '-15vh', 
-                                    '40vh', 
-                                    '40vh'
+                                    'calc(40vh - 96px)', 
+                                    'calc(40vh - 96px)', 
+                                    'calc(40vh - 96px)', 
+                                    'calc(100vh - 180px)', 
+                                    'calc(100vh - 180px)'
                                 ]
                             }}
                             transition={{
