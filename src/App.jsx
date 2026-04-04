@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useId } from 'react'
+import React, { useState, useRef, useEffect, useId, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X, Star, Check } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
