@@ -496,9 +496,8 @@ main {
 }
 
 .assistant .message-icon {
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    background: transparent;
     color: white;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .user .message-icon {

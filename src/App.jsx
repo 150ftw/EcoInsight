@@ -4553,7 +4553,10 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                     </motion.div>
                                 ) : (
                                     <AnimatePresence initial={false}>
-                                        {messages.map((msg, i) => (
+                                        {messages.map((msg, i) => {
+                                        // Skip the empty assistant placeholder while loading — the explicit indicator below handles it
+                                        if (msg.role === 'assistant' && msg.content === '') return null;
+                                        return (
                                         <motion.div
                                             key={i}
                                             className={`message-wrapper ${msg.role}`}
@@ -4585,7 +4588,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                                 </div>
                                             </div>
                                         </motion.div>
-                                        ))}
+                                        );
+                                        })}
                                     </AnimatePresence>
                                 )}
                             {isLoading && messages.length > 0 && messages[messages.length - 1].content === '' && (
