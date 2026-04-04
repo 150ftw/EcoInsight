@@ -128,12 +128,7 @@ export default function ComingSoon() {
     return (
         <div className="coming-soon-root">
             {/* Background layers */}
-            <div className="cs-gradient-mesh">
-                <div className="cs-mesh-extra" />
-            </div>
             <div className="cs-grid-overlay" />
-            <Particles />
-            <div className="cs-scanlines" />
 
             {/* Main content */}
             <motion.div
