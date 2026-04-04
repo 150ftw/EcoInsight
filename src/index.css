@@ -645,7 +645,7 @@ main {
 }
 
 .empty-chat-greeting .greeting-name {
-    background: linear-gradient(90deg, #4385f5, #ea4335, #fbbc04, #34a853);
+    background: linear-gradient(90deg, #6d28d9, #c084fc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

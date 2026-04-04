@@ -38,14 +38,13 @@ import { SUBPAGE_DATA } from './lib/SubpageContent'
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
 const EkoSparkle = ({ size = 24, className = "" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <path d="M11.666 0.166687C11.8327 5.83335 16.166 10.1667 21.8327 10.3334C16.166 10.5 11.8327 14.8334 11.666 20.5C11.5 14.8334 7.16602 10.5 1.49935 10.3334C7.16602 10.1667 11.5 5.83335 11.666 0.166687Z" fill="url(#gemini_gradient)"/>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="url(#eko_gradient)" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
         <defs>
-            <linearGradient id="gemini_gradient" x1="1.49935" y1="10.3334" x2="21.8327" y2="10.3334" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#4385f5" />
-                <stop offset="0.33" stopColor="#ea4335" />
-                <stop offset="0.67" stopColor="#fbbc04" />
-                <stop offset="1" stopColor="#34a853" />
+            <linearGradient id="eko_gradient" x1="2" y1="21.02" x2="22" y2="2" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#1a1a1a" />
+                <stop offset="0.4" stopColor="#6d28d9" />
+                <stop offset="1" stopColor="#c084fc" />
             </linearGradient>
         </defs>
     </svg>
