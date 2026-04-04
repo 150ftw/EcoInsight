@@ -492,7 +492,7 @@ main {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-top: 4px;
+    margin-top: -2px; /* Aligned with text midline */
 }
 
 .assistant .message-icon {
