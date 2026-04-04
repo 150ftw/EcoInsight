@@ -37,18 +37,31 @@ import { SUBPAGE_DATA } from './lib/SubpageContent'
 
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
-const EkoSparkle = ({ size = 24, className = "" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="url(#eko_gradient)" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-        <defs>
-            <linearGradient id="eko_gradient" x1="2" y1="21.02" x2="22" y2="2" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#1a1a1a" />
-                <stop offset="0.4" stopColor="#6d28d9" />
-                <stop offset="1" stopColor="#c084fc" />
-            </linearGradient>
-        </defs>
-    </svg>
-)
+const EkoSparkle = ({ size = 24, className = "", animate = false }) => {
+    const id = useId();
+    const gradientId = `eko_gradient_${id.replace(/:/g, '')}`;
+    
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+            <defs>
+                <linearGradient id={gradientId} x1="2" y1="21.02" x2="22" y2="2" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#1a1a1a" />
+                    <stop offset="0.4" stopColor="#6d28d9" />
+                    <stop offset="1" stopColor="#c084fc" />
+                </linearGradient>
+            </defs>
+            <motion.path 
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                fill={`url(#${gradientId})`}
+                stroke="rgba(255,255,255,0.4)"
+                strokeWidth={animate ? "0.5" : "0"}
+                initial={animate ? { pathLength: 0, opacity: 0 } : {}}
+                animate={animate ? { pathLength: 1, opacity: 1 } : {}}
+                transition={animate ? { duration: 1.2, ease: "easeInOut" } : {}}
+            />
+        </svg>
+    )
+}
 
 const EcoInsightLogo = ({ size = 24, className = "" }) => {
     const id = useId();
@@ -3518,6 +3531,7 @@ function App() {
     const messagesEndRef = useRef(null)
     const userScrolledUp = useRef(false)
     const [showStarFly, setShowStarFly] = useState(false);
+    const [isNeuralSearching, setIsNeuralSearching] = useState(false);
 
     // Scroll to top on view change
     useEffect(() => {
@@ -4048,13 +4062,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         if (!textToSend.trim() || isLoading) return
 
         setIsLoading(true)
+        setIsNeuralSearching(true)
         userScrolledUp.current = false;
 
-        // Trigger the cinematic star animation on the very first user query
-        if (activeChat.messages.length === 1) {
-            setShowStarFly(true);
-            setTimeout(() => setShowStarFly(false), 2600);
-        }
+        // Trigger the cinematic star animation on EVERY query for a premium branded feel
+        // This coordinates with the showStarFly overlay which we'll update
+        setShowStarFly(true);
         const userMessage = { role: 'user', content: textToSend }
 
         // Update title if it's the first user message
@@ -4119,6 +4132,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             ];
 
 
+
+            // Wait for the cinematic star animation to complete its "drawing" and "descent" phase (~2s)
+            // before showing the thinking indicator or starting the stream
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            setShowStarFly(false);
+            setIsNeuralSearching(false);
 
             let assistantContent = '';
             await streamMessage(chatMessages, API_KEY, (chunk) => {
@@ -4730,16 +4749,23 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 {isLoading && (
                                     <motion.div 
                                         className="eko-thinking-indicator"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
+                                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                                     >
-                                        <div className="thinking-dots">
-                                            <div className="dot"></div>
-                                            <div className="dot"></div>
-                                            <div className="dot"></div>
+                                        <div className="thinking-icon-stage">
+                                            <EkoSparkle size={20} animate={true} />
+                                            <div className="neural-pulse-ring" />
                                         </div>
-                                        <span>Eko is thinking...</span>
+                                        <div className="thinking-content-stage">
+                                            <span className="thinking-label">Neural Engine Searching</span>
+                                            <div className="thinking-dots">
+                                                <div className="dot"></div>
+                                                <div className="dot"></div>
+                                                <div className="dot"></div>
+                                            </div>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -5000,32 +5026,37 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 }}
             />
 
-            {/* Cinematic star fly animation */}
+            {/* Cinematic 5-edge star "Neural Search" animation */}
             <AnimatePresence>
                 {showStarFly && (
                     <motion.div
                         className="star-fly-overlay"
-                        initial={false}
+                        initial={{ backgroundColor: 'rgba(0,0,0,0)' }}
+                        animate={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+                        exit={{ backgroundColor: 'rgba(0,0,0,0)', transition: { delay: 0.5 } }}
                     >
                         <motion.div
                             className="star-fly-icon"
                             initial={{ 
-                                x: 'calc(50vw - 24px)', 
+                                x: 'calc(50vw - 32px)', 
                                 y: 'calc(50vh - 120px)', 
-                                scale: 2.2, 
-                                opacity: 1, 
-                                rotate: 0 
+                                scale: 3, 
+                                opacity: 0, 
+                                rotate: -15 
                             }}
                             animate={[
-                                { x: 'calc(50vw + 160px)', y: 'calc(50vh - 260px)', scale: 1.8, rotate: 30, opacity: 1, transition: { duration: 0.45, ease: [0.34,1.56,0.64,1] } },
-                                { x: 'calc(50vw - 220px)', y: 'calc(50vh - 200px)', scale: 1.5, rotate: -20, opacity: 1, transition: { duration: 0.4, ease: [0.16,1,0.3,1] } },
-                                { x: 'calc(50vw + 80px)', y: 'calc(40vh + 60px)', scale: 1.2, rotate: 15, opacity: 1, transition: { duration: 0.38, ease: [0.16,1,0.3,1] } },
-                                { x: 380, y: 'calc(100vh - 200px)', scale: 0.85, rotate: -10, opacity: 1, transition: { duration: 0.5, ease: [0.16,1,0.3,1] } },
-                                { x: 310, y: 'calc(100vh - 170px)', scale: 0.55, rotate: 0, opacity: 0, transition: { duration: 0.35, ease: 'easeIn' } },
+                                // Stage 1: Drawing (Centered)
+                                { opacity: 1, scale: 2.5, rotate: 0, transition: { duration: 0.6, ease: "easeOut" } },
+                                // Stage 2: Glow/Pulse in center
+                                { scale: 2.8, transition: { duration: 0.4, repeat: 1, repeatType: 'reverse' } },
+                                // Stage 3: Descent to input area
+                                { x: 380, y: 'calc(100vh - 200px)', scale: 0.6, rotate: 360, opacity: 0.6, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+                                // Stage 4: Fade into the thinking indicator
+                                { opacity: 0, scale: 0.2, transition: { duration: 0.4, ease: "easeIn" } }
                             ]}
-                            exit={{ opacity: 0 }}
                         >
-                            <EkoSparkle size={48} />
+                            <EkoSparkle size={64} animate={true} />
+                            <div className="star-draw-glow" />
                         </motion.div>
                     </motion.div>
                 )}
