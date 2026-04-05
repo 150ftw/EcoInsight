@@ -16,7 +16,8 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 // Helper for dynamic Google Callback URL
 function getCallbackUrl(req) {
   if (process.env.VITE_APP_URL) {
-    return `${process.env.VITE_APP_URL}/api/auth/google-callback`;
+    const baseUrl = process.env.VITE_APP_URL.replace(/\/+$/, '');
+    return `${baseUrl}/api/auth/google-callback`;
   }
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const host = req.headers.host || 'localhost:5173';
