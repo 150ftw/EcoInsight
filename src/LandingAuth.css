@@ -295,10 +295,9 @@ select,
     font-weight: 800;
     letter-spacing: -3px;
     margin-bottom: 2rem;
-    line-height: 1;
-    max-width: 1200px;
-    margin: 0 auto 2rem;
     color: #fff;
+    line-height: 1.2;
+    max-width: 1200px;
     /* Visibility Guard */
     position: relative;
     z-index: 10;
@@ -315,6 +314,7 @@ select,
     background-size: 200% auto;
     animation: shine 8s linear infinite;
     display: inline-block;
+    padding-bottom: 0.12em;
     /* Essential for clipping */
 }
 

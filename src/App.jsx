@@ -1136,9 +1136,9 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                         <Sparkles size={14} /> Intelligence for Bharat's Markets
                     </motion.div>
                     <h1>
-                        {splitText("Master the ")}
-                        <span className="text-gradient">{splitText("Economic")}</span>
-                        {splitText(" Pulse of ")}
+                        {splitText("Empowering ")}
+                        <span className="text-gradient">{splitText("AI Economic Intelligence")}</span>
+                        {splitText(" for ")}
                         <span style={{
                             background: 'linear-gradient(90deg, #FF9933 0%, #FF9933 30%, #ffffff 50%, #138808 70%, #138808 100%)',
                             WebkitBackgroundClip: 'text',
@@ -4408,16 +4408,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         return firstUser ? firstUser.content.substring(0, 180) + "..." : "Neural Session active.";
     };
 
-    if (!isLoaded && !authLoadingTimeout) {
-        return (
-            <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#09090b', color: 'white', flexDirection: 'column', gap: '1rem', fontFamily: 'Inter, sans-serif' }}>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Eko by EcoInsight</h2>
-                <Loader2 className="animate-spin" size={48} style={{ color: '#8b5cf6' }} />
-                <p style={{ fontSize: '1.2rem', fontWeight: '600', letterSpacing: '0.05em' }}>Eko by EcoInsight Engine Initializing...</p>
-                <p style={{ fontSize: '0.9rem', color: '#71717a' }}>Connecting to Neural Intelligence Gateway</p>
-            </div>
-        );
-    }
+
 
     const onInit = (name) => {
         setInitializingModule(name);
