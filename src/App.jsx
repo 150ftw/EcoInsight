@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useId, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X, Star, Check } from 'lucide-react'
+import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { streamMessage } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
@@ -21,8 +21,10 @@ import {
 } from '@clerk/clerk-react'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
+import { Bug } from 'lucide-react'
 
 import CreditModal from './components/CreditModal';
+import BugReportModal from './components/BugReportModal';
 import OnboardingView from './components/OnboardingView';
 import * as pdfjs from 'pdfjs-dist'
 // Set worker for pdfjs (using a static file from the public directory to bypass Vite bundler issues)
@@ -34,6 +36,7 @@ import { fetchNewsTickerData } from './lib/MarketData'
 import './LandingAuth.css'
 import Threads from './components/Threads'
 import { SUBPAGE_DATA } from './lib/SubpageContent'
+import CookieConsent from './components/CookieConsent'
 
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
@@ -350,6 +353,22 @@ const NewsTicker = () => {
         </div>
     );
 };
+
+const LegalFooter = ({ onOpenSubpage }) => (
+    <footer className="legal-footer">
+        <div className="footer-left">
+            <EcoInsightLogo size={20} />
+            <span className="footer-logo-text">EcoInsight</span>
+            <span className="copyright">© {new Date().getFullYear()} Shivam Sharma</span>
+        </div>
+        <div className="footer-links">
+            <button className="footer-link" onClick={() => onOpenSubpage('privacy-policy')}>Privacy</button>
+            <button className="footer-link" onClick={() => onOpenSubpage('terms')}>Terms</button>
+            <button className="footer-link" onClick={() => onOpenSubpage('refund')}>Refunds</button>
+            <button className="footer-link" onClick={() => onOpenSubpage('contact')}>Contact</button>
+        </div>
+    </footer>
+);
 
 // --- PREMIUM FEATURE: PDF TEXT EXTRACTION ---
 const extractTextFromPDF = async (file) => {
@@ -1704,6 +1723,10 @@ const SubpageRenderer = ({ view, onBack }) => {
                     )}
                 </div>
             </PageWrapper>
+            <LegalFooter onOpenSubpage={(v) => {
+                window.scrollTo(0, 0);
+                setView(v);
+            }} />
         </div>
     );
 };
@@ -3583,6 +3606,7 @@ function App() {
     const [isLoading, setIsLoading] = useState(false)
     const [authLoadingTimeout, setAuthLoadingTimeout] = useState(false)
     const [showCreditModal, setShowCreditModal] = useState(false);
+    const [showBugModal, setShowBugModal] = useState(false);
     const [modalType, setModalType] = useState('credits');
     const [pendingScrollToPricing, setPendingScrollToPricing] = useState(false);
 
@@ -3665,8 +3689,13 @@ function App() {
     const [chatSettings, setChatSettings] = useState({
         autoTitles: true,
         showTimestamps: false,
-        performanceMode: false
+        performanceMode: false,
+        history: true,
+        autoSave: true
     })
+
+    const [lastMessageTime, setLastMessageTime] = useState(0);
+    const [rateLimitActive, setRateLimitActive] = useState(false);
 
     const [personalization, setPersonalization] = useState({
         callMe: '',
@@ -3880,31 +3909,33 @@ function App() {
         }
     };
 
-    // Welcome Email Automation
+    // Welcome Email Automation (Robust Version)
     useEffect(() => {
-        if (isSignedIn && user?.id && supaLoaded && !profile?.welcome_email_sent) {
-            console.log(`[App] Welcome email trigger conditions met for: ${user.primaryEmailAddress?.emailAddress}`);
-            const handleWelcomeEmail = async () => {
+        if (!isSignedIn || !user?.id || !supaLoaded || profile?.welcome_email_sent) return;
+
+        // CRITICAL FIX: Only send to users created in the last 30 minutes.
+        // This prevents returning users from ever triggering a re-send on login.
+        const accountAgeMs = Date.now() - new Date(user.createdAt).getTime();
+        const isNewSignup = accountAgeMs < 30 * 60 * 1000; // 30 mins window
+
+        if (profile.onboarded && isNewSignup) {
+            console.log(`[App] Triggering robust welcome email for new signup: ${user.primaryEmailAddress?.emailAddress}`);
+            const triggerEmail = async () => {
                 try {
                     const response = await sendWelcomeEmail(
                         user.primaryEmailAddress?.emailAddress,
-                        user.firstName || user.fullName
+                        profile.name || user.firstName || user.fullName
                     );
-                    
-                    console.log(`[App] sendWelcomeEmail response:`, response);
-
                     if (response.success) {
-                        // Update profile flag to ensure we don't send it again
                         setProfile(prev => ({ ...prev, welcome_email_sent: true }));
                     }
-                } catch (emailErr) {
-                    console.error(`[App] Failed to handle welcome email:`, emailErr);
+                } catch (err) {
+                    console.error("[App] Robust welcome email failed:", err);
                 }
             };
-            handleWelcomeEmail();
+            triggerEmail();
         }
-    }, [isSignedIn, user?.id, supaLoaded, profile?.welcome_email_sent]);
-
+    }, [isSignedIn, user?.id, supaLoaded, profile?.welcome_email_sent, profile.onboarded]);
     // Dynamic Profile Sync (Clerk -> Profile State)
     useEffect(() => {
         if (!user || !supaLoaded) return;
@@ -4126,6 +4157,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         const textToSend = customText || input
         if (!textToSend.trim() || isLoading) return
 
+        // Rate Limiting (5s cooldown)
+        const now = Date.now();
+        if (now - lastMessageTime < 5000 && !customText) {
+            setRateLimitActive(true);
+            setTimeout(() => setRateLimitActive(false), 2000);
+            return;
+        }
+        setLastMessageTime(now);
+
         setIsLoading(true)
         setIsNeuralSearching(true)
         userScrolledUp.current = false;
@@ -4283,6 +4323,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 heightLeft -= pdfHeight;
             }
 
+            if (window.gtag) {
+                window.gtag('event', 'pdf_download', {
+                    'event_category': 'Engagement',
+                    'event_label': activeChat.title
+                });
+            }
+
             pdf.save(`Eko_by_EcoInsight_Report_${activeChat.title.replace(/\s+/g, '_')}.pdf`);
         } catch (error) {
             console.error("PDF Export Failed:", error);
@@ -4291,7 +4338,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         }
     };
 
-    // --- PREMIUM FEATURE: PDF UPLOAD ---
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
         if (!file || file.type !== 'application/pdf') return;
@@ -4300,7 +4346,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         try {
             const text = await extractTextFromPDF(file);
             setPdfText(text);
-            // Auto-trigger a "Analyze this document" message and pass the sync text
             handleSend(`I've uploaded a document. Please analyze it and summarize the key economic/financial points.`, text);
         } catch (error) {
             console.error("Upload failed:", error);
@@ -4316,12 +4361,52 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         } : c));
     };
 
-    // Modified handleSend call inside try to seed assistant message
+        const [sidebarWidth, setSidebarWidth] = useState(() => {
+        const saved = localStorage.getItem('ecoinsight_sidebar_width');
+        return saved ? parseInt(saved, 10) : 280;
+    });
+    const [isResizing, setIsResizing] = useState(false);
+    const [hoveredChatId, setHoveredChatId] = useState(null);
+    const hoverTimeout = useRef(null);
+
+    const startResizing = (e) => {
+        e.preventDefault();
+        setIsResizing(true);
+    };
+
     useEffect(() => {
-        if (isLoading && activeChat.messages[activeChat.messages.length - 1].content === '') {
-            // This is handled inside handleSend now to avoid separate seeds
+        const handleMouseMove = (e) => {
+            if (!isResizing) return;
+            let newWidth = e.clientX;
+            if (newWidth < 200) newWidth = 200;
+            if (newWidth > 500) newWidth = 500;
+            setSidebarWidth(newWidth);
+        };
+
+        const stopResizing = () => {
+            setIsResizing(false);
+            localStorage.setItem('ecoinsight_sidebar_width', sidebarWidth.toString());
+        };
+
+        if (isResizing) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', stopResizing);
         }
-    }, [isLoading]);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', stopResizing);
+        };
+    }, [isResizing, sidebarWidth]);
+
+    const getChatSummary = (chatId) => {
+        const chat = chats.find(c => c.id === chatId);
+        if (!chat || chat.messages.length <= 1) return "Initiating elite economic analysis...";
+        const firstAssistant = chat.messages.find(m => m.role === 'assistant' && m.content);
+        if (firstAssistant) return firstAssistant.content.substring(0, 180) + "...";
+        const firstUser = chat.messages.find(m => m.role === 'user' && m.content);
+        return firstUser ? firstUser.content.substring(0, 180) + "..." : "Neural Session active.";
+    };
 
     if (!isLoaded && !authLoadingTimeout) {
         return (
@@ -4339,13 +4424,32 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         setShowInitialization(true);
     };
 
-    const handleOnboardingComplete = (onboardingData) => {
+    const handleOnboardingComplete = async (onboardingData) => {
+        // Update local profile first with onboarding data
         setProfile(prev => ({
             ...prev,
             ...onboardingData,
             onboarded: true // Mark as onboarded
         }));
-        // Note: The profile sync effect will automatically save this to Supabase
+
+        // Send welcome email immediately after successful onboarding
+        if (!profile.welcome_email_sent && user?.primaryEmailAddress?.emailAddress) {
+            console.log(`[App] Triggering one-time welcome email for new signup: ${user.primaryEmailAddress.emailAddress}`);
+            try {
+                const response = await sendWelcomeEmail(
+                    user.primaryEmailAddress.emailAddress,
+                    onboardingData.name || user.firstName || user.fullName
+                );
+                
+                if (response.success) {
+                    // Update state to reflect email sent
+                    setProfile(prev => ({ ...prev, welcome_email_sent: true }));
+                }
+            } catch (err) {
+                console.error("[App] Failed to send welcome email during onboarding:", err);
+            }
+        }
+        // Note: The profile sync effect will automatically save these updates to Supabase
     };
 
     const renderView = () => {
@@ -4813,10 +4917,35 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </div>
 
                         <div className="input-container">
-
-                            
-                            {/* Legacy eko-thinking-indicator removed to consolidate loading into the chat stream */}
-
+                            <AnimatePresence>
+                                {rateLimitActive && (
+                                    <motion.div 
+                                        className="rate-limit-warning"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '-30px',
+                                            left: '50%',
+                                            transform: 'translateX(-50%)',
+                                            background: 'rgba(239, 68, 68, 0.2)',
+                                            color: '#ef4444',
+                                            padding: '4px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '0.75rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                                            backdropFilter: 'blur(4px)',
+                                            zIndex: 5
+                                        }}
+                                    >
+                                        <AlertCircle size={12} /> Please wait 5 seconds between messages.
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                             <motion.div className="input-wrapper">
                                 <label className="file-upload-btn" title="Upload PDF Analysis">
                                     <input type="file" accept=".pdf" onChange={handleFileUpload} style={{ display: 'none' }} />
@@ -4924,7 +5053,14 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </button>
                     </header>
                 )}
-                <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+                <aside 
+                    className={`sidebar ${isSidebarOpen ? 'open' : ''}`}
+                    style={{ 
+                        '--sidebar-width': `${sidebarWidth}px`,
+                        flexBasis: isMobile ? '280px' : 'var(--sidebar-width)',
+                        width: isMobile ? '280px' : 'var(--sidebar-width)'
+                    }}
+                >
                     <div className="sidebar-header">
                         <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <EcoInsightLogo size={36} className="logo-icon" /> <span>EcoInsight</span>
@@ -4937,7 +5073,17 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <button className="nav-item new-chat" onClick={() => { createNewChat(); if (isMobile) setIsSidebarOpen(false); }}>
                                 <EcoNewChatIcon size={18} /> <span>New Chat</span>
                             </button>
-                            <div className="history-item-wrapper active-chat-item">
+                            <div 
+                                className="history-item-wrapper active-chat-item"
+                                onMouseEnter={() => {
+                                    clearTimeout(hoverTimeout.current);
+                                    hoverTimeout.current = setTimeout(() => setHoveredChatId(activeChat.id), 400);
+                                }}
+                                onMouseLeave={() => {
+                                    clearTimeout(hoverTimeout.current);
+                                    setHoveredChatId(null);
+                                }}
+                            >
                                 <button
                                     className={`nav-item ${view === 'chat' ? 'active' : ''}`}
                                     onClick={() => { setView('chat'); if (isMobile) setIsSidebarOpen(false); }}
@@ -4954,7 +5100,18 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <span className="section-label">Chat History</span>
                             <div className="history-list">
                                 {chats.filter(c => c.id !== activeChatId && c.messages.length > 1).map(chat => (
-                                    <div key={chat.id} className="history-item-wrapper">
+                                    <div 
+                                        key={chat.id} 
+                                        className="history-item-wrapper"
+                                        onMouseEnter={() => {
+                                            clearTimeout(hoverTimeout.current);
+                                            hoverTimeout.current = setTimeout(() => setHoveredChatId(chat.id), 400);
+                                        }}
+                                        onMouseLeave={() => {
+                                            clearTimeout(hoverTimeout.current);
+                                            setHoveredChatId(null);
+                                        }}
+                                    >
                                         <button
                                             className="nav-item history-item"
                                             onClick={() => {
@@ -5008,7 +5165,22 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 )}
                             </AnimatePresence>
 
-                            <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => { setView('settings'); if (isMobile) setIsSidebarOpen(false); }} style={{ marginTop: '0.5rem' }}><Settings size={18} /> Settings</button>
+                            <button 
+                                className="nav-item" 
+                                onClick={() => { setModalType('premium'); setShowCreditModal(true); }} 
+                                style={{ 
+                                    marginTop: '0.5rem', 
+                                    opacity: 0.6, 
+                                    display: 'flex', 
+                                    justifyContent: 'space-between', 
+                                    alignItems: 'center' 
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    <Settings size={18} /> Settings
+                                </div>
+                                <Lock size={12} color="#a78bfa" />
+                            </button>
                         </div>
                     </nav>
                     <div className="sidebar-footer">
@@ -5025,7 +5197,39 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </SignedIn>
 
                     </div>
+                    <AnimatePresence>
+                        {hoveredChatId && (
+                            <motion.div 
+                                className="chat-summary-tooltip"
+                                initial={{ opacity: 0, x: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                exit={{ opacity: 0, x: 10, scale: 0.95 }}
+                                style={{
+                                    left: isMobile ? '290px' : `calc(${sidebarWidth}px + 10px)`,
+                                    top: '50%',
+                                    transform: 'translateY(-50%)'
+                                }}
+                            >
+                                <div className="summary-header">
+                                    <Sparkles size={12} className="text-accent" />
+                                    <span>Intelligence Summary</span>
+                                </div>
+                                <div className="summary-content">
+                                    {getChatSummary(hoveredChatId)}
+                                </div>
+                                <div className="summary-footer">
+                                    {chats.find(c => c.id === hoveredChatId)?.messages.length || 0} messages • EcoInsight AI
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </aside>
+                {!isMobile && (
+                    <div 
+                        className={`sidebar-resizer ${isResizing ? 'active' : ''}`}
+                        onMouseDown={startResizing}
+                    />
+                )}
                 <main className="chat-area">
                     {!isMobile && (
                         <header className="chat-header">
@@ -5081,6 +5285,10 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         initial={{ backgroundColor: 'rgba(0,0,0,0)' }}
                         animate={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
                         exit={{ backgroundColor: 'rgba(0,0,0,0)', transition: { delay: 0.5 } }}
+                        style={{ 
+                            left: isMobile ? 0 : `${sidebarWidth}px`,
+                            width: isMobile ? '100%' : `calc(100% - ${sidebarWidth}px)`
+                        }}
                     >
                         <motion.div
                             className="star-fly-icon"
@@ -5094,12 +5302,10 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             animate={{
                                 opacity: [0, 1, 1, 1, 0.6, 0],
                                 scale: [3, 2.8, 2.8, 2.8, 0.6, 0.2],
-                                rotate: [0, 45, 90, 720, 1440, 2160], // Drawing phase (slow), then accelerated spin
-                                x: [
-                                    0, 0, 0, 0,
-                                    isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 100px)',
-                                    isMobile ? 'calc(-50vw + 60px)' : 'calc(-(100vw - 280px) / 2 + 100px)'
-                                ],
+                                rotate: [0, 45, 90, 720, 1440, 2160], 
+                                x: isMobile ? 
+                                    [0, 0, 0, 0, -window.innerWidth / 2 + 60, -window.innerWidth / 2 + 60] : 
+                                    [0, 0, 0, 0, -(window.innerWidth - sidebarWidth) / 2 + 100, -(window.innerWidth - sidebarWidth) / 2 + 100],
                                 y: [
                                     '-12vh', 
                                     '-10vh', 
@@ -5121,6 +5327,43 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <BugReportModal 
+                isOpen={showBugModal}
+                onClose={() => setShowBugModal(false)}
+            />
+
+            <button 
+                className="bug-fab"
+                onClick={() => setShowBugModal(true)}
+                title="Report Bug / Feedback"
+                style={{
+                    position: 'fixed',
+                    bottom: '80px',
+                    right: '24px',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    color: '#ef4444',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    zIndex: 9999,
+                    backdropFilter: 'blur(8px)',
+                    transition: 'all 0.3s ease',
+                    opacity: 0.6,
+                    '--hover-opacity': 1
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '0.6'}
+            >
+                <Bug size={14} />
+            </button>
+
+            <CookieConsent />
         </>
     );
 };

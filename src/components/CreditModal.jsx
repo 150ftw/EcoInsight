@@ -63,8 +63,8 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                     )}
 
                     <div className="modal-actions">
-                        <button className="btn-upgrade-now" style={{ opacity: 0.7, cursor: 'default' }} onClick={(e) => e.preventDefault()}>
-                            <Zap size={18} /> Premium Tiers: Coming Soon
+                        <button className="btn-shine-primary" onClick={() => window.open('https://ecoinsight.online/#pricing', '_blank')}>
+                            <Zap size={18} /> Join the Pro Waitlist
                         </button>
                         <button className="btn-secondary-modal" onClick={onClose}>
                             I understand
