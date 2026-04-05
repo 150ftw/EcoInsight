@@ -6,7 +6,17 @@ const OnboardingView = ({ user, onComplete }) => {
     const [step, setStep] = useState(1);
     const [name, setName] = useState(user?.fullName || '');
     const [username, setUsername] = useState(user?.username || '');
+    const [avatar, setAvatar] = useState(user?.imageUrl || '');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const PRESET_AVATARS = [
+        'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=Elite1&backgroundColor=b6e3f4,c0aede,d1d4f9',
+        'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=Elite2&backgroundColor=b6e3f4,c0aede,d1d4f9',
+        'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=Elite3&backgroundColor=b6e3f4,c0aede,d1d4f9',
+        'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=Elite4&backgroundColor=b6e3f4,c0aede,d1d4f9',
+        'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=Elite5&backgroundColor=b6e3f4,c0aede,d1d4f9',
+        'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=Elite6&backgroundColor=b6e3f4,c0aede,d1d4f9'
+    ];
 
     const handleComplete = async () => {
         if (!name || !username) return;
@@ -20,7 +30,7 @@ const OnboardingView = ({ user, onComplete }) => {
             onComplete({
                 name,
                 username: formattedUsername,
-                avatar: user?.imageUrl || null,
+                avatar: avatar,
                 onboarded: true
             });
             setIsSubmitting(false);
@@ -71,17 +81,41 @@ const OnboardingView = ({ user, onComplete }) => {
                         <span className="field-hint">A unique identifier for your economic insights.</span>
                     </div>
 
-                    <div className="onboarding-avatar-preview">
-                        <div className="avatar-circle">
-                            {user?.imageUrl ? (
-                                <img src={user.imageUrl} alt="Profile" />
-                            ) : (
-                                <Camera size={24} />
-                            )}
-                        </div>
-                        <div className="avatar-info">
-                            <span className="avatar-status">Linked from Auth Provider</span>
-                            <p>You can change your avatar later in your account settings.</p>
+                    <div className="onboarding-avatar-section">
+                        <label><Camera size={14} /> Profile Identity Icon</label>
+                        <div className="onboarding-avatar-header">
+                            <div className="avatar-circle-large">
+                                {avatar ? (
+                                    <img src={avatar} alt="Profile" />
+                                ) : (
+                                    <span className="avatar-placeholder">{name.charAt(0) || <User size={32} />}</span>
+                                )}
+                                <div className="avatar-badge">Pro</div>
+                            </div>
+                            <div className="avatar-selection-controls">
+                                <span className="field-hint">Select a neural identity or paste a URL</span>
+                                <div className="avatar-presets-grid">
+                                    {PRESET_AVATARS.map((url, i) => (
+                                        <button 
+                                            key={i} 
+                                            type="button" 
+                                            className={`avatar-preset-btn ${avatar === url ? 'active' : ''}`}
+                                            onClick={() => setAvatar(url)}
+                                        >
+                                            <img src={url} alt={`Preset ${i}`} />
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="avatar-url-input">
+                                    <AtSign size={14} />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Paste custom image URL..." 
+                                        value={avatar.startsWith('https://api.dicebear.com') ? '' : avatar}
+                                        onChange={(e) => setAvatar(e.target.value)}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 

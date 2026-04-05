@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useId, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save } from 'lucide-react'
+import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { streamMessage } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
@@ -8,17 +8,10 @@ import { fetchWebSearchContext } from './lib/WebSearch'
 import { loadChats, saveChats, deleteChat as supaDeleteChat, deleteAllChats, loadSettings, saveSettings } from './lib/SupabaseStorage'
 import { sendWelcomeEmail } from './lib/EmailService';
 import { parseChartBlocks, EcoChartRenderer } from './components/EcoCharts'
-import {
-    SignedIn,
-    SignedOut,
-    SignIn,
-    SignUp,
-    SignInButton,
-    SignUpButton,
-    UserButton,
-    useUser,
-    useAuth
-} from '@clerk/clerk-react'
+import { useAuth, useUser } from './context/AuthContext'
+import AuthModal from './components/AuthModal'
+import AccountSettingsModal from './components/AccountSettingsModal'
+import UserAccountMenu from './components/UserAccountMenu'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import { Bug } from 'lucide-react'
@@ -1025,8 +1018,108 @@ const ReviewsSection = () => {
     );
 };
 
-const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine, supaLoaded }) => {
-    const { isSignedIn, isLoaded } = useAuth();
+
+const FloatingWhatsAppButton = () => {
+    return (
+        <a 
+            href="https://wa.me/918244646000" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="floating-whatsapp-btn"
+        >
+            <div className="whatsapp-icon-circle">
+                 <MessageCircle size={14} fill="white" color="white" />
+            </div>
+            <span>Chat with Founder</span>
+        </a>
+    );
+};
+
+const DetailedFooter = ({ setAppSection }) => {
+    const currentYear = new Date().getFullYear();
+    
+    const footerSections = [
+        {
+            title: "PLATFORM",
+            links: [
+                { label: "Help Center", id: "help-center" },
+                { label: "Knowledge Base", id: "knowledge-base" },
+                { label: "Network Status", id: "network-status" },
+                { label: "Security Advisories", id: "security-advisories" }
+            ]
+        },
+        {
+            title: "COMPANY",
+            links: [
+                { label: "About Us", id: "about-us" },
+                { label: "Careers", id: "careers" },
+                { label: "Partners", id: "partners" },
+                { label: "Referral Program", id: "referral" },
+                { label: "Contact", id: "contact" }
+            ]
+        },
+        {
+            title: "LEGAL",
+            links: [
+                { label: "Privacy Policy", id: "privacy-policy" },
+                { label: "Terms of Service", id: "terms-of-service" },
+                { label: "Acceptable Use Policy", id: "acceptable-use" },
+                { label: "Payment & Refund", id: "payment-refund" },
+                { label: "Report Abuse", id: "report-abuse" }
+            ]
+        }
+    ];
+
+    return (
+        <footer className="detailed-footer">
+            <div className="footer-glow" />
+            <div className="footer-content">
+                <div className="footer-main-grid">
+                    <div className="footer-brand-col">
+                        <div className="footer-brand-header">
+                            <EcoInsightLogo size={24} />
+                            <span>EcoInsight</span>
+                        </div>
+                        <p className="footer-tagline">
+                            Empowering investors with institutional-grade AI analysis for the modern market.
+                        </p>
+                    </div>
+
+                    {footerSections.map((section, idx) => (
+                        <div key={idx} className="footer-nav-col">
+                            <h4>{section.title}</h4>
+                            <ul>
+                                {section.links.map((link, lIdx) => (
+                                    <li key={lIdx}>
+                                        <button 
+                                            key={link.id} 
+                                            className="footer-link-btn"
+                                            onClick={() => {
+                                                setAppSection(link.id);
+                                                window.scrollTo(0, 0);
+                                            }}
+                                        >
+                                            {link.label}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="footer-bottom-bar">
+                <div className="footer-copyright">
+                    © {currentYear} EcoInsight. All rights reserved. Made for Bharat 🇮🇳
+                </div>
+            </div>
+        </footer>
+    );
+};
+
+const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine, supaLoaded, openLogin, openSignup, setIsAccountModalOpen }) => {
+    const { user, isLoaded, isSignedIn } = useUser();
     const [hoveredPlanIndex, setHoveredPlanIndex] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -1087,28 +1180,26 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                         </div>
                     ) : (
                         <>
-                            <SignedIn>
+                            {user ? (
                                 <div className="signed-in-nav">
-                                    <button className="btn-signin" onClick={onLaunchEngine} disabled={!supaLoaded && isSignedIn}>
+                                    <button className="btn-signin" onClick={onLaunchEngine} disabled={!supaLoaded}>
                                         {!supaLoaded ? (
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <Loader2 size={14} className="animate-spin" /> Syncing...
                                             </div>
                                         ) : "Open Engine"}
                                     </button>
-                                    <UserButton afterSignOutUrl="/" />
+                                    <UserAccountMenu 
+                                        onSettingsClick={() => setIsAccountModalOpen(true)}
+                                        onSubscriptionClick={() => { setAppSection('chat'); setModalType('premium'); setShowCreditModal(true); }}
+                                    />
                                 </div>
-                            </SignedIn>
-                            <SignedOut>
+                            ) : (
                                 <div className="signed-out-nav">
-                                    <SignInButton mode="modal">
-                                        <button className="nav-link">Sign In</button>
-                                    </SignInButton>
-                                    <SignUpButton mode="modal">
-                                        <button className="btn-header">Get Started</button>
-                                    </SignUpButton>
+                                    <button className="nav-link" onClick={openLogin}>Sign In</button>
+                                    <button className="btn-header" onClick={openSignup}>Get Started</button>
                                 </div>
-                            </SignedOut>
+                            )}
                         </>
                     )}
                 </div>
@@ -1173,11 +1264,9 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                                     )}
                                 </button>
                             ) : (
-                                <SignUpButton mode="modal">
-                                    <button className="btn-primary">
-                                        Launch Engine <Maximize2 size={18} />
-                                    </button>
-                                </SignUpButton>
+                                <button className="btn-primary" onClick={openSignup}>
+                                    Launch Engine <Maximize2 size={18} />
+                                </button>
                             )}
                         </Magnetic>
                         <Magnetic distance={0.2}>
@@ -1332,52 +1421,13 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                     {isSignedIn ? (
                         <button className="btn-primary" onClick={onLaunchEngine}>Launch Engine Now</button>
                     ) : (
-                        <SignUpButton mode="modal">
-                            <button className="btn-primary">Get Started Now</button>
-                        </SignUpButton>
+                        <button className="btn-primary" onClick={openSignup}>Get Started Now</button>
                     )}
                 </motion.div>
             </section>
-
-            <footer className="landing-footer" style={{ position: 'relative', overflow: 'hidden' }}>
-                <div className="footer-threads-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 1.0 }}>
-                    <Threads amplitude={1.5} distance={0.2} enableMouseInteraction={false} color={[0, 0, 0]} />
-                </div>
-                <div className="footer-content">
-                    <div className="footer-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <EcoInsightLogo size={42} /> <span>Eko by EcoInsight</span>
-                    </div>
-                    <div className="footer-links-grid">
-                        <div className="link-group">
-                            <h4>Resources</h4>
-                            <button className="footer-link-btn" onClick={() => setAppSection('help-center')}>Help Center</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('knowledge-base')}>Knowledge Base</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('network-status')}>Network Status</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('security-advisories')}>Security Advisories</button>
-                        </div>
-                        <div className="link-group">
-                            <h4>Company</h4>
-                            <button className="footer-link-btn" onClick={() => setAppSection('about-us')}>About Us</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('careers')}>Careers</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('partners')}>Partners</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('referral')}>Referral Program</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('contact')}>Contact</button>
-                        </div>
-                        <div className="link-group">
-                            <h4>Legal</h4>
-                            <button className="footer-link-btn" onClick={() => setAppSection('privacy-policy')}>Privacy Policy</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('terms-of-service')}>Terms of Service</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('acceptable-use')}>Acceptable Use Policy</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('payment-refund')}>Payment & Refund</button>
-                            <button className="footer-link-btn" onClick={() => setAppSection('report-abuse')}>Report Abuse</button>
-                        </div>
-                    </div>
-                </div>
-                <div className="footer-bottom">
-                    <p>&copy; 2024 Eko by EcoInsight. All rights reserved.</p>
-                </div>
-            </footer>
-        </div >
+            
+            <DetailedFooter setAppSection={setAppSection} />
+        </div>
     );
 };
 
@@ -1892,20 +1942,20 @@ const SecurityPage = ({ onBack, onInit }) => {
                     />
                     <InteractiveActionCard
                         icon={Key}
-                        title="Clerk Perimeter"
+                        title="EcoInsight Identity"
                         description="MFA and hardware-key support for all analyst entries."
-                        details="Passkey-first authentication logic ensures zero credential phishing risk."
+                        details="Secure custom JWT authentication ensures zero credential phishing risk."
                         expandedDetails={
                             <div style={{ fontSize: '0.85rem', color: '#a78bfa', background: 'rgba(139,92,246,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(139,92,246,0.2)' }}>
                                 <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <li><strong>Provider:</strong> Clerk B2B Identity.</li>
-                                    <li><strong>FIDO2:</strong> YubiKey / Hardware Token requirement enabled.</li>
-                                    <li><strong>Biometrics:</strong> Passkey WebAuthn supported.</li>
+                                    <li><strong>Provider:</strong> Custom Secure Identity.</li>
+                                    <li><strong>Security:</strong> JWT + HttpOnly Cookies.</li>
+                                    <li><strong>OAuth:</strong> Google Integration enabled.</li>
                                 </ul>
                             </div>
                         }
                         onInit={onInit}
-                        isActive={activeCard === "Clerk Perimeter"}
+                        isActive={activeCard === "EcoInsight Identity"}
                         onToggle={handleToggle}
                         delay={0.2}
                     />
@@ -3585,8 +3635,22 @@ const EventImpactPredictor = () => {
 };
 
 function App() {
-    const { user, isLoaded } = useUser();
-    const { isSignedIn } = useAuth();
+    const { logout, loginWithGoogle, loading: authLoading, updateProfile, updatePassword } = useAuth();
+    const { user, isLoaded, isSignedIn } = useUser();
+    
+    // Auth Modal State
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [authModalView, setAuthModalView] = useState('login-email');
+
+    const openLogin = () => {
+        setAuthModalView('login-email');
+        setIsAuthModalOpen(true);
+    };
+
+    const openSignup = () => {
+        setAuthModalView('signup');
+        setIsAuthModalOpen(true);
+    };
 
     // --- State Declarations (Must be at the top) ---
     const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
@@ -3666,9 +3730,9 @@ function App() {
 
 
     const [profile, setProfile] = useState({
-        name: 'Guest User',
-        username: '@guest',
-        email: 'guest@ecoinsight.ai',
+        name: '',
+        username: '',
+        email: '',
         avatar: null,
         tier: 'Free',
         credits: 10,
@@ -3711,7 +3775,41 @@ function App() {
     })
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    const handleAccountSave = async (updatedData) => {
+        setProfile(prev => ({ ...prev, ...updatedData }));
+        
+        if (user?.id && supaLoaded) {
+            try {
+                // 1. Sync identity fields (name) with Auth backend if changed
+                if (updatedData.name || updatedData.avatar) {
+                    await updateProfile({ 
+                        name: updatedData.name,
+                        profileImage: updatedData.avatar 
+                    });
+                }
+
+                // 2. Handle security update (password) if provided
+                if (updatedData.newPassword) {
+                    await updatePassword(updatedData.newPassword);
+                }
+
+                // 3. Persist everything to user_settings table
+                await saveSettings(user.id, {
+                    ai_settings: aiSettings,
+                    chat_settings: chatSettings,
+                    personalization: personalization,
+                    appearance: appearance,
+                    profile: { ...profile, ...updatedData }
+                });
+            } catch (err) {
+                console.error('Account save failed:', err);
+                throw err;
+            }
+        }
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -3732,7 +3830,7 @@ function App() {
             isLoaded,
             isSignedIn,
             hasUser: !!user,
-            hasKey: !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+            hasKey: true,
             section: appSection,
             forceEntry
         };
@@ -3936,25 +4034,30 @@ function App() {
             triggerEmail();
         }
     }, [isSignedIn, user?.id, supaLoaded, profile?.welcome_email_sent, profile.onboarded]);
-    // Dynamic Profile Sync (Clerk -> Profile State)
+    // Dynamic Profile Sync (Custom Auth -> Profile State)
     useEffect(() => {
         if (!user || !supaLoaded) return;
 
         // Automatically update profile if it's currently at default state or missing real data
-        const isDefault = profile.name === 'Professional Analyst' || profile.name === 'Guest User' || profile.email === 'analyst@ecoinsight.ai';
+        const isDefault = !profile.email || 
+                         profile.name === 'Professional Analyst' || 
+                         profile.name === 'Guest User' || 
+                         profile.name === '' ||
+                         profile.email === 'analyst@ecoinsight.ai' || 
+                         profile.email === 'guest@ecoinsight.ai';
         
-        if (isDefault || !profile.onboarded) {
-            const clerkName = user.fullName;
-            const clerkUsername = user.username ? `@${user.username}` : (user.firstName ? `@${user.firstName.toLowerCase()}` : null);
+        if (isDefault || !profile.onboarded || (user.email && profile.email !== user.email)) {
+            const userName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || user.email.split('@')[0];
+            const userHandle = user.username ? `@${user.username}` : `@${user.email.split('@')[0]}`;
             
             setProfile(prev => ({
                 ...prev,
-                name: clerkName || prev.name,
-                email: user.primaryEmailAddress?.emailAddress || prev.email,
-                avatar: user.imageUrl || prev.avatar,
-                username: clerkUsername || prev.username,
-                // AUTO-ONBOARD: If they have a name and username from Clerk, consider them onboarded
-                onboarded: prev.onboarded || (!!clerkName && !!clerkUsername)
+                name: userName || prev.name,
+                email: user.email || prev.email,
+                avatar: user.profile_image || prev.avatar,
+                username: userHandle || prev.username,
+                // AUTO-ONBOARD: If they have a name and handle, consider them onboarded
+                onboarded: prev.onboarded || (!!userName && !!userHandle)
             }));
         }
     }, [user, supaLoaded, profile.onboarded]);
@@ -4422,6 +4525,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             ...onboardingData,
             onboarded: true // Mark as onboarded
         }));
+
+        // Sync with Auth backend for identity consistency
+        if (onboardingData.avatar) {
+            try {
+                await updateProfile({ profileImage: onboardingData.avatar });
+            } catch (err) {
+                console.error("Failed to sync onboarding avatar to backend:", err);
+            }
+        }
 
         // Send welcome email immediately after successful onboarding
         if (!profile.welcome_email_sent && user?.primaryEmailAddress?.emailAddress) {
@@ -4976,15 +5088,20 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         createNewChat();
                         setAppSection('chat');
                     } else if (!isSignedIn) {
-                        setAppSection('auth');
+                        openLogin();
                     }
-                    // If supaLoaded is false, we might want to show a loader or wait, 
-                    // but usually it's fast enough or handled by the next condition.
                 }}
                 onSelectPlan={(plan) => {
                     setSelectedPlan(plan);
-                    setAppSection('checkout');
+                    if (isSignedIn) {
+                        setAppSection('checkout');
+                    } else {
+                        openSignup();
+                    }
                 }}
+                openLogin={openLogin}
+                openSignup={openSignup}
+                setIsAccountModalOpen={setIsAccountModalOpen}
             />
         );
 
@@ -5175,18 +5292,32 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </div>
                     </nav>
                     <div className="sidebar-footer">
-                        <SignedIn>
-                            <div className="user-profile-clerk" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.5rem' }}>
-                                <UserButton afterSignOutUrl="/" />
+                        {user ? (
+                            <div className="user-profile-custom" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
+                                <UserAccountMenu 
+                                    hideName={true} 
+                                    side="left" 
+                                    align="top" 
+                                    role={`${profile?.tier || 'Free'} Access`} 
+                                    onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
+                                    onSubscriptionClick={() => { setModalType('premium'); setShowCreditModal(true); if (isMobile) setIsSidebarOpen(false); }}
+                                />
                                 <div className="user-info">
-                                    <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.fullName || user?.primaryEmailAddress?.emailAddress}</span>
+                                    <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
                                     <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                        {profile.tier} Access {profile.tier === 'Free' && `• ${profile.credits} Credits`}
+                                        {profile?.tier || 'Free'} Access {profile?.tier === 'Free' && `• ${profile?.credits || 0} Credits`}
                                     </span>
                                 </div>
                             </div>
-                        </SignedIn>
-
+                        ) : (
+                            <button 
+                                onClick={openLogin}
+                                className="sidebar-btn sidebar-btn-primary"
+                                style={{ width: '100%', justifyContent: 'center' }}
+                            >
+                                <Lock size={16} /> Sign In
+                            </button>
+                        )}
                     </div>
                     <AnimatePresence>
                         {hoveredChatId && (
@@ -5354,7 +5485,25 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 <Bug size={14} />
             </button>
 
+            <FloatingWhatsAppButton />
             <CookieConsent />
+            <AuthModal 
+                isOpen={isAuthModalOpen} 
+                onClose={() => setIsAuthModalOpen(false)} 
+                initialView={authModalView}
+            />
+            <AccountSettingsModal 
+                isOpen={isAccountModalOpen}
+                onClose={() => setIsAccountModalOpen(false)}
+                profile={profile}
+                onSave={handleAccountSave}
+            />
+            <CreditModal 
+                isOpen={showCreditModal}
+                onClose={() => setShowCreditModal(false)}
+                lastRechargeDate={profile?.lastRechargeDate}
+                type={modalType}
+            />
         </>
     );
 };
