@@ -47,6 +47,8 @@ export default async function handler(req, res) {
         return await handleUpdateProfile(req, res);
       case 'update-password':
         return await handleUpdatePassword(req, res);
+      case 'decrement-credits':
+        return await handleDecrementCredits(req, res);
       default:
         return res.status(404).json({ message: 'Action not found' });
     }
@@ -101,7 +103,13 @@ async function handleSignup(req, res) {
 
   return res.status(200).json({ 
     message: 'User created successfully',
-    user: { id: newUser.id, email: newUser.email, first_name: newUser.first_name, last_name: newUser.last_name }
+    user: { 
+      id: newUser.id, 
+      email: newUser.email, 
+      first_name: newUser.first_name, 
+      last_name: newUser.last_name,
+      credits: 10
+    }
   });
 }
 
@@ -136,7 +144,14 @@ async function handleLogin(req, res) {
 
   return res.status(200).json({ 
     message: 'Login successful',
-    user: { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name, profile_image: user.profile_image }
+    user: { 
+      id: user.id, 
+      email: user.email, 
+      first_name: user.first_name, 
+      last_name: user.last_name, 
+      profile_image: user.profile_image,
+      credits: user.credits || 0
+    }
   });
 }
 
@@ -155,7 +170,7 @@ async function handleMe(req, res) {
 
   const { data: user, error } = await supabase
     .from('users')
-    .select('id, email, first_name, last_name, profile_image, onboarded, provider')
+    .select('id, email, first_name, last_name, profile_image, onboarded, provider, credits')
     .eq('id', decoded.id)
     .single();
 
@@ -235,7 +250,8 @@ async function handleGoogleCallback(req, res) {
         profile_image: googleUser.picture,
         provider: 'google',
         provider_id: googleUser.id,
-        onboarded: true
+        onboarded: true,
+        credits: 10
       }])
       .select().single();
     if (createError) throw createError;
@@ -305,4 +321,39 @@ async function handleUpdatePassword(req, res) {
 
   if (error) throw error;
   return res.status(200).json({ message: 'Password updated successfully' });
+}
+
+async function handleDecrementCredits(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
+  const token = getAuthToken(req);
+  const decoded = token ? verifyToken(token) : null;
+  if (!decoded) return res.status(401).json({ message: 'Not authenticated' });
+
+  // Atomic decrement
+  const { data, error } = await supabase.rpc('decrement_credits', { user_id: decoded.id });
+  
+  if (error) {
+    // Fallback if RPC doesn't exist
+    const { data: user, error: fetchError } = await supabase
+      .from('users')
+      .select('credits')
+      .eq('id', decoded.id)
+      .single();
+    
+    if (fetchError || !user) throw fetchError || new Error('User not found');
+    
+    const newCredits = Math.max(0, (user.credits || 0) - 1);
+    
+    const { data: updated, error: updateError } = await supabase
+      .from('users')
+      .update({ credits: newCredits })
+      .eq('id', decoded.id)
+      .select('credits')
+      .single();
+      
+    if (updateError) throw updateError;
+    return res.status(200).json({ credits: updated.credits });
+  }
+
+  return res.status(200).json({ credits: data });
 }

@@ -4056,6 +4056,7 @@ function App() {
                 email: user.email || prev.email,
                 avatar: user.profile_image || prev.avatar,
                 username: userHandle || prev.username,
+                credits: user.credits !== undefined ? user.credits : prev.credits,
                 // AUTO-ONBOARD: If they have a name and handle, consider them onboarded
                 onboarded: prev.onboarded || (!!userName && !!userHandle)
             }));
@@ -4297,14 +4298,20 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         if (!customText) setInput('')
 
         // Credit Enforcement
-        if (profile.tier === 'Free') {
+        if (isSignedIn && profile.tier === 'Free') {
             if (profile.credits <= 0) {
                 setModalType('credits');
                 setShowCreditModal(true);
                 return;
             }
-            // Decrement credits
-            setProfile(prev => ({ ...prev, credits: Math.max(0, prev.credits - 1) }));
+            // Decrement credits on server
+            try {
+                const creditRes = await axios.post('/api/auth/decrement-credits');
+                setProfile(prev => ({ ...prev, credits: creditRes.data.credits }));
+            } catch (err) {
+                console.error("Failed to decrement credits:", err);
+                // Optionally block if decrement fails
+            }
         }
 
 
