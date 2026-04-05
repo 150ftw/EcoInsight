@@ -807,34 +807,11 @@ const ReviewsSection = () => {
     return (
         <section id="reviews" className="reviews-section">
             <div className="section-title" style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <div style={{ 
-                    display: 'inline-block', 
-                    position: 'relative',
-                    marginBottom: '0.75rem'
-                }}>
-                    <h2 style={{ 
-                        margin: 0, 
-                        fontSize: '2.5rem', 
-                        fontWeight: 800,
-                        display: 'inline-block'
-                    }}>
+                <div className="consensus-header-wrap">
+                    <h2 className="consensus-title">
                         The Analyst Consensus
                     </h2>
-                    <span style={{ 
-                        position: 'absolute',
-                        top: '-8px',
-                        right: '-75px',
-                        fontSize: '0.6rem', 
-                        fontWeight: 800, 
-                        background: 'rgba(139, 92, 246, 0.15)', 
-                        color: '#a78bfa', 
-                        padding: '3px 8px', 
-                        borderRadius: '4px', 
-                        letterSpacing: '1px',
-                        border: '1px solid rgba(139, 92, 246, 0.3)',
-                        textTransform: 'uppercase',
-                        whiteSpace: 'nowrap'
-                    }}>
+                    <span className="consensus-badge">
                         Alpha Stage
                     </span>
                 </div>
