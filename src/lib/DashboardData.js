@@ -5,7 +5,7 @@ const YAHOO_BASE = '/yahoo-finance/v8/finance/chart/';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
 
 /**
- * Fetch historical data points for sparklines
+ * Fetch historical data points for sparklines & metadata
  * @param {string} symbol Yahoo Finance symbol (e.g. ^NSEI)
  * @param {string} range '1d', '5d', '1mo'
  * @param {string} interval '5m', '15m', '1d'
@@ -20,12 +20,14 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
 
         const timestamps = result.timestamp || [];
         const prices = result.indicators?.quote?.[0]?.close || [];
+        const volumes = result.indicators?.quote?.[0]?.volume || [];
         const meta = result.meta;
 
         // Map to standard format { time, price }
         const sparkline = timestamps.map((t, i) => ({
             time: new Date(t * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            price: prices[i] ? parseFloat(prices[i].toFixed(2)) : null
+            price: prices[i] ? parseFloat(prices[i].toFixed(2)) : null,
+            volume: volumes[i] || 0
         })).filter(p => p.price !== null);
 
         const currentPrice = meta.regularMarketPrice;
@@ -35,12 +37,21 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
 
         return {
             symbol: symbol.replace('^', ''),
+            fullSymbol: symbol,
             name: meta.shortName || symbol,
-            price: currentPrice.toFixed(2),
+            price: currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            rawPrice: currentPrice,
             change: change.toFixed(2),
             changePercent: changePercent.toFixed(2),
             isPositive: change >= 0,
-            sparkline
+            sparkline,
+            // Advanced Metrics for "Theoretical" investors
+            volume: (meta.regularMarketVolume || 0).toLocaleString(),
+            dayHigh: meta.regularMarketDayHigh?.toFixed(2) || 'N/A',
+            dayLow: meta.regularMarketDayLow?.toFixed(2) || 'N/A',
+            fiftyTwoWeekHigh: 'N/A', // Not in /chart/ endpoint usually, but we can interpolate or mock
+            marketCap: 'N/A',
+            peRatio: 'N/A'
         };
     } catch (e) {
         console.warn(`History fetch failed for ${symbol}:`, e);
@@ -64,6 +75,21 @@ export const fetchDashboardIndices = async () => {
 };
 
 /**
+ * Fetch Global Macro (USD/INR, Gold, Brent)
+ */
+export const fetchGlobalMacro = async () => {
+    const targets = [
+        { symbol: 'INR=X', name: 'USD/INR' },
+        { symbol: 'GC=F', name: 'Gold' },
+        { symbol: 'BZ=F', name: 'Brent Oil' },
+        { symbol: '^TNX', name: '10Y Yield' }
+    ];
+
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '60m')));
+    return results.filter(r => r !== null);
+};
+
+/**
  * Fetch Crypto Prices (BTC, ETH)
  */
 export const fetchCryptoData = async () => {
@@ -77,6 +103,7 @@ export const fetchCryptoData = async () => {
                 symbol: 'BTC',
                 name: 'Bitcoin',
                 price: data.bitcoin.usd.toLocaleString(),
+                rawPrice: data.bitcoin.usd,
                 changePercent: data.bitcoin.usd_24h_change.toFixed(2),
                 isPositive: data.bitcoin.usd_24h_change >= 0
             },
@@ -84,6 +111,7 @@ export const fetchCryptoData = async () => {
                 symbol: 'ETH',
                 name: 'Ethereum',
                 price: data.ethereum.usd.toLocaleString(),
+                rawPrice: data.ethereum.usd,
                 changePercent: data.ethereum.usd_24h_change.toFixed(2),
                 isPositive: data.ethereum.usd_24h_change >= 0
             }
@@ -95,7 +123,7 @@ export const fetchCryptoData = async () => {
 };
 
 /**
- * Fetch Top Movers (Mocked for Demo if API limits hit, but tries Yahoo)
+ * Fetch Top Movers
  */
 export const fetchMarketMovers = async () => {
     const symbols = [
@@ -117,21 +145,28 @@ export const fetchMarketMovers = async () => {
 };
 
 /**
- * Sector Heatmap Data (Mocked based on index performance)
+ * Fetch Market News for a specific ticker using the web-search proxy
  */
-export const fetchSectorPerformance = async () => {
-    // In a real app, this would fetch Sectoral Indices like Nifty Bank, Nifty IT, etc.
-    const targets = [
-        { symbol: '^CNXBANK', name: 'Banking' },
-        { symbol: '^CNXIT', name: 'IT' },
-        { symbol: '^CNXPHARMA', name: 'Pharma' },
-        { symbol: '^CNXENERGY', name: 'Energy' }
-    ];
+export const fetchMarketNews = async (query) => {
+    try {
+        const res = await fetch(`/api/web-search?q=${encodeURIComponent(query + ' finance stock news')}`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.results || [];
+    } catch (e) {
+        console.error('News fetch failed:', e);
+        return [];
+    }
+};
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
-    return results.filter(r => r !== null).map(r => ({
-        name: r.name.replace('Nifty ', ''),
-        changePercent: r.changePercent,
-        isPositive: r.isPositive
-    }));
+/**
+ * Mocked Economic Calendar for high-impact events
+ */
+export const fetchEconomicCalendar = () => {
+    return [
+        { date: 'Apr 12', time: '10:30 AM', event: 'India CPI Inflation (Mar)', impact: 'High' },
+        { date: 'Apr 15', time: '06:00 PM', event: 'US Core Retail Sales', impact: 'Medium' },
+        { date: 'Apr 18', time: '02:30 PM', event: 'ECB Policy Meeting', impact: 'High' },
+        { date: 'Apr 24', time: '09:00 AM', event: 'RBI Monetary Policy Update', impact: 'Critical' }
+    ];
 };
