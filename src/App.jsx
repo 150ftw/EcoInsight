@@ -999,7 +999,7 @@ const ReviewsSection = () => {
 const FloatingWhatsAppButton = () => {
     return (
         <a 
-            href="https://wa.me/918244646000" 
+            href="https://wa.me/919667510634" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="floating-whatsapp-btn"
