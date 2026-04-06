@@ -30,6 +30,7 @@ import './LandingAuth.css'
 import Threads from './components/Threads'
 import { SUBPAGE_DATA } from './lib/SubpageContent'
 import CookieConsent from './components/CookieConsent'
+import LiveMarketDashboard from './components/LiveMarketDashboard'
 
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
@@ -4545,6 +4546,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         }
 
         switch (view) {
+            case 'dashboard':
+                return <LiveMarketDashboard />;
             case 'trends':
                 return (
                     <div className="view-content" key={view}>
@@ -5160,6 +5163,33 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         {isMobile && <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}><X size={20} /></button>}
                     </div>
                     <nav className="sidebar-nav">
+                        <div className="sidebar-section">
+                            <span className="section-label">Real-time Data</span>
+                            <button 
+                                className={`nav-item ${view === 'dashboard' ? 'active' : ''}`}
+                                onClick={() => { setView('dashboard'); if (isMobile) setIsSidebarOpen(false); }}
+                                style={{
+                                    background: view === 'dashboard' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                                    marginBottom: '1rem',
+                                    border: '1px solid rgba(139, 92, 246, 0.2)'
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative' }}>
+                                    <BarChart3 size={18} className="text-purple-400" /> 
+                                    <span>Market Dashboard</span>
+                                    <span style={{ 
+                                        width: 6, 
+                                        height: 6, 
+                                        borderRadius: '50%', 
+                                        background: '#22c55e', 
+                                        marginLeft: '4px',
+                                        boxShadow: '0 0 8px #22c55e',
+                                        animation: 'pulse 1.5s infinite'
+                                    }}></span>
+                                </div>
+                            </button>
+                        </div>
+
                         <div className="sidebar-section">
                             <span className="section-label">Ongoing Chat</span>
                             <button className="nav-item new-chat" onClick={() => { createNewChat(); if (isMobile) setIsSidebarOpen(false); }}>
