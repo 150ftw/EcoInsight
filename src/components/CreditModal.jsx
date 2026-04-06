@@ -45,6 +45,21 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                                 </div>
                             </div>
                         </>
+                    ) : type === "intelligence_hub" ? (
+                        <>
+                            <div className="modal-header">
+                                <div className="alert-icon" style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--accent-primary)' }}>
+                                    <Zap size={32} />
+                                </div>
+                                <h2 style={{ letterSpacing: '-0.5px' }}>Neural Intelligence Node Locked</h2>
+                                <p>
+                                    This proprietary intelligence hub is currently undergoing synchronization with institutional data pipelines. Advanced sector sentiment and neural portfolio analysis are restricted to Sentinel tier analysts.
+                                </p>
+                                <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '1rem', fontStyle: 'italic' }}>
+                                    Your credential level is currently being validated across our decentralized node network. Retail access windows open quarterly.
+                                </p>
+                            </div>
+                        </>
                     ) : type === "market_dashboard" ? (
                         <>
                             <div className="modal-header">
@@ -78,9 +93,6 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                     )}
 
                     <div className="modal-actions">
-                        <button className="btn-shine-primary" onClick={() => window.open('https://ecoinsight.online/#pricing', '_blank')}>
-                            <Zap size={18} /> Join the Pro Waitlist
-                        </button>
                         <button className="btn-secondary-modal" onClick={onClose}>
                             I understand
                         </button>
