@@ -25,6 +25,8 @@ function apiServerPlugin(env) {
         ];
 
         let foundFile = null;
+        let queryParams = Object.fromEntries(url.searchParams);
+        
         const fs = await import('fs');
         const path = await import('path');
 
@@ -32,6 +34,16 @@ function apiServerPlugin(env) {
           if (fs.existsSync(path.resolve(process.cwd(), file))) {
             foundFile = path.resolve(process.cwd(), file);
             break;
+          }
+        }
+
+        // --- DYNAMIC ROUTE SUPPORT ([action].js) ---
+        if (!foundFile && filePath.startsWith('auth/')) {
+          const action = filePath.split('/')[1];
+          const dynamicFile = 'api/auth/[action].js';
+          if (fs.existsSync(path.resolve(process.cwd(), dynamicFile))) {
+             foundFile = path.resolve(process.cwd(), dynamicFile);
+             queryParams.action = action; // Inject the dynamic segment as a query param
           }
         }
 
@@ -60,7 +72,7 @@ function apiServerPlugin(env) {
           const body = await bodyPromise;
           const mockReq = Object.assign(req, {
             body,
-            query: Object.fromEntries(url.searchParams),
+            query: queryParams,
             cookies: {} 
           });
 
