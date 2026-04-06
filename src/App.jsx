@@ -4579,6 +4579,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <button className="btn-shine-primary" onClick={() => { setModalType('market_dashboard'); setShowCreditModal(true); }}>
                                 <Zap size={16} /> Request Priority Access
                             </button>
+                            <div className="version-tag" style={{ marginTop: '1.5rem', fontSize: '0.65rem', opacity: 0.3, letterSpacing: '1px' }}>
+                                ENGINE_v2.5_LOCKED
+                            </div>
                         </div>
                     </div>
                 );
