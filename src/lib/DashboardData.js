@@ -1,7 +1,7 @@
 // Dashboard data fetcher for EcoInsight
 // Fetches Indices, Stocks, and Crypto with sparkline data for charts
 
-const YAHOO_BASE = '/yahoo-finance/v8/finance/chart/';
+const YAHOO_BASE = '/api/yahoo?path=v8/finance/chart/';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
 
 /**
@@ -49,7 +49,7 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
             volume: (meta.regularMarketVolume || 0).toLocaleString(),
             dayHigh: meta.regularMarketDayHigh?.toFixed(2) || 'N/A',
             dayLow: meta.regularMarketDayLow?.toFixed(2) || 'N/A',
-            fiftyTwoWeekHigh: 'N/A', // Not in /chart/ endpoint usually, but we can interpolate or mock
+            fiftyTwoWeekHigh: 'N/A',
             marketCap: 'N/A',
             peRatio: 'N/A'
         };
@@ -75,13 +75,42 @@ export const fetchDashboardIndices = async () => {
 };
 
 /**
- * Fetch Global Macro (USD/INR, Gold, Brent)
+ * Fetch Commodities (Gold, Silver, Oil, Gas)
+ */
+export const fetchCommodities = async () => {
+    const targets = [
+        { symbol: 'GC=F', name: 'Gold' },
+        { symbol: 'SI=F', name: 'Silver' },
+        { symbol: 'BZ=F', name: 'Brent Oil' },
+        { symbol: 'NG=F', name: 'Nat Gas' }
+    ];
+
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '60m')));
+    return results.filter(r => r !== null);
+};
+
+/**
+ * Fetch Global Giants
+ */
+export const fetchGlobalEquities = async () => {
+    const targets = [
+        { symbol: 'NVDA', name: 'NVIDIA' },
+        { symbol: 'AAPL', name: 'Apple' },
+        { symbol: 'TSLA', name: 'Tesla' },
+        { symbol: 'MSFT', name: 'Microsoft' }
+    ];
+
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
+    return results.filter(r => r !== null);
+};
+
+/**
+ * Fetch Global Macro (Forex & Yields)
  */
 export const fetchGlobalMacro = async () => {
     const targets = [
         { symbol: 'INR=X', name: 'USD/INR' },
-        { symbol: 'GC=F', name: 'Gold' },
-        { symbol: 'BZ=F', name: 'Brent Oil' },
+        { symbol: 'EURUSD=X', name: 'EUR/USD' },
         { symbol: '^TNX', name: '10Y Yield' }
     ];
 
@@ -123,28 +152,6 @@ export const fetchCryptoData = async () => {
 };
 
 /**
- * Fetch Top Movers
- */
-export const fetchMarketMovers = async () => {
-    const symbols = [
-        { s: 'RELIANCE.NS', n: 'Reliance' },
-        { s: 'TCS.NS', n: 'TCS' },
-        { s: 'HDFCBANK.NS', n: 'HDFC Bank' },
-        { s: 'INFY.NS', n: 'Infosys' },
-        { s: 'ICICIBANK.NS', n: 'ICICI Bank' },
-        { s: 'SBIN.NS', n: 'SBI' }
-    ];
-
-    const results = await Promise.all(symbols.map(t => fetchHistory(t.s, '1d', '15m')));
-    const valid = results.filter(r => r !== null);
-    
-    return {
-        gainers: valid.filter(r => r.isPositive).sort((a, b) => b.changePercent - a.changePercent).slice(0, 3),
-        losers: valid.filter(r => !r.isPositive).sort((a, b) => a.changePercent - b.changePercent).slice(0, 3)
-    };
-};
-
-/**
  * Sector Heatmap Data
  */
 export const fetchSectorPerformance = async () => {
@@ -161,6 +168,28 @@ export const fetchSectorPerformance = async () => {
         changePercent: r.changePercent,
         isPositive: r.isPositive
     }));
+};
+
+/**
+ * Search for tickers using Yahoo Finance Search API via Serverless Proxy
+ */
+export const searchTickers = async (query) => {
+    if (!query || query.length < 2) return [];
+    try {
+        const path = `v1/finance/search?q=${encodeURIComponent(query)}`;
+        const res = await fetch(`/api/yahoo?path=${encodeURIComponent(path)}`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.quotes || []).map(q => ({
+            symbol: q.symbol,
+            name: q.shortname || q.longname || q.symbol,
+            exch: q.exchange,
+            type: q.quoteType
+        })).filter(q => ['EQUITY', 'CRYPTOCURRENCY', 'ETF', 'INDEX', 'CURRENCY'].includes(q.type));
+    } catch (e) {
+        console.error('Search failed:', e);
+        return [];
+    }
 };
 
 /**

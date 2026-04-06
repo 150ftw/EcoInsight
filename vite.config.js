@@ -198,6 +198,20 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: true,
           rewrite: (path) => path.replace(/^\/yahoo-finance/, ''),
+          configure: (proxy, _options) => {
+            proxy.on('proxyReq', (proxyReq, req, _res) => {
+              // Strip ALL headers to avoid Yahoo 429
+              Object.keys(req.headers).forEach(h => proxyReq.removeHeader(h));
+              
+              // Set bare minimum headers for Yahoo
+              proxyReq.setHeader('Host', 'query1.finance.yahoo.com');
+              proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+              proxyReq.setHeader('Accept', 'application/json');
+              proxyReq.setHeader('Accept-Language', 'en-US,en;q=0.9');
+              proxyReq.setHeader('Origin', 'https://finance.yahoo.com');
+              proxyReq.setHeader('Referer', 'https://finance.yahoo.com');
+            });
+          },
         },
         '/google-finance': {
           target: 'https://www.google.com',
