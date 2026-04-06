@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     LineChart, Line, AreaChart, Area, 
     XAxis, YAxis, CartesianGrid, Tooltip, 
-    ResponsiveContainer, Sparkline 
+    ResponsiveContainer 
 } from 'recharts';
 import { 
     Activity, TrendingUp, TrendingDown, 
