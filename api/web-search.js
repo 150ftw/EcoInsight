@@ -1,110 +1,83 @@
-// Vercel Serverless Function: Web Search Proxy
-// Scrapes DuckDuckGo HTML search results for real-time information
-// No API key required, no rate limits
+import fetch from 'node-fetch';
+
+/**
+ * Web Search Proxy for EcoInsight
+ * Uses DuckDuckGo HTML Lite with robust headers and error handling.
+ */
 
 export default async function handler(req, res) {
-    // Only allow GET requests
-    if (req.method !== 'GET') {
-        return res.status(405).json({ error: 'Method not allowed' });
+  const { q } = req.query;
+
+  if (!q) {
+    return res.status(400).json({ error: 'Query parameter "q" is required' });
+  }
+
+  const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(q)}`;
+
+  try {
+    const response = await fetch(ddgUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://duckduckgo.com/',
+        'Cache-Control': 'no-cache'
+      }
+    });
+
+    if (!response.ok) {
+      // Handle rate limits or bot detection
+      if (response.status === 403 || response.status === 429) {
+         return res.status(response.status).json({
+            error: 'Upstream Search Blocked',
+            message: 'Search provider detected automated traffic. Please try again in a few minutes.',
+            results: []
+         });
+      }
+      throw new Error(`Upstream Error: ${response.status}`);
     }
 
-    const { q } = req.query;
-    if (!q || q.trim().length < 2) {
-        return res.status(400).json({ error: 'Query parameter "q" is required' });
+    const html = await response.text();
+
+    // Check for "Bots use DuckDuckGo too" (CAPTCHA)
+    if (html.includes('anomaly-modal') || html.includes('Bots use DuckDuckGo too')) {
+       return res.status(200).json({
+          error: 'Anomaly Detected',
+          message: 'Upstream search is temporarily restricted. Falling back to internal intelligence.',
+          results: [],
+          is_blocked: true
+       });
     }
 
-    try {
-        // Fetch DuckDuckGo HTML search results
-        const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(q)}`;
-        const response = await fetch(searchUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-IN,en;q=0.9,hi;q=0.8',
-            },
-        });
+    // Extraction logic for DuckDuckGo HTML results
+    const results = [];
+    // Result blocks usually look like: <div class="result results_links results_links_deep web-result ">
+    const resultBlocks = html.match(/<div class="[^"]*web-result[\s\S]*?<\/div>[\s\S]*?<\/div>/g) || [];
 
-        if (!response.ok) {
-            throw new Error(`DuckDuckGo returned ${response.status}`);
-        }
+    for (const block of resultBlocks) {
+      const titleMatch = block.match(/class="result__a"[^>]*>([\s\S]*?)<\/a>/);
+      const linkMatch = block.match(/class="result__url"[^>]*>([\s\S]*?)<\/a>/);
+      const snippetMatch = block.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/);
 
-        const html = await response.text();
-
-        // Parse search results from DuckDuckGo HTML
-        const results = [];
-
-        // DuckDuckGo HTML format: results are in <div class="result"> blocks
-        // Each result has:
-        //   - Title in <a class="result__a"> 
-        //   - Snippet in <a class="result__snippet">
-        //   - URL in <a class="result__url">
-
-        // Extract result blocks
-        const resultBlocks = html.split(/class="result\s/g).slice(1); // Skip the first split (before first result)
-
-        for (const block of resultBlocks.slice(0, 8)) {
-            try {
-                // Extract title
-                const titleMatch = block.match(/class="result__a"[^>]*>([^<]+(?:<[^>]+>[^<]*)*)<\/a>/);
-                let title = '';
-                if (titleMatch) {
-                    title = titleMatch[1].replace(/<[^>]+>/g, '').trim();
-                }
-
-                // Extract snippet
-                const snippetMatch = block.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/);
-                let snippet = '';
-                if (snippetMatch) {
-                    snippet = snippetMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-                }
-
-                // Extract URL
-                const urlMatch = block.match(/class="result__url"[^>]*>([^<]+)/);
-                let url = '';
-                if (urlMatch) {
-                    url = urlMatch[1].trim();
-                }
-
-                // Also try to extract the actual href URL
-                const hrefMatch = block.match(/class="result__a"\s+href="([^"]+)"/);
-                let href = '';
-                if (hrefMatch) {
-                    href = hrefMatch[1];
-                    // DuckDuckGo wraps URLs in a redirect, extract the actual URL
-                    const uddgMatch = href.match(/uddg=([^&]+)/);
-                    if (uddgMatch) {
-                        href = decodeURIComponent(uddgMatch[1]);
-                    }
-                }
-
-                if (title && snippet) {
-                    results.push({
-                        title,
-                        snippet,
-                        url: href || url,
-                        source: url,
-                    });
-                }
-            } catch (parseError) {
-                // Skip malformed results
-                continue;
-            }
-        }
-
-        // Set cache headers (cache for 5 minutes to reduce load)
-        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
-
-        return res.status(200).json({
-            query: q,
-            results,
-            resultCount: results.length,
-            timestamp: new Date().toISOString(),
-        });
-    } catch (error) {
-        console.error('Web search error:', error);
-        return res.status(500).json({
-            error: 'Search failed',
-            message: error.message,
-        });
+      if (titleMatch && linkMatch) {
+         results.push({
+           title: titleMatch[1].replace(/<[^>]+>/g, '').trim(),
+           url: linkMatch[1].replace(/<[^>]+>/g, '').trim(),
+           snippet: snippetMatch ? snippetMatch[1].replace(/<[^>]+>/g, '').trim() : ''
+         });
+      }
     }
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json({ 
+      query: q, 
+      results: results.slice(0, 5), // Return top 5 results
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('WebSearch Error:', error);
+    res.status(500).json({ error: 'Search failed', message: error.message });
+  }
 }
