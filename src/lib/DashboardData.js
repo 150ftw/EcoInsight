@@ -1,11 +1,11 @@
 // Dashboard data fetcher for EcoInsight
-// Pivoted to /api/ticker (Google Finance Scraper) for stability
+// Corrected for V5 Search-Sync Scraper
 
 const TICKER_API = '/api/ticker?symbol=';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
 
 /**
- * Fetch market data for a symbol (Google Finance Scraper)
+ * Fetch market data for a symbol (Search-Sync v5 Scraper)
  */
 export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
     try {
@@ -13,12 +13,19 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
         if (!res.ok) return null;
         const data = await res.json();
         
-        // Google Finance scraper returns current price + a simulated sparkline for now
-        // Mapping to our common terminal format
+        // Ensure data.price is handled as numeric or fallback
+        const rawString = String(data.price || '').replace(/[^0-9.]/g, '');
+        let numericPrice = parseFloat(rawString);
+        
+        // Final formatting check for UI
+        let formattedPrice = isNaN(numericPrice) || numericPrice === 0 
+            ? (data.price && data.price !== '0' ? data.price : '---')
+            : numericPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
         return {
             ...data,
-            price: data.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            rawPrice: parseFloat(data.price.replace(/[^0-9.]/g, '')),
+            price: formattedPrice || '---',
+            rawPrice: numericPrice || 0,
             changePercent: parseFloat(data.changePercent || 0).toFixed(2),
             isPositive: parseFloat(data.changePercent || 0) >= 0
         };
@@ -33,10 +40,10 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
  */
 export const fetchDashboardIndices = async () => {
     const targets = [
-        { symbol: 'NIFTY_50:INDEXNSE', name: 'Nifty 50' },
-        { symbol: 'SENSEX:INDEXBOM', name: 'Sensex' },
-        { symbol: '.INX:INDEXSP', name: 'S&P 500' },
-        { symbol: '.IXIC:INDEXNASDAQ', name: 'Nasdaq 100' }
+        { symbol: '^NSEI', name: 'Nifty 50' },
+        { symbol: '^BSESN', name: 'Sensex' },
+        { symbol: '^GSPC', name: 'S&P 500' },
+        { symbol: '^IXIC', name: 'Nasdaq 100' }
     ];
 
     const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
@@ -125,14 +132,13 @@ export const fetchCryptoData = async () => {
  */
 export const fetchSectorPerformance = async () => {
     const targets = [
-        { symbol: 'NIFTY_BANK:INDEXNSE', name: 'Banking' },
-        { symbol: 'NIFTY_IT:INDEXNSE', name: 'IT' },
-        { symbol: 'NIFTY_PHARMA:INDEXNSE', name: 'Pharma' }
+        { symbol: '^NSEI', name: 'Nifty 50' },
+        { symbol: '^GSPC', name: 'S&P 500' }
     ];
 
     const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
     return results.filter(r => r !== null).map(r => ({
-        name: r.name.replace('Nifty ', ''),
+        name: r.name,
         changePercent: r.changePercent,
         isPositive: r.isPositive
     }));
@@ -144,13 +150,11 @@ export const fetchSectorPerformance = async () => {
 export const searchTickers = async (query) => {
     if (!query || query.length < 2) return [];
     try {
-        // Query DuckDuckGo to find potential Google Finance links/tickers
         const res = await fetch(`/api/web-search?q=${encodeURIComponent(query + ' stock symbol google finance')}`);
         if (!res.ok) return [];
         const data = await res.json();
         
         return (data.results || []).map(r => {
-            // Try to extract ticker from Google Finance URL in DuckDuckGo results
             const gMatch = r.url.match(/quote\/([^/?]+)/);
             if (gMatch) {
                 return {
@@ -183,7 +187,7 @@ export const fetchMarketNews = async (query) => {
 };
 
 /**
- * Mocked Economic Calendar for high-impact events
+ * Mocked Economic Calendar
  */
 export const fetchEconomicCalendar = () => {
     return [

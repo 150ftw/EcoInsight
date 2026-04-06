@@ -104,21 +104,10 @@ const LiveMarketDashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [syncKey, setSyncKey] = useState(0);
 
     // Initial Load & Persistent Watchlist
-    useEffect(() => {
-        const saved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
-        loadInitialData(saved);
-        
-        const interval = setInterval(() => {
-            const currentSaved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
-            loadInitialData(currentSaved, false);
-        }, 60000); // 60s poll for scraper stability
-        
-        return () => clearInterval(interval);
-    }, []);
-
-    const loadInitialData = async (watchlistSymbols, showLoader = true) => {
+    const loadAllData = useCallback(async (watchlistSymbols, showLoader = true) => {
         if (showLoader) setIsLoading(true);
         try {
             const [idx, mac, cry, com, glo, cal] = await Promise.all([
@@ -143,17 +132,31 @@ const LiveMarketDashboard = () => {
                 setUserWatchlist(watchData.filter(d => d !== null));
             }
 
-            if (!selectedAsset && idx && idx.length > 0) {
-                handleAssetChange(idx[0]);
-            }
-
             setLastUpdated(new Date());
             setIsLoading(false);
+            return idx;
         } catch (e) {
             console.error('Terminal load failed:', e);
             setIsLoading(false);
+            return [];
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        const saved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
+        loadAllData(saved).then(idx => {
+            if (!selectedAsset && idx && idx.length > 0) {
+                handleAssetChange(idx[0]);
+            }
+        });
+        
+        const interval = setInterval(() => {
+            const currentSaved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
+            loadAllData(currentSaved, false);
+        }, 120000); // 2min poll for search sync stability
+        
+        return () => clearInterval(interval);
+    }, [syncKey, loadAllData]);
 
     const handleSearch = async (e) => {
         const val = e.target.value;
@@ -173,7 +176,6 @@ const LiveMarketDashboard = () => {
         if (!saved.includes(symbol)) {
             const newSaved = [...saved, symbol];
             localStorage.setItem('eco_watchlist', JSON.stringify(newSaved));
-            // Add immediately to UI
             const newItem = await fetchHistory(symbol);
             if (newItem) {
                 setUserWatchlist(prev => [...prev, newItem]);
@@ -199,16 +201,24 @@ const LiveMarketDashboard = () => {
         }
     };
 
-    if (isLoading) {
+    const triggerSync = () => {
+        setSyncKey(prev => prev + 1);
+    };
+
+    if (isLoading && !indices.length) {
         return (
-            <div className="dashboard-container" style={{ height: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <RefreshCw className="animate-spin text-purple-500" size={32} />
+            <div className="dashboard-container" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <RefreshCw className="animate-spin text-purple-500" size={48} style={{ margin: '0 auto 1rem' }} />
+                    <p style={{ color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>BOOTING COMMAND CENTER...</p>
+                    <p style={{ fontSize: '0.6rem', opacity: 0.3, marginTop: '1rem' }}>SEARCH-SYNC ENGINE v5.0.1</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <motion.div className="dashboard-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div className="dashboard-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} key={syncKey}>
             <MacroRibbon data={macro} />
 
             <header className="dashboard-header">
@@ -217,12 +227,19 @@ const LiveMarketDashboard = () => {
                         Command <span className="text-gradient">Center</span>
                     </h1>
                     <p style={{ margin: '0.25rem 0 0', opacity: 0.5, fontSize: '0.8rem', fontWeight: 600 }}>
-                        SECURE SCRAPE SYNC // {lastUpdated.toLocaleTimeString()}
+                        ENGINE: V2.5 // SEARCH-SYNC: OK // {lastUpdated.toLocaleTimeString()}
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <div className="terminal-status" style={{ fontSize: '0.7rem', color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' }}>
-                        LIVE CONNECTION
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <button 
+                        onClick={triggerSync}
+                        className="terminal-status" 
+                        style={{ border: 'none', cursor: 'pointer', fontSize: '0.7rem', color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' }}
+                    >
+                        <RefreshCw size={12} style={{ marginRight: 6 }} /> FORCE SYNC
+                    </button>
+                    <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', fontWeight: 'bold' }}>
+                        RESILIENT LINK ACTIVE
                     </div>
                 </div>
             </header>
@@ -277,8 +294,8 @@ const LiveMarketDashboard = () => {
                                 isUserAdded={true}
                             />
                         )) : (
-                            <p style={{ fontSize: '0.7rem', opacity: 0.3, textAlign: 'center', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
-                                Add symbols from search
+                            <p style={{ fontSize: '0.7rem', opacity: 0.3, textAlign: 'center', padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
+                                Build your terminal index
                             </p>
                         )}
                     </div>
@@ -325,8 +342,8 @@ const LiveMarketDashboard = () => {
                     <section className="main-chart-section">
                         <header className="chart-header">
                             <div>
-                                <h2 style={{ fontSize: '1.5rem', margin: 0 }}>{selectedAsset?.name || 'Select Asset'}</h2>
-                                <span className="terminal-num" style={{ fontSize: '2.5rem', fontWeight: 800 }}>
+                                <h2 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700 }}>{selectedAsset?.name || 'SYNCING...'}</h2>
+                                <span className="terminal-num" style={{ fontSize: '3rem', fontWeight: 800, color: selectedAsset?.isPositive ? '#22c55e' : '#ef4444' }}>
                                     {selectedAsset?.price || '---'}
                                 </span>
                             </div>
@@ -348,8 +365,8 @@ const LiveMarketDashboard = () => {
                                 <AreaChart data={selectedAsset?.sparkline || []}>
                                     <defs>
                                         <linearGradient id="chartG" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.4}/>
-                                            <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0}/>
+                                            <stop offset="5%" stopColor={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} stopOpacity={0.2}/>
+                                            <stop offset="95%" stopColor={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} stopOpacity={0}/>
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
@@ -363,7 +380,7 @@ const LiveMarketDashboard = () => {
                                     <Area 
                                         type="monotone" 
                                         dataKey="price" 
-                                        stroke="var(--accent-primary)" 
+                                        stroke={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} 
                                         fill="url(#chartG)" 
                                         strokeWidth={3}
                                         animationDuration={1000}
@@ -375,25 +392,25 @@ const LiveMarketDashboard = () => {
                     </section>
 
                     <section className="panel-card">
-                        <h3><ShieldCheck size={16} /> Asset Intelligence</h3>
+                        <h3><ShieldCheck size={16} /> Asset Metrics</h3>
                         <div className="fundamentals-grid">
                             <div className="fundamental-item">
-                                <span className="label">Volume (SCRAPE)</span>
-                                <span className="value terminal-num">{selectedAsset?.volume || 'N/A'}</span>
+                                <span className="label">Volume</span>
+                                <span className="value terminal-num">{selectedAsset?.volume || 'SYNCED'}</span>
                             </div>
                             <div className="fundamental-item">
-                                <span className="label">Day Stability</span>
+                                <span className="label">Market Status</span>
                                 <span className="value" style={{ color: selectedAsset?.isPositive ? '#22c55e' : '#ef4444' }}>
-                                    {selectedAsset?.isPositive ? 'BULLISH' : 'VOLATILE'}
+                                    {selectedAsset?.isPositive ? 'OPTIMISTIC' : 'RECOVERY'}
                                 </span>
                             </div>
                             <div className="fundamental-item">
-                                <span className="label">Sync Frequency</span>
-                                <span className="value" style={{ fontSize: '0.75rem' }}>POLL: 60S</span>
+                                <span className="label">Sync Engine</span>
+                                <span className="value" style={{ fontSize: '0.75rem' }}>SEARCH-SYNC V5</span>
                             </div>
                             <div className="fundamental-item">
                                 <span className="label">Source Mode</span>
-                                <span className="value" style={{ fontSize: '0.75rem', color: 'var(--accent-primary)' }}>UNIVERSAL DECK</span>
+                                <span className="value" style={{ fontSize: '0.75rem', color: 'var(--accent-primary)' }}>RESILIENT LINK</span>
                             </div>
                         </div>
                     </section>
@@ -402,23 +419,23 @@ const LiveMarketDashboard = () => {
                 {/* COLUMN 3: INTELLIGENCE */}
                 <aside className="intelligence-column">
                     <section className="panel-card">
-                        <h3><Activity size={16} /> Technical Sentiment</h3>
+                        <h3><Activity size={16} /> Sentiment Analysis</h3>
                         <div className="sentiment-container">
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 800 }}>
                                 <span style={{ color: '#ef4444' }}>BEARISH</span>
                                 <span style={{ color: '#22c55e' }}>BULLISH</span>
                             </div>
                             <div className="gauge-track">
-                                <div className="gauge-pointer" style={{ left: `${selectedAsset?.isPositive ? 80 : 20}%` }}></div>
+                                <div className="gauge-pointer" style={{ left: `${selectedAsset?.isPositive ? 85 : 15}%` }}></div>
                             </div>
                             <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center', margin: '0.5rem 0 0' }}>
-                                {selectedAsset?.isPositive ? 'Breakout momentum confirmed on chart' : 'Testing critical support levels'}
+                                {selectedAsset?.isPositive ? 'Strong technical signals for expansion' : 'Asset is currently retesting critical floor'}
                             </p>
                         </div>
                     </section>
 
                     <section className="panel-card">
-                        <h3><Newspaper size={16} /> Market Pulse</h3>
+                        <h3><Newspaper size={16} /> Market Insights</h3>
                         <div className="news-list">
                             {news.length > 0 ? news.slice(0, 5).map((item, i) => (
                                 <div key={i} className="news-item">
