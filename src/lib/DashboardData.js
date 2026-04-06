@@ -145,6 +145,25 @@ export const fetchMarketMovers = async () => {
 };
 
 /**
+ * Sector Heatmap Data
+ */
+export const fetchSectorPerformance = async () => {
+    const targets = [
+        { symbol: '^CNXBANK', name: 'Banking' },
+        { symbol: '^CNXIT', name: 'IT' },
+        { symbol: '^CNXPHARMA', name: 'Pharma' },
+        { symbol: '^CNXENERGY', name: 'Energy' }
+    ];
+
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
+    return results.filter(r => r !== null).map(r => ({
+        name: r.name.replace('Nifty ', ''),
+        changePercent: r.changePercent,
+        isPositive: r.isPositive
+    }));
+};
+
+/**
  * Fetch Market News for a specific ticker using the web-search proxy
  */
 export const fetchMarketNews = async (query) => {
