@@ -411,7 +411,38 @@ const fetchGoogleFinancePrice = async (nseSymbol) => {
             }
         }
 
-        if (!priceMatch) return null;
+        if (!priceMatch) {
+            // ULTIMATE FALLBACK: Search-Sync v6 API
+            try {
+                const tickerRes = await fetch(`/api/ticker?symbol=${encodeURIComponent(nseSymbol)}`);
+                if (tickerRes.ok) {
+                    const tickerData = await tickerRes.json();
+                    if (tickerData.price && tickerData.price !== '---') {
+                         const result = {
+                            symbol: nseSymbol,
+                            price: tickerData.price,
+                            change: (parseFloat(tickerData.changePercent) * parseFloat(tickerData.price) / 100).toFixed(2),
+                            changePercent: tickerData.changePercent.replace(/[+-]/g, ''),
+                            isPositive: tickerData.isPositive,
+                            previousClose: '-',
+                            dayRange: '-',
+                            yearRange: '-',
+                            marketCap: '-',
+                            avgVolume: '-',
+                            peRatio: '-',
+                            dividendYield: '-',
+                            exchange: 'VERIFIED (v6)',
+                            source: 'SEARCH-SYNC v6 (ULTRA-STABLE)',
+                        };
+                        await setCachedMarketData(cacheKey, result, 15 * 60 * 1000);
+                        return result;
+                    }
+                }
+            } catch (syncErr) {
+                console.warn("Search-Sync v6 Fallback failed:", syncErr);
+            }
+            return null;
+        }
 
         const price = parseFloat(priceMatch[1]);
         if (isNaN(price)) return null;
