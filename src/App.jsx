@@ -4548,8 +4548,38 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         switch (view) {
             case 'dashboard':
                 return (
-                    <div className="view-content dashboard-view" key={view}>
-                        <LiveMarketDashboard />
+                    <div className="view-content dashboard-view" key={view} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '60vh' }}>
+                        <div className="locked-view-card" style={{ 
+                            background: 'rgba(255, 255, 255, 0.02)', 
+                            border: '1px solid rgba(255, 255, 255, 0.05)', 
+                            padding: '3rem', 
+                            borderRadius: '24px', 
+                            textAlign: 'center',
+                            maxWidth: '500px',
+                            backdropFilter: 'blur(20px)'
+                        }}>
+                            <div className="alert-icon" style={{ 
+                                width: '64px', 
+                                height: '64px', 
+                                background: 'rgba(139, 92, 246, 0.1)', 
+                                color: 'var(--accent-primary)',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 1.5rem'
+                            }}>
+                                <Lock size={32} />
+                            </div>
+                            <h2 style={{ fontSize: '1.8rem', color: 'white', marginBottom: '1rem' }}>Institutional Access Only</h2>
+                            <p style={{ color: '#a1a1aa', lineHeight: '1.6', marginBottom: '2rem' }}>
+                                The real-time Market Intelligence Hub is undergoing a neural synchronization. 
+                                Access is currently restricted to Institutional & Enterprise tier members.
+                            </p>
+                            <button className="btn-shine-primary" onClick={() => { setModalType('market_dashboard'); setShowCreditModal(true); }}>
+                                <Zap size={16} /> Request Priority Access
+                            </button>
+                        </div>
                     </div>
                 );
             case 'trends':
@@ -5170,27 +5200,23 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         <div className="sidebar-section">
                             <span className="section-label">Real-time Data</span>
                             <button 
-                                className={`nav-item ${view === 'dashboard' ? 'active' : ''}`}
-                                onClick={() => { setView('dashboard'); if (isMobile) setIsSidebarOpen(false); }}
+                                className="nav-item"
+                                onClick={() => { setModalType('market_dashboard'); setShowCreditModal(true); }}
                                 style={{
-                                    background: view === 'dashboard' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                                    background: 'rgba(255, 255, 255, 0.02)',
                                     marginBottom: '1rem',
-                                    border: '1px solid rgba(139, 92, 246, 0.2)'
+                                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                                    opacity: 0.6,
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
                                 }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative' }}>
                                     <BarChart3 size={18} className="text-purple-400" /> 
                                     <span>Market Dashboard</span>
-                                    <span style={{ 
-                                        width: 6, 
-                                        height: 6, 
-                                        borderRadius: '50%', 
-                                        background: '#22c55e', 
-                                        marginLeft: '4px',
-                                        boxShadow: '0 0 8px #22c55e',
-                                        animation: 'pulse 1.5s infinite'
-                                    }}></span>
                                 </div>
+                                <Lock size={12} color="#a78bfa" />
                             </button>
                         </div>
 

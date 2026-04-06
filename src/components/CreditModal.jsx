@@ -45,6 +45,21 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                                 </div>
                             </div>
                         </>
+                    ) : type === "market_dashboard" ? (
+                        <>
+                            <div className="modal-header">
+                                <div className="alert-icon" style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--accent-primary)' }}>
+                                    <ShieldAlert size={32} />
+                                </div>
+                                <h2 style={{ letterSpacing: '-0.5px' }}>Institutional Access Restricted</h2>
+                                <p>
+                                    The Live Market Dashboard is currently restricted to our Institutional & Enterprise partners while we calibrate our high-frequency data streams.
+                                </p>
+                                <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '1rem', fontStyle: 'italic' }}>
+                                    Retail access for Sentinel members is scheduled for Q3 2026. Join the priority waitlist to get notified of our next roll-out.
+                                </p>
+                            </div>
+                        </>
                     ) : (
                         <>
                             <div className="modal-header">
