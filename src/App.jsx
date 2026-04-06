@@ -4547,7 +4547,11 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         switch (view) {
             case 'dashboard':
-                return <LiveMarketDashboard />;
+                return (
+                    <div className="view-content dashboard-view" key={view}>
+                        <LiveMarketDashboard />
+                    </div>
+                );
             case 'trends':
                 return (
                     <div className="view-content" key={view}>
