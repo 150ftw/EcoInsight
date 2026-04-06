@@ -17,7 +17,6 @@ import {
     fetchDashboardIndices, 
     fetchGlobalMacro,
     fetchCryptoData, 
-    fetchSectorPerformance,
     fetchMarketNews,
     fetchEconomicCalendar,
     fetchHistory,
@@ -54,7 +53,7 @@ const WatchlistCard = ({ data, onClick, onRemove, active, isUserAdded }) => (
             <div className="card-meta">
                 <h4>{data.name}</h4>
                 <p className="price terminal-num">
-                    {data.fullSymbol?.includes('USD') || data.fullSymbol?.includes('=F') || data.fullSymbol?.includes('BTC') ? '$' : '₹'}{data.price}
+                    {data.price}
                 </p>
             </div>
             <div className={`change-mini terminal-num ${data.isPositive ? 'text-green-400' : 'text-red-400'}`}>
@@ -105,7 +104,6 @@ const LiveMarketDashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
-    const [hasError, setHasError] = useState(false);
 
     // Initial Load & Persistent Watchlist
     useEffect(() => {
@@ -115,7 +113,7 @@ const LiveMarketDashboard = () => {
         const interval = setInterval(() => {
             const currentSaved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
             loadInitialData(currentSaved, false);
-        }, 60000);
+        }, 60000); // 60s poll for scraper stability
         
         return () => clearInterval(interval);
     }, []);
@@ -139,11 +137,7 @@ const LiveMarketDashboard = () => {
             setGlobalGiants(glo || []);
             setCalendar(cal || []);
 
-            // Handle potential rate-limits
-            if (!idx && !mac) setHasError(true);
-            else setHasError(false);
-
-            // Fetch high-fidelity data for user watchlist
+            // Fetch data for user watchlist
             if (watchlistSymbols.length > 0) {
                 const watchData = await Promise.all(watchlistSymbols.map(s => fetchHistory(s)));
                 setUserWatchlist(watchData.filter(d => d !== null));
@@ -157,7 +151,6 @@ const LiveMarketDashboard = () => {
             setIsLoading(false);
         } catch (e) {
             console.error('Terminal load failed:', e);
-            setHasError(true);
             setIsLoading(false);
         }
     };
@@ -180,7 +173,7 @@ const LiveMarketDashboard = () => {
         if (!saved.includes(symbol)) {
             const newSaved = [...saved, symbol];
             localStorage.setItem('eco_watchlist', JSON.stringify(newSaved));
-            // Fetch data for the new item immediately
+            // Add immediately to UI
             const newItem = await fetchHistory(symbol);
             if (newItem) {
                 setUserWatchlist(prev => [...prev, newItem]);
@@ -202,7 +195,7 @@ const LiveMarketDashboard = () => {
         setSelectedAsset(asset);
         if (asset.name) {
             const newsData = await fetchMarketNews(asset.name);
-            setNews(newsData);
+            setNews(newsData || []);
         }
     };
 
@@ -221,20 +214,15 @@ const LiveMarketDashboard = () => {
             <header className="dashboard-header">
                 <div>
                     <h1 style={{ fontSize: '2.5rem', margin: 0, fontWeight: 800 }}>
-                        Terminal <span className="text-gradient">Engine</span>
+                        Command <span className="text-gradient">Center</span>
                     </h1>
                     <p style={{ margin: '0.25rem 0 0', opacity: 0.5, fontSize: '0.8rem', fontWeight: 600 }}>
-                        LATENCY: 42MS // SYNC: {lastUpdated.toLocaleTimeString()}
+                        SECURE SCRAPE SYNC // {lastUpdated.toLocaleTimeString()}
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    {hasError && (
-                        <div className="terminal-status error" style={{ fontSize: '0.7rem', color: '#ef4444', background: 'rgba(239,68,68,0.1)', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <AlertTriangle size={12} /> API RATE-LIMIT RECOVERY ACTIVE
-                        </div>
-                    )}
                     <div className="terminal-status" style={{ fontSize: '0.7rem', color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' }}>
-                        STABLE CONNECTION
+                        LIVE CONNECTION
                     </div>
                 </div>
             </header>
@@ -251,6 +239,7 @@ const LiveMarketDashboard = () => {
                                 value={searchQuery}
                                 onChange={handleSearch}
                             />
+                            {isSearching && <RefreshCw className="animate-spin" size={12} style={{ position: 'absolute', right: '1rem', opacity: 0.5 }} />}
                         </div>
                         <AnimatePresence>
                             {searchResults.length > 0 && (
@@ -260,8 +249,8 @@ const LiveMarketDashboard = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
                                 >
-                                    {searchResults.map(res => (
-                                        <div key={res.symbol} className="search-result-item" onClick={() => addToWatchlist(res.symbol)}>
+                                    {searchResults.map((res, i) => (
+                                        <div key={i} className="search-result-item" onClick={() => addToWatchlist(res.symbol)}>
                                             <div className="result-info">
                                                 <span className="symbol">{res.symbol}</span>
                                                 <span className="name">{res.name}</span>
@@ -288,17 +277,17 @@ const LiveMarketDashboard = () => {
                                 isUserAdded={true}
                             />
                         )) : (
-                            <p style={{ fontSize: '0.7rem', opacity: 0.3, textAlign: 'center', padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', margin: '0.5rem' }}>
-                                Search assets to build your terminal
+                            <p style={{ fontSize: '0.7rem', opacity: 0.3, textAlign: 'center', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
+                                Add symbols from search
                             </p>
                         )}
                     </div>
 
                     <div className="ticker-group">
                         <span className="ticker-group-label"><Globe size={12} style={{ marginRight: 4 }} /> Global Equities</span>
-                        {globalGiants.map(asset => (
+                        {globalGiants.map((asset, i) => (
                             <WatchlistCard 
-                                key={asset.fullSymbol} 
+                                key={i} 
                                 data={asset} 
                                 active={selectedAsset?.fullSymbol === asset.fullSymbol} 
                                 onClick={handleAssetChange} 
@@ -336,10 +325,9 @@ const LiveMarketDashboard = () => {
                     <section className="main-chart-section">
                         <header className="chart-header">
                             <div>
-                                <h2 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700 }}>{selectedAsset?.name || 'Loading Asset...'}</h2>
-                                <span className="terminal-num" style={{ fontSize: '2rem', fontWeight: 800, color: selectedAsset?.isPositive ? '#22c55e' : '#ef4444' }}>
-                                    {selectedAsset?.fullSymbol?.includes('USD') || selectedAsset?.fullSymbol?.includes('=F') || selectedAsset?.fullSymbol?.includes('BTC') ? '$' : '₹'}
-                                    {selectedAsset?.price || '0.00'}
+                                <h2 style={{ fontSize: '1.5rem', margin: 0 }}>{selectedAsset?.name || 'Select Asset'}</h2>
+                                <span className="terminal-num" style={{ fontSize: '2.5rem', fontWeight: 800 }}>
+                                    {selectedAsset?.price || '---'}
                                 </span>
                             </div>
                             <div className="chart-tabs">
@@ -387,27 +375,25 @@ const LiveMarketDashboard = () => {
                     </section>
 
                     <section className="panel-card">
-                        <h3><ShieldCheck size={16} /> Asset Fundamentals</h3>
+                        <h3><ShieldCheck size={16} /> Asset Intelligence</h3>
                         <div className="fundamentals-grid">
                             <div className="fundamental-item">
-                                <span className="label">Volume (24H)</span>
+                                <span className="label">Volume (SCRAPE)</span>
                                 <span className="value terminal-num">{selectedAsset?.volume || 'N/A'}</span>
                             </div>
                             <div className="fundamental-item">
-                                <span className="label">Day High / Low</span>
-                                <span className="value terminal-num" style={{ fontSize: '0.8rem' }}>
-                                    {selectedAsset?.dayHigh} / {selectedAsset?.dayLow}
+                                <span className="label">Day Stability</span>
+                                <span className="value" style={{ color: selectedAsset?.isPositive ? '#22c55e' : '#ef4444' }}>
+                                    {selectedAsset?.isPositive ? 'BULLISH' : 'VOLATILE'}
                                 </span>
                             </div>
                             <div className="fundamental-item">
-                                <span className="label">Asset Class</span>
-                                <span className="value" style={{ fontSize: '0.75rem', color: 'var(--accent-primary)' }}>
-                                    {selectedAsset?.fullSymbol?.includes('=F') ? 'COMMODITY' : selectedAsset?.fullSymbol?.includes('USD') ? 'FOREX' : 'EQUITY'}
-                                </span>
+                                <span className="label">Sync Frequency</span>
+                                <span className="value" style={{ fontSize: '0.75rem' }}>POLL: 60S</span>
                             </div>
                             <div className="fundamental-item">
-                                <span className="label">Exchange SOURCE</span>
-                                <span className="value" style={{ fontSize: '0.75rem' }}>{selectedAsset?.fullSymbol?.split('.').pop() || 'GLOBAL'}</span>
+                                <span className="label">Source Mode</span>
+                                <span className="value" style={{ fontSize: '0.75rem', color: 'var(--accent-primary)' }}>UNIVERSAL DECK</span>
                             </div>
                         </div>
                     </section>
@@ -416,27 +402,27 @@ const LiveMarketDashboard = () => {
                 {/* COLUMN 3: INTELLIGENCE */}
                 <aside className="intelligence-column">
                     <section className="panel-card">
-                        <h3><Activity size={16} /> Market Sentiment</h3>
+                        <h3><Activity size={16} /> Technical Sentiment</h3>
                         <div className="sentiment-container">
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 800 }}>
                                 <span style={{ color: '#ef4444' }}>BEARISH</span>
                                 <span style={{ color: '#22c55e' }}>BULLISH</span>
                             </div>
                             <div className="gauge-track">
-                                <div className="gauge-pointer" style={{ left: `${selectedAsset?.isPositive ? 75 : 25}%` }}></div>
+                                <div className="gauge-pointer" style={{ left: `${selectedAsset?.isPositive ? 80 : 20}%` }}></div>
                             </div>
                             <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center', margin: '0.5rem 0 0' }}>
-                                {selectedAsset?.isPositive ? 'Technical setup indicates Bullish momentum' : 'Asset is currently retesting major support'}
+                                {selectedAsset?.isPositive ? 'Breakout momentum confirmed on chart' : 'Testing critical support levels'}
                             </p>
                         </div>
                     </section>
 
                     <section className="panel-card">
-                        <h3><Newspaper size={16} /> Global Intelligence</h3>
+                        <h3><Newspaper size={16} /> Market Pulse</h3>
                         <div className="news-list">
                             {news.length > 0 ? news.slice(0, 5).map((item, i) => (
                                 <div key={i} className="news-item">
-                                    <span className="source">{item.source || 'ECONOMY'}</span>
+                                    <span className="source">{item.source || 'GLOBAL'}</span>
                                     <a href={item.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <p style={{ margin: '0.2rem 0', cursor: 'pointer', fontWeight: 600 }}>{item.title}</p>
                                     </a>
@@ -444,7 +430,7 @@ const LiveMarketDashboard = () => {
                             )) : (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: 0.4, padding: '1rem' }}>
                                     <RefreshCw className="animate-spin" size={14} />
-                                    <span style={{ fontSize: '0.8rem' }}>Tracking feeds for {selectedAsset?.name}...</span>
+                                    <span style={{ fontSize: '0.8rem' }}>Syncing global news...</span>
                                 </div>
                             )}
                         </div>

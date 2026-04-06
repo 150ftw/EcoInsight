@@ -1,60 +1,29 @@
 // Dashboard data fetcher for EcoInsight
-// Fetches Indices, Stocks, and Crypto with sparkline data for charts
+// Pivoted to /api/ticker (Google Finance Scraper) for stability
 
-const YAHOO_BASE = '/api/yahoo?path=v8/finance/chart/';
+const TICKER_API = '/api/ticker?symbol=';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
 
 /**
- * Fetch historical data points for sparklines & metadata
- * @param {string} symbol Yahoo Finance symbol (e.g. ^NSEI)
- * @param {string} range '1d', '5d', '1mo'
- * @param {string} interval '5m', '15m', '1d'
+ * Fetch market data for a symbol (Google Finance Scraper)
  */
 export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
     try {
-        const res = await fetch(`${YAHOO_BASE}${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`);
+        const res = await fetch(`${TICKER_API}${encodeURIComponent(symbol)}`);
         if (!res.ok) return null;
         const data = await res.json();
-        const result = data.chart?.result?.[0];
-        if (!result) return null;
-
-        const timestamps = result.timestamp || [];
-        const prices = result.indicators?.quote?.[0]?.close || [];
-        const volumes = result.indicators?.quote?.[0]?.volume || [];
-        const meta = result.meta;
-
-        // Map to standard format { time, price }
-        const sparkline = timestamps.map((t, i) => ({
-            time: new Date(t * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            price: prices[i] ? parseFloat(prices[i].toFixed(2)) : null,
-            volume: volumes[i] || 0
-        })).filter(p => p.price !== null);
-
-        const currentPrice = meta.regularMarketPrice;
-        const prevClose = meta.chartPreviousClose;
-        const change = currentPrice - prevClose;
-        const changePercent = (change / prevClose) * 100;
-
+        
+        // Google Finance scraper returns current price + a simulated sparkline for now
+        // Mapping to our common terminal format
         return {
-            symbol: symbol.replace('^', ''),
-            fullSymbol: symbol,
-            name: meta.shortName || symbol,
-            price: currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            rawPrice: currentPrice,
-            change: change.toFixed(2),
-            changePercent: changePercent.toFixed(2),
-            isPositive: change >= 0,
-            sparkline,
-            // Advanced Metrics for "Theoretical" investors
-            volume: (meta.regularMarketVolume || 0).toLocaleString(),
-            dayHigh: meta.regularMarketDayHigh?.toFixed(2) || 'N/A',
-            dayLow: meta.regularMarketDayLow?.toFixed(2) || 'N/A',
-            fiftyTwoWeekHigh: 'N/A',
-            marketCap: 'N/A',
-            peRatio: 'N/A'
+            ...data,
+            price: data.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            rawPrice: parseFloat(data.price.replace(/[^0-9.]/g, '')),
+            changePercent: parseFloat(data.changePercent || 0).toFixed(2),
+            isPositive: parseFloat(data.changePercent || 0) >= 0
         };
     } catch (e) {
-        console.warn(`History fetch failed for ${symbol}:`, e);
+        console.warn(`Ticker fetch failed for ${symbol}:`, e);
         return null;
     }
 };
@@ -64,10 +33,10 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
  */
 export const fetchDashboardIndices = async () => {
     const targets = [
-        { symbol: '^NSEI', name: 'Nifty 50' },
-        { symbol: '^BSESN', name: 'Sensex' },
-        { symbol: '^GSPC', name: 'S&P 500' },
-        { symbol: '^IXIC', name: 'Nasdaq 100' }
+        { symbol: 'NIFTY_50:INDEXNSE', name: 'Nifty 50' },
+        { symbol: 'SENSEX:INDEXBOM', name: 'Sensex' },
+        { symbol: '.INX:INDEXSP', name: 'S&P 500' },
+        { symbol: '.IXIC:INDEXNASDAQ', name: 'Nasdaq 100' }
     ];
 
     const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
@@ -85,7 +54,7 @@ export const fetchCommodities = async () => {
         { symbol: 'NG=F', name: 'Nat Gas' }
     ];
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '60m')));
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
     return results.filter(r => r !== null);
 };
 
@@ -94,10 +63,10 @@ export const fetchCommodities = async () => {
  */
 export const fetchGlobalEquities = async () => {
     const targets = [
-        { symbol: 'NVDA', name: 'NVIDIA' },
-        { symbol: 'AAPL', name: 'Apple' },
-        { symbol: 'TSLA', name: 'Tesla' },
-        { symbol: 'MSFT', name: 'Microsoft' }
+        { symbol: 'AAPL:NASDAQ', name: 'Apple' },
+        { symbol: 'NVDA:NASDAQ', name: 'NVIDIA' },
+        { symbol: 'TSLA:NASDAQ', name: 'Tesla' },
+        { symbol: 'MSFT:NASDAQ', name: 'Microsoft' }
     ];
 
     const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
@@ -109,12 +78,12 @@ export const fetchGlobalEquities = async () => {
  */
 export const fetchGlobalMacro = async () => {
     const targets = [
-        { symbol: 'INR=X', name: 'USD/INR' },
-        { symbol: 'EURUSD=X', name: 'EUR/USD' },
-        { symbol: '^TNX', name: '10Y Yield' }
+        { symbol: 'USD-INR', name: 'USD/INR' },
+        { symbol: 'EUR-USD', name: 'EUR/USD' },
+        { symbol: 'TY10:INDEXCBOE', name: '10Y Yield' }
     ];
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '60m')));
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
     return results.filter(r => r !== null);
 };
 
@@ -156,10 +125,9 @@ export const fetchCryptoData = async () => {
  */
 export const fetchSectorPerformance = async () => {
     const targets = [
-        { symbol: '^CNXBANK', name: 'Banking' },
-        { symbol: '^CNXIT', name: 'IT' },
-        { symbol: '^CNXPHARMA', name: 'Pharma' },
-        { symbol: '^CNXENERGY', name: 'Energy' }
+        { symbol: 'NIFTY_BANK:INDEXNSE', name: 'Banking' },
+        { symbol: 'NIFTY_IT:INDEXNSE', name: 'IT' },
+        { symbol: 'NIFTY_PHARMA:INDEXNSE', name: 'Pharma' }
     ];
 
     const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
@@ -171,23 +139,30 @@ export const fetchSectorPerformance = async () => {
 };
 
 /**
- * Search for tickers using Yahoo Finance Search API via Serverless Proxy
+ * Search for tickers using Web-Search fallback (DuckDuckGo Discover)
  */
 export const searchTickers = async (query) => {
     if (!query || query.length < 2) return [];
     try {
-        const path = `v1/finance/search?q=${encodeURIComponent(query)}`;
-        const res = await fetch(`/api/yahoo?path=${encodeURIComponent(path)}`);
+        // Query DuckDuckGo to find potential Google Finance links/tickers
+        const res = await fetch(`/api/web-search?q=${encodeURIComponent(query + ' stock symbol google finance')}`);
         if (!res.ok) return [];
         const data = await res.json();
-        return (data.quotes || []).map(q => ({
-            symbol: q.symbol,
-            name: q.shortname || q.longname || q.symbol,
-            exch: q.exchange,
-            type: q.quoteType
-        })).filter(q => ['EQUITY', 'CRYPTOCURRENCY', 'ETF', 'INDEX', 'CURRENCY'].includes(q.type));
+        
+        return (data.results || []).map(r => {
+            // Try to extract ticker from Google Finance URL in DuckDuckGo results
+            const gMatch = r.url.match(/quote\/([^/?]+)/);
+            if (gMatch) {
+                return {
+                    symbol: decodeURIComponent(gMatch[1]),
+                    name: r.title.split(' - ')[0],
+                    exch: gMatch[1].includes(':') ? gMatch[1].split(':')[1] : 'GLOBAL'
+                };
+            }
+            return null;
+        }).filter(r => r !== null).slice(0, 5);
     } catch (e) {
-        console.error('Search failed:', e);
+        console.error('Search Discovery failed:', e);
         return [];
     }
 };
