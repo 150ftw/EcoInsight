@@ -4686,41 +4686,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 );
             case 'dashboard':
                 return (
-                    <div className="view-content dashboard-view" key={view} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '60vh' }}>
-                        <div className="locked-view-card" style={{ 
-                            background: 'rgba(255, 255, 255, 0.02)', 
-                            border: '1px solid rgba(255, 255, 255, 0.05)', 
-                            padding: '3rem', 
-                            borderRadius: '24px', 
-                            textAlign: 'center',
-                            maxWidth: '500px',
-                            backdropFilter: 'blur(20px)'
-                        }}>
-                            <div className="alert-icon" style={{ 
-                                width: '64px', 
-                                height: '64px', 
-                                background: 'rgba(139, 92, 246, 0.1)', 
-                                color: 'var(--accent-primary)',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 1.5rem'
-                            }}>
-                                <Lock size={32} />
-                            </div>
-                            <h2 style={{ fontSize: '1.8rem', color: 'white', marginBottom: '1rem' }}>Institutional Access Only</h2>
-                            <p style={{ color: '#a1a1aa', lineHeight: '1.6', marginBottom: '2rem' }}>
-                                The real-time Market Intelligence Hub is undergoing a neural synchronization. 
-                                Access is currently restricted to Institutional & Enterprise tier members.
-                            </p>
-                            <button className="btn-shine-primary" onClick={() => { setModalType('market_dashboard'); setShowCreditModal(true); }}>
-                                <Zap size={16} /> Request Priority Access
-                            </button>
-                            <div className="version-tag" style={{ marginTop: '1.5rem', fontSize: '0.65rem', opacity: 0.3, letterSpacing: '1px' }}>
-                                ENGINE_v2.5_LOCKED
-                            </div>
+                    <div className="view-content dashboard-view" key={view}>
+                        <div className="view-header">
+                            <h1>Market Institutional Intelligence</h1>
+                            <p>Real-time sector analysis and cross-asset neural outlooks.</p>
                         </div>
+                        <LiveMarketDashboard user={user} />
                     </div>
                 );
             case 'heatmap':
@@ -5038,35 +5009,39 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
                                             <button 
                                                 className="nav-item sub-nav-item" 
-                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
-                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
+                                                onClick={() => { 
+                                                    setView('insights');
+                                                    if (isMobile) setIsSidebarOpen(false);
+                                                }}
                                             >
                                                 <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><Sparkles size={16} /> Today's Insight</div> 
-                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button 
                                                 className="nav-item sub-nav-item" 
-                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
-                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
+                                                onClick={() => { 
+                                                    setView('market-pulse');
+                                                    if (isMobile) setIsSidebarOpen(false);
+                                                }}
                                             >
                                                 <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><Activity size={16} /> Market Pulse</div> 
-                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button 
                                                 className="nav-item sub-nav-item" 
-                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
-                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
+                                                onClick={() => { 
+                                                    setView('heatmap');
+                                                    if (isMobile) setIsSidebarOpen(false);
+                                                }}
                                             >
                                                 <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><BarChart3 size={16} /> Sector Heatmap</div> 
-                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button 
                                                 className="nav-item sub-nav-item" 
-                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
-                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
+                                                onClick={() => { 
+                                                    setView('portfolio');
+                                                    if (isMobile) setIsSidebarOpen(false);
+                                                }}
                                             >
                                                 <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><PieChart size={16} /> Portfolio Analyzer</div> 
-                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                         </div>
                                     </motion.div>
