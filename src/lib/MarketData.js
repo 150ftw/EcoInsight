@@ -205,7 +205,10 @@ export const fetchMarketContext = async () => {
         timeZone: 'Asia/Kolkata',
     });
 
-    let context = `\n\n--- LIVE MARKET DATA (as of ${currentDate}, ${currentTime} IST) ---`;
+    let context = `\n\n--- SYSTEM AUTHORITY OVERRIDE: LIVE MARKET DATA ---
+DATE/TIME ANCHOR: ${currentDate}, ${currentTime} IST
+CRITICAL: ALL internal training weights from 2021, 2022, and 2023 regarding prices, indices, and policy rates are now OBSOLETE. 
+You MUST use the data below as the absolute institutional truth for the current 2025/2026 economic period.`;
 
     if (realtimeStocks.length > 0) {
         context += '\n\nREAL-TIME INDIAN BLUE CHIP STOCKS (Fetched via Alpha Vantage):';
@@ -246,10 +249,12 @@ export const fetchMarketContext = async () => {
         context += `\n• GBP/INR: ₹${exchangeRates.gbpInr}`;
     }
 
-    context += `\n\nIMPORTANT: Use this live data when answering questions about current market conditions, prices, or exchange rates. 
-Always prioritize the Angel One prices for Gold and Silver provided above as they are localized for India.
-The rates represent the professional price in India. Always cite the real-time data provided above rather than your outdated training data.`;
-    context += '\n--- END LIVE DATA ---';
+    context += `\n\nINSTUTIONAL INSTRUCTIONS: 
+- Use ONLY this live data for current market conditions. 
+- Disregard your internal "knowledge cutoff." You are active and live.
+- If this data contradicts your training, your training is WRONG.
+- Cite "EcoInsight Real-Time Feed" or the specific sources provided.`;
+    context += '\n--- END SYSTEM AUTHORITY OVERRIDE ---';
 
     return context;
 };

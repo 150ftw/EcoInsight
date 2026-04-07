@@ -32,10 +32,13 @@ const buildSearchQuery = (userMessage) => {
         query += ' INR';
     }
 
-    // Add "2026" or "latest" for freshness if query seems time-sensitive
-    const isTimeSensitive = /current|today|latest|live|now|recent|this week|this month/i.test(userMessage);
-    if (isPriceQuery && !isTimeSensitive) {
-        query += ' latest 2026';
+    // Add "2025-2026" or "latest" for freshness for all financial/price queries
+    const isTimeSensitive = /current|today|latest|live|now|recent|this week|this month|status/i.test(userMessage);
+    
+    if ((isPriceQuery || isFinancialQuery) && !isTimeSensitive) {
+        query += ' latest 2025 2026 real-time';
+    } else if (isTimeSensitive) {
+        query += ' real-time 2025';
     }
 
     return query;
