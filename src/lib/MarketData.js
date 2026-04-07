@@ -398,7 +398,12 @@ const fetchGoogleFinancePrice = async (nseSymbol) => {
         let html = await res.text();
 
         // Regex for the price and other stats
-        let priceMatch = html.match(/data-last-price="([^"]+)"/);
+        // Modern Google Finance Regex (Class-based & jsname-based)
+        // Pattern 1: Standard Classic View (e.g., <div class="YMlKec fxKbKc">₹3,801.00</div>)
+        // Pattern 2: Beta/Real-time View (e.g., <span jsname="Pdsbrc" class="">₹3,801.00</span>)
+        let priceMatch = html.match(/class=["']YMlKec fxKbKc["'][^>]*>₹?([\d,]+\.?\d*)<\/div>/) || 
+                         html.match(/jsname=["']Pdsbrc["'][^>]*>₹?([\d,]+\.?\d*)<\/span>/) ||
+                         html.match(/data-last-price=["']([^"']+)["']/); // legacy fallback
         
         // Fallback to BSE if NSE fails to give a price
         if (!priceMatch) {
@@ -426,8 +431,8 @@ const fetchGoogleFinancePrice = async (nseSymbol) => {
                     if (tickerData.price && tickerData.price !== '---') {
                          const result = {
                             symbol: nseSymbol,
-                            price: tickerData.price,
-                            change: (parseFloat(tickerData.changePercent) * parseFloat(tickerData.price) / 100).toFixed(2),
+                            price: tickerData.price.replace(/[₹,]/g, ''),
+                            change: (parseFloat(tickerData.changePercent) * parseFloat(tickerData.price.replace(/[₹,]/g, '')) / 100).toFixed(2),
                             changePercent: tickerData.changePercent.replace(/[+-]/g, ''),
                             isPositive: tickerData.isPositive,
                             previousClose: '-',
@@ -450,7 +455,7 @@ const fetchGoogleFinancePrice = async (nseSymbol) => {
             return null;
         }
 
-        const price = parseFloat(priceMatch[1]);
+        const price = parseFloat(priceMatch[1].replace(/,/g, ''));
         if (isNaN(price)) return null;
 
         // Extract rich data from the P6K39c class values
