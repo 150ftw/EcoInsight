@@ -437,14 +437,23 @@ const LiveMarketDashboard = () => {
                     <section className="panel-card">
                         <h3><Newspaper size={16} /> Market Insights</h3>
                         <div className="news-list">
-                            {news.length > 0 ? news.slice(0, 5).map((item, i) => (
-                                <div key={i} className="news-item">
-                                    <span className="source">{item.source || 'GLOBAL'}</span>
-                                    <a href={item.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                        <p style={{ margin: '0.2rem 0', cursor: 'pointer', fontWeight: 600 }}>{item.title}</p>
-                                    </a>
-                                </div>
-                            )) : (
+                            {news.length > 0 ? (
+                                news.filter(item => 
+                                    !item.title.toLowerCase().includes('duckduckgo') && 
+                                    !item.title.toLowerCase().includes('ad clicks') &&
+                                    !item.title.toLowerCase().includes('privacy protected') &&
+                                    !item.title.toLowerCase().includes('microsoft')
+                                ).slice(0, 5).map((item, i) => (
+                                    <div key={i} className="news-item">
+                                        <span className="source">{item.source || 'GLOBAL'}</span>
+                                        <a href={item.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <p style={{ margin: '0.2rem 0', cursor: 'pointer', fontWeight: 600 }}>
+                                                {item.title.split(' --\u003e')[0]} 
+                                            </p>
+                                        </a>
+                                    </div>
+                                ))
+                            ) : (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: 0.4, padding: '1rem' }}>
                                     <RefreshCw className="animate-spin" size={14} />
                                     <span style={{ fontSize: '0.8rem' }}>Syncing global news...</span>

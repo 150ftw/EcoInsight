@@ -11,8 +11,10 @@
 
 /* Allow the dashboard view to be wider than default 950px */
 .view-content.dashboard-view {
-    max-width: 1600px;
+    max-width: 100%;
     padding: 0 !important;
+    margin: 0 !important;
+    flex: 1;
 }
 
 /* Terminal Typography */
@@ -23,18 +25,19 @@
 
 /* Global Macro Ribbon */
 .macro-ribbon {
-    background: rgba(10, 10, 12, 0.6);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--glass-border);
     display: flex;
-    padding: 0.75rem 1.5rem;
-    gap: 2.5rem;
+    padding: 0.85rem 1.75rem;
+    gap: 3rem;
     overflow-x: auto;
     scrollbar-width: none;
-    white-space: nowrap;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 100;
+    width: 100%;
 }
 
 .macro-ribbon::-webkit-scrollbar { display: none; }
@@ -92,10 +95,12 @@
 }
 
 .market-stat-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 1rem;
-    padding: 1.15rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 1.25rem;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -158,11 +163,12 @@
 }
 
 .main-chart-section {
-    background: rgba(10, 10, 12, 0.4);
-    backdrop-filter: blur(20px);
-    border-radius: 1.5rem;
-    padding: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur-heavy));
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+    border-radius: 2rem;
+    padding: 2.5rem;
+    border: 1px solid var(--glass-border);
 }
 
 .chart-header {
@@ -354,25 +360,37 @@
 .impact-Medium { background: rgba(234, 179, 8, 0.15); color: #facc15; }
 
 /* Responsive Terminal */
-@media (max-width: 1300px) {
+@media (max-width: 1200px) {
     .terminal-grid {
-        grid-template-columns: 280px 1fr;
-    }
-    .intelligence-column {
-        grid-column: span 2;
-        display: grid;
         grid-template-columns: 1fr 1fr;
+    }
+    .analysis-column {
+        grid-column: span 2;
+        order: -1;
     }
 }
 
 @media (max-width: 850px) {
     .terminal-grid {
         grid-template-columns: 1fr;
+        padding: 0 1rem 2rem;
     }
-    .intelligence-column {
-        grid-template-columns: 1fr;
+    .analysis-column, .intelligence-column, .ticker-column {
+        grid-column: span 1;
     }
-    .macro-ribbon { gap: 1.5rem; padding: 0.5rem 1rem; }
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding: 1.5rem 1rem 1rem;
+    }
+    .dashboard-header h1 {
+        font-size: 1.8rem !important;
+    }
+    .macro-ribbon { 
+        gap: 2rem; 
+        padding: 0.75rem 1rem; 
+    }
 }
 
 .text-gradient {
