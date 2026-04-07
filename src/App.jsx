@@ -4903,12 +4903,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <span className="section-label">Real-time Data</span>
                             <button 
                                 className="nav-item"
-                                onClick={() => { setModalType('market_dashboard'); setShowCreditModal(true); }}
+                                onClick={() => { 
+                                    setView('dashboard');
+                                    if (isMobile) setIsSidebarOpen(false);
+                                }}
                                 style={{
                                     background: 'rgba(255, 255, 255, 0.02)',
                                     marginBottom: '1rem',
                                     border: '1px solid rgba(255, 255, 255, 0.05)',
-                                    opacity: 0.6,
+                                    opacity: 1,
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center'
@@ -4918,7 +4921,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                     <BarChart3 size={18} className="text-purple-400" /> 
                                     <span>Market Dashboard</span>
                                 </div>
-                                <Lock size={12} color="#a78bfa" />
                             </button>
                         </div>
 
@@ -5009,39 +5011,35 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
                                             <button 
                                                 className="nav-item sub-nav-item" 
-                                                onClick={() => { 
-                                                    setView('insights');
-                                                    if (isMobile) setIsSidebarOpen(false);
-                                                }}
+                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
+                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
                                             >
                                                 <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><Sparkles size={16} /> Today's Insight</div> 
+                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button 
                                                 className="nav-item sub-nav-item" 
-                                                onClick={() => { 
-                                                    setView('market-pulse');
-                                                    if (isMobile) setIsSidebarOpen(false);
-                                                }}
+                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
+                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
                                             >
                                                 <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><Activity size={16} /> Market Pulse</div> 
+                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button 
                                                 className="nav-item sub-nav-item" 
-                                                onClick={() => { 
-                                                    setView('heatmap');
-                                                    if (isMobile) setIsSidebarOpen(false);
-                                                }}
+                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
+                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
                                             >
                                                 <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><BarChart3 size={16} /> Sector Heatmap</div> 
+                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button 
                                                 className="nav-item sub-nav-item" 
-                                                onClick={() => { 
-                                                    setView('portfolio');
-                                                    if (isMobile) setIsSidebarOpen(false);
-                                                }}
+                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
+                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
                                             >
                                                 <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><PieChart size={16} /> Portfolio Analyzer</div> 
+                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                         </div>
                                     </motion.div>
