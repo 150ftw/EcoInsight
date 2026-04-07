@@ -4600,8 +4600,20 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     transition={{ duration: 0.3 }}
                                                 >
-                                                    <div className="message-icon">
-                                                        {msg.role === 'assistant' ? <EkoSparkle size={20} /> : <User size={18} />}
+                                                    <div className="message-icon" style={{ overflow: 'hidden' }}>
+                                                        {msg.role === 'assistant' ? (
+                                                            <EkoSparkle size={20} />
+                                                        ) : (
+                                                            user?.profile_image ? (
+                                                                <img 
+                                                                    src={user.profile_image} 
+                                                                    alt="User" 
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                                                />
+                                                            ) : (
+                                                                <User size={18} />
+                                                            )
+                                                        )}
                                                     </div>
                                                     <div className="message-container">
                                                         <div className="message-content">
