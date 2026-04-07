@@ -4687,10 +4687,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             case 'dashboard':
                 return (
                     <div className="view-content dashboard-view" key={view}>
-                        <div className="view-header">
-                            <h1>Market Institutional Intelligence</h1>
-                            <p>Real-time sector analysis and cross-asset neural outlooks.</p>
-                        </div>
                         <LiveMarketDashboard user={user} />
                     </div>
                 );

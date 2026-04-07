@@ -737,11 +737,14 @@ export const fetchNewsTickerData = async () => {
     try {
         // We use a public, free RSS-to-JSON service pointing to The Economic Times (India Markets)
         // This requires ZERO API keys and provides extremely relevant Indian financial news natively.
-        const rssUrl = encodeURIComponent('https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms');
+        // Use "Stocks" specific feed (more domestic) with strict filtering
+        const rssUrl = encodeURIComponent('https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2145690.cms');
         const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
         if (!res.ok) throw new Error('Failed to fetch news');
 
         const newsData = await res.json();
+        const indianKeywords = ['india', 'nse', 'bse', 'sebi', 'nifty', 'sensex', 'inr', 'rs.', 'crore', 'lakh', 'it stocks', 'bank', 'tata', 'reliance', 'hdfc', 'infosys', 'adani', 'dalal street', 'mumbai', 'domestic', 'rbi', 'pvt', 'ltd'];
+        const globalFilters = ['us stocks', 'nasdaq', 'wall street', 's&p 500', 'london', 'uk stocks', 'trump', 'medicare', 'eu stocks'];
 
         // Helper to unescape HTML entities (e.g. &amp; -> &) to fix "messed up text"
         const decodeEntities = (text) => {
@@ -757,7 +760,12 @@ export const fetchNewsTickerData = async () => {
 
         const headlines = (newsData.items || [])
             .map(item => decodeEntities(item.title))
-            .filter(title => title.length > 20)
+            .filter(title => {
+                const lowTitle = title.toLowerCase();
+                const hasIndianContext = indianKeywords.some(key => lowTitle.includes(key));
+                const isGlobalNoise = globalFilters.some(key => lowTitle.includes(key)) && !lowTitle.includes('india');
+                return title.length > 20 && hasIndianContext && !isGlobalNoise;
+            })
             .slice(0, 10); // Get top 10 valid headlines
 
         // Fetch real-time prices for top Indian tickers using Google Finance (Unlimited, Free)
@@ -785,9 +793,9 @@ export const fetchNewsTickerData = async () => {
         return {
             trending,
             headlines: headlines.length > 0 ? headlines : [
-                "Markets monitor global interest rate policies closely.",
-                "Technology sector sees renewed investment following strong earnings.",
-                "Energy prices fluctuate amid geopolitical shifts."
+                "Nifty 50 extends gains as domestic institutional buying surges.",
+                "Sensex scales new heights led by banking and IT blue-chips.",
+                "RBI governor highlights resilient Indian macroeconomic fundamentals."
             ]
         };
     } catch (e) {

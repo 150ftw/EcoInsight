@@ -1,43 +1,71 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Briefcase, Cpu, Pill, Zap } from 'lucide-react';
+import { LayoutGrid, Activity } from 'lucide-react';
 
-const SectorHeatmap = () => {
-    // Sector Data (Mocked for demonstration, real sectoral indices can be added later)
-    const SECTORS = [
-        { name: 'Banking', change: '1.24', isPositive: true, icon: <Briefcase size={20} /> },
-        { name: 'IT', change: '0.85', isPositive: true, icon: <Cpu size={20} /> },
-        { name: 'Pharma', change: '-0.32', isPositive: false, icon: <Pill size={20} /> },
-        { name: 'Energy', change: '2.10', isPositive: true, icon: <Zap size={20} /> }
-    ];
+const SectorHeatmap = ({ sectors }) => {
+    if (!sectors || sectors.length === 0) return null;
 
     return (
-        <div className="sector-heatmap-container">
-            <div className="section-header">
-                <h3>Sector Heatmap</h3>
-                <div className="live-status-dot pulse" />
+        <div className="panel-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <LayoutGrid size={16} className="text-blue-400" />
+                    Sector Heatmap
+                </h3>
+                <span style={{ fontSize: '0.65rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    NSE Real-time
+                </span>
             </div>
-            
-            <div className="sector-grid">
-                {SECTORS.map((sector, i) => (
-                    <motion.div 
-                        key={sector.name}
-                        className={`sector-card ${sector.isPositive ? 'bullish' : 'bearish'}`}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.1, duration: 0.4 }}
-                    >
-                        <div className="sector-icon">{sector.icon}</div>
-                        <div className="sector-info">
-                            <span className="name">{sector.name}</span>
-                            <span className={`change ${sector.isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                                {sector.isPositive ? '+' : ''}{sector.change}%
-                                {sector.isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', 
+                gap: '8px',
+                flex: 1
+            }}>
+                {sectors.map((sector, idx) => {
+                    const absChange = Math.abs(parseFloat(sector.changePercent));
+                    const opacity = Math.min(0.1 + (absChange / 5), 0.8);
+                    const color = sector.isPositive ? `rgba(34, 197, 94, ${opacity})` : `rgba(239, 68, 68, ${opacity})`;
+                    const borderColor = sector.isPositive ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)';
+
+                    return (
+                        <div 
+                            key={idx}
+                            style={{
+                                background: color,
+                                border: `1px solid ${borderColor}`,
+                                borderRadius: '8px',
+                                padding: '12px 8px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'transform 0.2s ease',
+                                cursor: 'pointer',
+                                backdropFilter: 'blur(4px)'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        >
+                            <span style={{ fontSize: '0.7rem', fontWeight: 600, opacity: 0.9, marginBottom: '4px', textAlign: 'center' }}>
+                                {sector.name.toUpperCase()}
+                            </span>
+                            <span style={{ 
+                                fontSize: '0.85rem', 
+                                fontWeight: 800, 
+                                color: sector.isPositive ? '#4ade80' : '#f87171',
+                                textShadow: '0 0 10px rgba(0,0,0,0.5)'
+                            }}>
+                                {sector.isPositive ? '+' : ''}{sector.changePercent}%
                             </span>
                         </div>
-                        <div className="sector-glow" />
-                    </motion.div>
-                ))}
+                    );
+                })}
+            </div>
+
+            <div style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.7rem', opacity: 0.6 }}>
+                <Activity size={12} />
+                <span>Advancing: {sectors.filter(s => s.isPositive).length} | Declining: {sectors.filter(s => !s.isPositive).length}</span>
             </div>
         </div>
     );

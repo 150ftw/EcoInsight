@@ -11,10 +11,6 @@ function apiServerPlugin(env) {
           return next();
         }
 
-        // Skip /api/web-search as it's handled by another plugin
-        if (req.url.startsWith('/api/web-search')) {
-           return next(); 
-        }
 
         const url = new URL(req.url, `http://${req.headers.host}`);
         const filePath = url.pathname.slice(5); // Remove /api/
@@ -125,68 +121,12 @@ function apiServerPlugin(env) {
 }
 
 // ... existing webSearchPlugin definition ...
-function webSearchPlugin() {
-  return {
-    name: 'web-search-proxy',
-    configureServer(server) {
-      server.middlewares.use('/api/web-search', async (req, res) => {
-        const url = new URL(req.url, 'http://localhost');
-        const query = url.searchParams.get('q');
-        if (!query || query.trim().length < 2) {
-          res.statusCode = 400;
-          res.end(JSON.stringify({ error: 'Query parameter "q" is required' }));
-          return;
-        }
-        try {
-          const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
-          const response = await fetch(searchUrl, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-              'Accept-Language': 'en-IN,en;q=0.9,hi;q=0.8',
-            },
-          });
-          if (!response.ok) throw new Error(`DuckDuckGo returned ${response.status}`);
-          const html = await response.text();
-          const results = [];
-          const resultBlocks = html.split(/class="result\s/g).slice(1);
-          for (const block of resultBlocks.slice(0, 8)) {
-            try {
-              const titleMatch = block.match(/class="result__a"[^>]*>([^<]+(?:<[^>]+>[^<]*)*)<\/a>/);
-              let title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '').trim() : '';
-              const snippetMatch = block.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/);
-              let snippet = snippetMatch ? snippetMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : '';
-              const urlMatch = block.match(/class="result__url"[^>]*>([^<]+)/);
-              let sourceUrl = urlMatch ? urlMatch[1].trim() : '';
-              const hrefMatch = block.match(/class="result__a"\s+href="([^"]+)"/);
-              let href = '';
-              if (hrefMatch) {
-                href = hrefMatch[1];
-                const uddgMatch = href.match(/uddg=([^&]+)/);
-                if (uddgMatch) href = decodeURIComponent(uddgMatch[1]);
-              }
-              if (title && snippet) {
-                results.push({ title, snippet, url: href || sourceUrl, source: sourceUrl });
-              }
-            } catch (e) { continue; }
-          }
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ query, results, resultCount: results.length, timestamp: new Date().toISOString() }));
-        } catch (error) {
-          console.error('Web search proxy error:', error);
-          res.statusCode = 500;
-          res.end(JSON.stringify({ error: 'Search failed', message: error.message }));
-        }
-      });
-    },
-  };
-}
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   
   return {
-    plugins: [react(), webSearchPlugin(), apiServerPlugin(env)],
+    plugins: [react(), apiServerPlugin(env)],
     server: {
       proxy: {
         '/v1': {
