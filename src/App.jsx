@@ -80,7 +80,6 @@ const ThinkingIndicator = () => (
         exit={{ opacity: 0, transition: { duration: 0.6 } }}
     >
         <div className="message-icon" style={{ position: 'relative' }}>
-            {/* The regular star that is showing during loading */}
             <motion.div 
                 animate={{ opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
@@ -90,7 +89,6 @@ const ThinkingIndicator = () => (
                 <EkoSparkle size={18} animate={true} />
             </motion.div>
             
-            {/* The absolute-positioned explosion that only occurs on exit */}
             <motion.div 
                 style={{ position: 'absolute', inset: -20, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}
                 initial={{ opacity: 0 }}
@@ -124,7 +122,7 @@ const ThinkingIndicator = () => (
             </motion.div>
         </div>
         <div className="message-content">
-            <motion.span className="typing-indicator" exit={{ opacity: 0 }}>Eko is analyzing...</motion.span>
+            <motion.span className="typing-indicator" exit={{ opacity: 0 }}>Eko is thinking...</motion.span>
         </div>
     </motion.div>
 );
@@ -4586,29 +4584,32 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 ) : (
                                     <AnimatePresence initial={false}>
                                         {messages.map((msg, i) => {
-                                        if (msg.role === 'assistant' && msg.content === '') return null;
-                                        return (
-                                        <motion.div
-                                            key={i}
-                                            className={`message-wrapper ${msg.role}`}
-                                            initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            transition={{ duration: 0.3 }}
-                                        >
-                                            <div className="message-icon">
-                                                {msg.role === 'assistant' ? <EkoSparkle size={20} /> : <User size={18} />}
-                                            </div>
-                                            <div className="message-container">
-                                                <div className="message-content">
-                                                    {parseChartBlocks(msg.content).map((block, bIdx) => (
-                                                        block.type === 'chart'
-                                                            ? <EcoChartRenderer key={bIdx} config={block.content} />
-                                                            : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                        )})}
+                                            if (msg.role === 'assistant' && msg.content === '') {
+                                                return <ThinkingIndicator key={`thinking-${i}`} />;
+                                            }
+                                            return (
+                                                <motion.div
+                                                    key={i}
+                                                    className={`message-wrapper ${msg.role}`}
+                                                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                >
+                                                    <div className="message-icon">
+                                                        {msg.role === 'assistant' ? <EkoSparkle size={20} /> : <User size={18} />}
+                                                    </div>
+                                                    <div className="message-container">
+                                                        <div className="message-content">
+                                                            {parseChartBlocks(msg.content).map((block, bIdx) => (
+                                                                block.type === 'chart'
+                                                                    ? <EcoChartRenderer key={bIdx} config={block.content} />
+                                                                    : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            );
+                                        })}
                                     </AnimatePresence>
                                 )}
                             <div ref={messagesEndRef} />
