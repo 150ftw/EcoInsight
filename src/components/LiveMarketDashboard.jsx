@@ -106,6 +106,16 @@ const LiveMarketDashboard = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [syncKey, setSyncKey] = useState(0);
 
+    const getTimeframeParams = (tf) => {
+        const timeframeMap = {
+            '1D': { range: '1d', interval: '5m' },
+            '1W': { range: '5d', interval: '15m' },
+            '1M': { range: '1mo', interval: '1d' },
+            '1Y': { range: '1y', interval: '1wk' }
+        };
+        return timeframeMap[tf] || { range: '1d', interval: '5m' };
+    };
+
     // Initial Load & Persistent Watchlist
     const loadAllData = useCallback(async (watchlistSymbols, showLoader = true) => {
         if (showLoader) setIsLoading(true);
@@ -142,7 +152,8 @@ const LiveMarketDashboard = () => {
             setEarningsWatch(earn);
 
             if (watchlistSymbols.length > 0) {
-                const watchData = await Promise.all(watchlistSymbols.map(s => fetchHistory(s, chartTimeframe)));
+                const { range, interval } = getTimeframeParams(chartTimeframe);
+                const watchData = await Promise.all(watchlistSymbols.map(s => fetchHistory(s, range, interval)));
                 setUserWatchlist(watchData.filter(d => d !== null));
             }
 
@@ -154,7 +165,7 @@ const LiveMarketDashboard = () => {
             setIsLoading(false);
             return [];
         }
-    }, []);
+    }, [chartTimeframe]);
 
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
@@ -165,7 +176,8 @@ const LiveMarketDashboard = () => {
     useEffect(() => {
         if (selectedAsset) {
             const fetchAssetHistory = async () => {
-                const updated = await fetchHistory(selectedAsset.fullSymbol, chartTimeframe);
+                const { range, interval } = getTimeframeParams(chartTimeframe);
+                const updated = await fetchHistory(selectedAsset.fullSymbol, range, interval);
                 if (updated) {
                     setSelectedAsset(updated);
                 }

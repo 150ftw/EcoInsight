@@ -89,7 +89,8 @@ export default async function handler(req, res) {
 
     // --- STAGE 2: YAHOO CHART API FALLBACK & HISTORICAL DATA ---
     let historyData = null;
-    if (price === '---' || (range && range !== '1d')) {
+    // Always run Stage 2 if we need historical data or a specific range
+    if (price === '---' || range !== '1d' || historyData === null) {
       try {
         let yahooSymbol = symbol.includes(':') ? symbol.split(':')[0] : symbol;
         if (symbol.endsWith(':NSE') || symbol.endsWith(':NS')) {
