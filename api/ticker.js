@@ -15,7 +15,7 @@ const HUMAN_HEADERS = {
 };
 
 export default async function handler(req, res) {
-  const { symbol } = req.query;
+  const { symbol, range = '1d', interval = '5m' } = req.query;
   
   if (!symbol) {
     return res.status(400).json({ error: 'Symbol parameter is required' });
@@ -46,72 +46,95 @@ export default async function handler(req, res) {
 
   try {
     // --- STAGE 1: GOOGLE SEARCH TITLE/SNIPPET SCRAPER ---
-    const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery + ' google finance')}`;
-    const googleRes = await fetch(googleUrl, { headers: HUMAN_HEADERS });
-    
-    if (googleRes.ok) {
-      const html = await googleRes.text();
-      // Google search titles often include the price: "Nifty 50 (NI50) 22,644.20 - Google Search"
-      // or "Reliance Industries (RELIANCE) 2,955.92 - Google Search"
-      const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
-      if (titleMatch) {
-        const titleText = titleMatch[1];
-        // Regex for Price like 22,644.20 or 2,955.92 or 1.05
-        const pMatch = titleText.match(/([\d,]+\.\d{2})/);
-        if (pMatch) {
-          const scrapedPrice = parseFloat(pMatch[1].replace(/,/g, ''));
-          
-          // --- ADR/INR PLAUSIBILITY CHECK ---
-          // If we expect ~1400 and get ~14, Stage 1 should "fail" to force Stage 2/3
-          const basePrices = {
-            'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
-            'USDINR': 83.35, 'EURINR': 90.15,
-            'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 'INFY:NSE': 1480
-          };
-          const base = basePrices[symbol] || basePrices[cleanSymbol];
-          
-          if (base && Math.abs(scrapedPrice - base) / base > 0.8) {
-            console.log(`Plausibility check failed for ${symbol}: Scraped ${scrapedPrice} vs Base ${base}. Falling back.`);
-          } else {
-            price = pMatch[1].replace(/,/g, '');
-            source = 'SEARCH-SYNC v6 (GOOGLE)';
+    try {
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery + ' google finance')}`;
+      const googleRes = await fetch(googleUrl, { 
+        headers: HUMAN_HEADERS,
+        timeout: 5000 // 5s timeout to prevent hanging
+      });
+      
+      if (googleRes.ok) {
+        const html = await googleRes.text();
+        const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+        if (titleMatch) {
+          const titleText = titleMatch[1];
+          const pMatch = titleText.match(/([\d,]+\.\d{2})/);
+          if (pMatch) {
+            const scrapedPrice = parseFloat(pMatch[1].replace(/,/g, ''));
             
-            // Try to extract change percent if present in snippet (e.g. "+1.24%")
-            const cMatch = html.match(/([-+]?[\d.]+)%/);
-            if (cMatch) {
-              changePercent = cMatch[1];
+            const basePrices = {
+              'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
+              'USDINR': 83.35, 'EURINR': 90.15,
+              'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 'INFY:NSE': 1480
+            };
+            const base = basePrices[symbol] || basePrices[cleanSymbol];
+            
+            if (base && Math.abs(scrapedPrice - base) / base > 0.8) {
+              console.log(`Plausibility check failed for ${symbol}: Scraped ${scrapedPrice} vs Base ${base}. Falling back.`);
+            } else {
+              price = pMatch[1].replace(/,/g, '');
+              source = 'SEARCH-SYNC v6 (GOOGLE)';
+              
+              const cMatch = html.match(/([-+]?[\d.]+)%/);
+              if (cMatch) {
+                changePercent = cMatch[1];
+              }
             }
           }
         }
       }
+    } catch (gError) {
+      console.warn(`Search-Sync v6 Stage 1 (Google) Error for ${symbol}:`, gError.message);
     }
 
-    // --- STAGE 2: YAHOO CHART API FALLBACK (Bypass 429) ---
-    if (price === '---') {
-      let yahooSymbol = symbol.includes(':') ? symbol.split(':')[0] : symbol;
-      // Handle NSE/BSE suffixes for Yahoo (Standard and Search formats)
-      if (symbol.endsWith(':NSE') || symbol.endsWith(':NS')) {
-          yahooSymbol = yahooSymbol.replace(':NS', '') + '.NS';
-      }
-      if (symbol.endsWith(':BOM') || symbol.endsWith(':BSE') || symbol.endsWith(':BO')) {
-          yahooSymbol = yahooSymbol.replace(':BO', '') + '.BO';
-      }
-      
-      const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?range=1d&interval=5m`;
-      
-      const yahooRes = await fetch(yahooUrl, { headers: HUMAN_HEADERS });
-      if (yahooRes.ok) {
-        const data = await yahooRes.json();
-        const meta = data.chart?.result?.[0]?.meta;
-        if (meta && meta.regularMarketPrice) {
-          price = meta.regularMarketPrice.toFixed(2);
-          const prevClose = meta.previousClose || meta.chartPreviousClose;
-          if (prevClose) {
-            const diff = meta.regularMarketPrice - prevClose;
-            changePercent = ((diff / prevClose) * 100).toFixed(2);
-          }
-          source = 'SEARCH-SYNC v6 (YAHOO)';
+    // --- STAGE 2: YAHOO CHART API FALLBACK & HISTORICAL DATA ---
+    let historyData = null;
+    if (price === '---' || (range && range !== '1d')) {
+      try {
+        let yahooSymbol = symbol.includes(':') ? symbol.split(':')[0] : symbol;
+        if (symbol.endsWith(':NSE') || symbol.endsWith(':NS')) {
+            yahooSymbol = yahooSymbol.replace(':NS', '').replace(':NSE', '') + '.NS';
         }
+        if (symbol.endsWith(':BOM') || symbol.endsWith(':BSE') || symbol.endsWith(':BO')) {
+            yahooSymbol = yahooSymbol.replace(':BO', '').replace(':BOM', '').replace(':BSE', '') + '.BO';
+        }
+        
+        const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?range=${range}&interval=${interval}`;
+        
+        const yahooRes = await fetch(yahooUrl, { 
+          headers: HUMAN_HEADERS,
+          timeout: 5000
+        });
+        
+        if (yahooRes.ok) {
+          const data = await yahooRes.json();
+          const result = data.chart?.result?.[0];
+          const meta = result?.meta;
+          if (meta && meta.regularMarketPrice) {
+            if (price === '---') {
+              price = meta.regularMarketPrice.toFixed(2);
+              const prevClose = meta.previousClose || meta.chartPreviousClose;
+              if (prevClose) {
+                const diff = meta.regularMarketPrice - prevClose;
+                changePercent = ((diff / prevClose) * 100).toFixed(2);
+              }
+              source = 'SEARCH-SYNC v6 (YAHOO)';
+            }
+
+            // Extract real history for sparkline
+            const indicators = result?.indicators?.quote?.[0];
+            const timestamps = result?.timestamp;
+            if (indicators && (indicators.close || indicators.open) && timestamps) {
+              const closes = indicators.close || indicators.open;
+              historyData = timestamps.map((t, i) => ({
+                time: new Date(t * 1000).toISOString(),
+                price: closes[i] ? parseFloat(closes[i].toFixed(2)) : null
+              })).filter(pt => pt.price !== null);
+            }
+          }
+        }
+      } catch (yError) {
+        console.warn(`Search-Sync v6 Stage 2 (Yahoo) Error for ${symbol}:`, yError.message);
       }
     }
 
@@ -134,7 +157,7 @@ export default async function handler(req, res) {
     const isPositive = parseFloat(changePercent) >= 0;
 
     // Sparkline Generation for UI
-    const sparkline = Array.from({ length: 20 }, (_, i) => ({
+    const sparkline = (historyData && historyData.length > 0) ? historyData : Array.from({ length: 20 }, (_, i) => ({
       time: `${i}:00`,
       price: numericPrice > 0 ? numericPrice - (Math.random() * (numericPrice * 0.002)) + (i * (numericPrice * 0.0001) * (isPositive ? 1 : -1)) : 0
     }));

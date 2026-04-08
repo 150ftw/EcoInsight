@@ -999,21 +999,8 @@ const ReviewsSection = () => {
 };
 
 
-const FloatingWhatsAppButton = () => {
-    return (
-        <a 
-            href="https://wa.me/919667510634" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="floating-whatsapp-btn"
-        >
-            <div className="whatsapp-icon-circle">
-                 <MessageCircle size={14} fill="white" color="white" />
-            </div>
-            <span>Chat with Founder</span>
-        </a>
-    );
-};
+
+
 
 const DetailedFooter = ({ setAppSection }) => {
     const currentYear = new Date().getFullYear();
@@ -5298,7 +5285,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 <Bug size={14} />
             </button>
 
-            <FloatingWhatsAppButton />
+
             <CookieConsent />
             <AuthModal 
                 isOpen={isAuthModalOpen} 

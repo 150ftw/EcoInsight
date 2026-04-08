@@ -3368,45 +3368,8 @@ select {
     color: rgba(255, 255, 255, 0.3);
 }
 
-.floating-whatsapp-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 24px;
-    z-index: 9998;
-    display: flex;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 4px 16px 4px 4px;
-    border-radius: 100px;
-    color: #fff;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
-    height: 38px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-}
 
-.floating-whatsapp-btn:hover {
-    background: rgba(0, 0, 0, 0.6);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(37, 211, 102, 0.2);
-}
 
-.whatsapp-icon-circle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    background: #25D366;
-    border-radius: 50%;
-    margin-right: 12px;
-    box-shadow: 0 0 15px rgba(37, 211, 102, 0.3);
-}
 
 /* Responsive Detailed Footer */
 @media (max-width: 1024px) {

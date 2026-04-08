@@ -3193,18 +3193,11 @@ html {
 /* ============================================================ */
 @media (max-width: 768px) {
     /* Prevent any injected elements from causing overflow */
-    .whatsapp-float-btn,
     .market-pulse-bar,
     .ticker-track,
     .landing-container {
         max-width: 100vw !important;
         box-sizing: border-box !important;
-    }
-    
-    .whatsapp-float-btn {
-        right: 15px !important;
-        bottom: 70px !important; /* Move up to clear the ticker */
-        z-index: 9999 !important;
     }
 
     /* Fix Ticker Overlap and 'Not Pure Black' issues found by subagent */

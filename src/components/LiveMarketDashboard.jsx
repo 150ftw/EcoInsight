@@ -35,21 +35,7 @@ import TechnicalPulse from './TechnicalPulse';
 import EarningsWatch from './EarningsWatch';
 import './Dashboard.css';
 
-const MacroRibbon = ({ data }) => (
-    <div className="macro-ribbon">
-        {data.map((item, i) => (
-            <div key={i} className="macro-item">
-                <span className="macro-label">{item.name}</span>
-                <span className={`macro-val terminal-num ${item.isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                    {item.price}
-                </span>
-                <span className={`macro-change terminal-num ${item.isPositive ? 'text-green-400' : 'text-red-400'}`} style={{ fontSize: '0.7rem' }}>
-                    {item.isPositive ? '▲' : '▼'} {item.changePercent}%
-                </span>
-            </div>
-        ))}
-    </div>
-);
+
 
 const WatchlistCard = ({ data, onClick, onRemove, active, isUserAdded }) => (
     <motion.div 
@@ -155,9 +141,8 @@ const LiveMarketDashboard = () => {
             setTechnicalSignals(tech);
             setEarningsWatch(earn);
 
-            // Fetch data for user watchlist
             if (watchlistSymbols.length > 0) {
-                const watchData = await Promise.all(watchlistSymbols.map(s => fetchHistory(s)));
+                const watchData = await Promise.all(watchlistSymbols.map(s => fetchHistory(s, chartTimeframe)));
                 setUserWatchlist(watchData.filter(d => d !== null));
             }
 
@@ -173,19 +158,21 @@ const LiveMarketDashboard = () => {
 
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
-        loadAllData(saved).then(idx => {
-            if (!selectedAsset && idx && idx.length > 0) {
-                handleAssetChange(idx[0]);
-            }
-        });
-        
-        const interval = setInterval(() => {
-            const currentSaved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
-            loadAllData(currentSaved, false);
-        }, 120000); // 2min poll for search sync stability
-        
-        return () => clearInterval(interval);
-    }, [syncKey, loadAllData]);
+        loadAllData(saved, true);
+    }, [syncKey]);
+
+    // Handle timeframe changes
+    useEffect(() => {
+        if (selectedAsset) {
+            const fetchAssetHistory = async () => {
+                const updated = await fetchHistory(selectedAsset.fullSymbol, chartTimeframe);
+                if (updated) {
+                    setSelectedAsset(updated);
+                }
+            };
+            fetchAssetHistory();
+        }
+    }, [chartTimeframe]);
 
     const handleSearch = async (e) => {
         const val = e.target.value;
@@ -248,7 +235,7 @@ const LiveMarketDashboard = () => {
 
     return (
         <motion.div className="dashboard-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} key={syncKey}>
-            <MacroRibbon data={macro} />
+
 
             <header className="dashboard-header">
                 <div>

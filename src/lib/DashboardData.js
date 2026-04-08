@@ -9,7 +9,7 @@ const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
  */
 export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
     try {
-        const res = await fetch(`${TICKER_API}${encodeURIComponent(symbol)}`);
+        const res = await fetch(`${TICKER_API}${encodeURIComponent(symbol)}&range=${range}&interval=${interval}`);
         if (!res.ok) return null;
         const data = await res.json();
         
