@@ -5097,7 +5097,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 <div className="user-info">
                                     <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
                                     <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                        {profile?.tier || 'Free'} Access {profile?.tier === 'Free' && `• ${profile?.credits || 0} Credits`}
+                                        {profile?.tier || 'Free'} Access
                                     </span>
                                 </div>
                             </div>

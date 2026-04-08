@@ -87,7 +87,8 @@ const UserAccountMenu = ({
                 <span>Account Settings</span>
               </button>
               
-              <button 
+              {/* Hiding for launch - will return with subscription tiers */}
+              {/* <button 
                 onClick={() => { 
                   setIsOpen(false); 
                   onSubscriptionClick();
@@ -98,7 +99,7 @@ const UserAccountMenu = ({
                   <CreditCard size={18} />
                 </div>
                 <span>Subscription</span>
-              </button>
+              </button> */}
               
               <div className="user-menu-divider" />
               
