@@ -4562,22 +4562,49 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         <div className="mobile-dashboard-lock">
             <motion.div 
                 className="lock-card"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                    background: 'rgba(15, 15, 20, 0.6)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    padding: '2.5rem 1.5rem',
+                    borderRadius: '32px',
+                    textAlign: 'center',
+                    maxWidth: '320px',
+                    boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.6)'
+                }}
             >
-                <div className="status-capsule">In Development</div>
-                <div className="lock-icon-container">
-                    <Smartphone size={32} />
-                    <div className="lock-badge"><Lock size={12} /></div>
+                <div className="institutional-header">
+                    <Monitor size={48} className="text-accent" style={{ opacity: 0.8, marginBottom: '1rem' }} />
                 </div>
-                <h2>Desktop Exclusive</h2>
-                <p>
-                    The institutional-grade Market Dashboard is optimized for Large-Density displays.
+                <div style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '6px', 
+                    background: 'rgba(139, 92, 246, 0.1)', 
+                    color: '#c084fc', 
+                    padding: '4px 12px', 
+                    borderRadius: '20px', 
+                    fontSize: '0.7rem', 
+                    fontWeight: '600',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    marginBottom: '1.5rem',
+                    border: '1px solid rgba(139, 92, 246, 0.2)'
+                }}>
+                    <Zap size={10} /> Institutional Terminal
+                </div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#fff' }}>Desktop Hub Gateway</h2>
+                <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '2rem' }}>
+                    The high-density Eko Intelligence Hub is purpose-built for ultra-wide precision displays. 
+                    Institutional access is currently restricted on mobile viewports.
                 </p>
-                <div className="lock-tip">
-                    <Laptop size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
-                    Released for Laptop & PC users.
+                <div className="lock-badges" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Laptop size={14} /> Full Access on PC
+                    </div>
                 </div>
             </motion.div>
         </div>
@@ -4969,7 +4996,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
                         <div className="mobile-logo">
-                            <EcoInsightLogo size={24} /> <span>EcoInsight</span>
+                            <EcoInsightLogo size={24} /> <span>Eko AI</span>
                         </div>
                         <button className="mobile-new-chat" onClick={createNewChat}>
                             <EcoNewChatIcon size={18} />
@@ -4986,7 +5013,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 >
                     <div className="sidebar-header">
                         <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <EcoInsightLogo size={36} className="logo-icon" /> <span>EcoInsight</span>
+                            <EcoInsightLogo size={36} className="logo-icon" /> <span>Eko AI</span>
                         </motion.div>
                         {isMobile && <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}><X size={20} /></button>}
                     </div>
@@ -5011,7 +5038,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative' }}>
                                     <BarChart3 size={18} className="text-purple-400" /> 
-                                    <span>Market Dashboard</span>
+                                    <span>Eko Intelligence Hub</span>
                                 </div>
                             </button>
                         </div>

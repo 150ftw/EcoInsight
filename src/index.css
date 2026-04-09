@@ -2585,6 +2585,7 @@ input[type="range"] {
     .message-content {
         font-size: 0.92rem;
         line-height: 1.55;
+        padding-top: 2px;
     }
 
     .message-content pre {
@@ -2892,10 +2893,10 @@ input[type="range"] {
         width: 80vw;
         max-width: 320px;
         background: rgba(10, 10, 12, 0.98) !important; /* Fully opaque to prevent bleed-through */
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
         z-index: 200; /* Above overlay */
-        border-right: 1px solid rgba(139, 92, 246, 0.15);
+        border-right: 1px solid rgba(139, 92, 246, 0.2);
         box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6);
     }
 
@@ -2960,7 +2961,19 @@ input[type="range"] {
         background: rgba(10, 10, 12, 0.95) !important;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid var(--glass-border);
+        border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+        padding: 0 1rem;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .mobile-logo span {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .mobile-logo {
