@@ -4732,37 +4732,53 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         exit={{ opacity: 0, y: 10 }}
                                         style={{
                                             position: 'absolute',
-                                            top: '-30px',
-                                            left: '30%',
+                                            top: '-35px',
+                                            left: '50%',
                                             transform: 'translateX(-50%)',
                                             background: 'rgba(139, 92, 246, 0.2)',
                                             color: '#c084fc',
-                                            padding: '4px 12px',
+                                            padding: '6px 16px',
                                             borderRadius: '20px',
                                             fontSize: '0.75rem',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '6px',
-                                            border: '1px solid rgba(139, 92, 246, 0.3)',
-                                            backdropFilter: 'blur(4px)',
-                                            zIndex: 5
+                                            gap: '8px',
+                                            border: '1px solid rgba(139, 92, 246, 0.4)',
+                                            backdropFilter: 'blur(12px)',
+                                            zIndex: 100,
+                                            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                                            whiteSpace: 'nowrap'
                                         }}
                                     >
-                                        <Info size={12} /> File upload in development — releasing very soon.
+                                        <Zap size={14} className="text-purple-400" /> 
+                                        <span>Pro Feature: File Analysis coming in next update</span>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
                             <motion.div className="input-wrapper">
                                 <button 
+                                    type="button"
                                     className="file-upload-btn" 
                                     title="Upload PDF Analysis"
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.preventDefault();
                                         setShowUploadSoon(true);
                                         setTimeout(() => setShowUploadSoon(false), 3000);
                                     }}
-                                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+                                    style={{ 
+                                        background: 'transparent', 
+                                        border: 'none', 
+                                        cursor: 'pointer', 
+                                        padding: '8px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: '4px',
+                                        borderRadius: '8px',
+                                        transition: 'all 0.2s ease'
+                                    }}
                                 >
-                                    <FilePlus size={20} />
+                                    <FilePlus size={20} style={{ opacity: 0.7 }} />
                                 </button>
                                 <input
                                     placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "Query economic trends, theories, or data..."}
