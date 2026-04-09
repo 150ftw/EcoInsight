@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 
 import shivamAvatar from '../assets/founder/shivam.jpg';
+import anshAvatar from '../assets/founder/ansh.jpg';
 
 export const SUBPAGE_DATA = {
     // Resources
@@ -121,6 +122,17 @@ export const SUBPAGE_DATA = {
                     entity: "EKO BY ECOINSIGHT AI (OPC) PRIVATE LIMITED",
                     avatarText: "S",
                     avatarImg: shivamAvatar
+                }
+            },
+            {
+                heading: "Digital Presence",
+                type: "leadership",
+                founder: {
+                    name: "Ansh Tripathi",
+                    title: "THE SOCIAL MEDIA GUY",
+                    entity: "ECOINSIGHT AI (OPC) PRIVATE LIMITED",
+                    avatarText: "A",
+                    avatarImg: anshAvatar
                 }
             },
             {
