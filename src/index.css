@@ -4441,3 +4441,60 @@ html {
     color: rgba(255, 255, 255, 0.4);
     font-style: italic;
 }
+
+/* --- CHAT MOBILE OPTIMIZATION --- */
+@media (max-width: 640px) {
+    .empty-chat-hero {
+        margin-top: 6vh !important;
+        margin-bottom: 1.5rem !important;
+        padding: 1rem !important;
+    }
+
+    .empty-chat-greeting {
+        font-size: 1.25rem !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.4rem !important;
+    }
+
+    .empty-chat-headline {
+        font-size: 1.75rem !important;
+        margin-bottom: 1.25rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .suggestion-chips {
+        gap: 0.4rem !important;
+        padding: 0 1rem !important;
+    }
+
+    .suggestion-chip {
+        padding: 0.5rem 0.9rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    .input-container {
+        padding: 0 1rem 0.5rem !important;
+        gap: 0.4rem !important;
+    }
+
+    .input-wrapper {
+        padding: 0.4rem 0.4rem 0.4rem 0.9rem !important;
+        border-radius: 16px !important;
+    }
+
+    input {
+        font-size: 0.9rem !important;
+        padding: 0.4rem 0 !important;
+    }
+
+    .input-footer {
+        font-size: 0.65rem !important;
+        margin-top: 0.2rem !important;
+        opacity: 0.5 !important;
+    }
+    
+    .messages-list {
+        padding: 1rem 1rem !important;
+        gap: 1rem !important;
+    }
+}
