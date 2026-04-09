@@ -131,6 +131,18 @@ const ThinkingIndicator = () => (
     </motion.div>
 );
 
+const FAST_GREETINGS = {
+    'how are you': 'I am performing at peak efficiency, synchronized with Bharat\'s market shifts. Ready for your intelligence deep-dive.',
+    'hi': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
+    'hello': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
+    'hey': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
+    'who are you': 'I am Eko, your institutional-grade Economic Intelligence engine, designed to decode complex financial dynamics.',
+    'what can you do': 'I can analyze market trends, simulate economic scenarios, and provide institutional-grade intelligence across equities, macro data, and sectoral shifts.',
+    'good morning': 'Good morning, Analyst. The markets are waking up. Ready to decode the early signals?',
+    'good afternoon': 'Good afternoon, Analyst. Intelligence feeds are live. What deep-dive shall we initiate?',
+    'good evening': 'Good evening, Analyst. Markets may be closed, but the intelligence flow never stops. Reviewing today\'s shifts?'
+};
+
 const EcoInsightLogo = ({ size = 24, className = "" }) => {
     const id = useId();
     const gradientId = `logoGradientMain-${id.replace(/:/g, '')}`;
@@ -3777,6 +3789,28 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         }
         
         const userMessage = { role: 'user', content: textToSend }
+
+        // FAST PATH: Handle greetings instantly (with platform-name stripping)
+        const cleanText = textToSend.toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .replace(/\b(eko|ecoinsight|echo|heye|heyeko|helloeko|hi|hey)\b/g, '') // Strip fillers/platform names
+            .trim();
+        
+        // Also check raw phrases if stripped version is too short or empty
+        const rawClean = textToSend.toLowerCase().replace(/[^\w\s]/g, '').trim();
+        const finalMatch = FAST_GREETINGS[cleanText] || FAST_GREETINGS[rawClean];
+
+        if (finalMatch) {
+            const quickResponse = { role: 'assistant', content: finalMatch };
+            setChats(prev => prev.map(c => c.id === activeChatId ? {
+                ...c,
+                messages: [...c.messages, userMessage, quickResponse]
+            } : c));
+            if (!customText) setInput('');
+            setIsLoading(false);
+            setIsNeuralSearching(false);
+            return;
+        }
 
         // Update title if it's the first user message
         let newTitle = activeChat.title;
