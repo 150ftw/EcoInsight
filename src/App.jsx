@@ -4208,7 +4208,26 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         return prompt;
     };
+    
+    const isComplexQuery = (text) => {
+        if (!text) return false;
+        const lowText = text.toLowerCase().trim();
+        
+        // Greetings and very short talk are NOT complex
+        const greetings = ['hi', 'hello', 'hey', 'yo', 'good morning', 'good afternoon', 'good evening', 'how are you', 'howdy', 'sup'];
+        if (greetings.includes(lowText)) return false;
+        if (lowText.length < 5 && !/\d/.test(lowText)) return false; 
 
+        // Keywords that MUST trigger a complex search
+        const complexKeywords = [
+            'nifty', 'sensex', 'price', 'stock', 'share', 'market', 'index', 'crypto', 'bitcoin', 'btc', 'eth',
+            'analysis', 'chart', 'trend', 'dividend', 'earning', 'profit', 'loss', 'gdp', 'inflation', 'rbi',
+            'policy', 'interest', 'rate', 'mutual fund', 'sip', 'gold', 'silver', 'commodity', 'portfolio',
+            'buy', 'sell', 'invest', 'ipo', 'company', 'reliance', 'tcs', 'hdfc', 'infy', 'news'
+        ];
+
+        return complexKeywords.some(keyword => lowText.includes(keyword)) || lowText.split(' ').length > 4;
+    };
 
 
     const handleSend = async (customText = null, customPdfText = null) => {
@@ -4229,6 +4248,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         userScrolledUp.current = false;
 
         const isFirstQuery = activeChat.messages.length === 1;
+        const isComplex = isComplexQuery(textToSend);
 
         // Forced Authentication Check
         if (!isSignedIn) {
@@ -4239,9 +4259,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             return;
         }
 
-        if (isFirstQuery) {
-            // Trigger the cinematic star animation only on the first query for a premium branded feel
+        if (isFirstQuery && isComplex) {
+            // Trigger the cinematic star animation only on complex first queries
             setShowStarFly(true);
+        } else {
+            // Skip search indicator for simple queries
+            setIsNeuralSearching(false);
         }
         
         const userMessage = { role: 'user', content: textToSend }
@@ -4278,30 +4301,33 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
 
         try {
-            // Fetch live market data, on-demand stock data, AND web search results in parallel
             let liveContext = '';
-            const [marketData, onDemandData, webSearchData] = await Promise.allSettled([
-                fetchMarketContext(),
-                fetchOnDemandContext(textToSend),
-                fetchWebSearchContext(textToSend)
-            ]);
+            
+            if (isComplex) {
+                // Fetch live market data, on-demand stock data, AND web search results in parallel only for complex queries
+                const [marketData, onDemandData, webSearchData] = await Promise.allSettled([
+                    fetchMarketContext(),
+                    fetchOnDemandContext(textToSend),
+                    fetchWebSearchContext(textToSend)
+                ]);
 
-            if (marketData.status === 'fulfilled' && marketData.value) {
-                liveContext += marketData.value;
-            } else if (marketData.status === 'rejected') {
-                console.warn('Could not fetch live market data:', marketData.reason);
-            }
+                if (marketData.status === 'fulfilled' && marketData.value) {
+                    liveContext += marketData.value;
+                } else if (marketData.status === 'rejected') {
+                    console.warn('Could not fetch live market data:', marketData.reason);
+                }
 
-            if (onDemandData.status === 'fulfilled' && onDemandData.value) {
-                liveContext += onDemandData.value;
-            } else if (onDemandData.status === 'rejected') {
-                console.warn('On-demand stock lookup failed:', onDemandData.reason);
-            }
+                if (onDemandData.status === 'fulfilled' && onDemandData.value) {
+                    liveContext += onDemandData.value;
+                } else if (onDemandData.status === 'rejected') {
+                    console.warn('On-demand stock lookup failed:', onDemandData.reason);
+                }
 
-            if (webSearchData.status === 'fulfilled' && webSearchData.value) {
-                liveContext += webSearchData.value;
-            } else if (webSearchData.status === 'rejected') {
-                console.warn('Web search failed:', webSearchData.reason);
+                if (webSearchData.status === 'fulfilled' && webSearchData.value) {
+                    liveContext += webSearchData.value;
+                } else if (webSearchData.status === 'rejected') {
+                    console.warn('Web search failed:', webSearchData.reason);
+                }
             }
 
             const currentPdfContext = customPdfText !== null ? customPdfText : pdfText;
@@ -4320,9 +4346,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
 
 
-            if (isFirstQuery) {
-                // Wait for the cinematic star animation to complete its "drawing", "rotating", and "descent" phase (~4.5s)
-                // before showing the thinking indicator or starting the stream
+            if (isFirstQuery && isComplex) {
+                // Wait for the cinematic star animation only for complex first queries
                 await new Promise(resolve => setTimeout(resolve, 4500));
                 setShowStarFly(false);
             }
