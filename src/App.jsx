@@ -5173,7 +5173,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     />
                 )}
                 <main className="chat-area">
-                    {view === 'chat' && <MarketTicker />}
                     {!isMobile && view !== 'dashboard' && (
                         <header className="chat-header">
                             <div className="header-content">
