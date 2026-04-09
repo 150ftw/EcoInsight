@@ -3622,7 +3622,7 @@ function App() {
     };
 
     // --- State Declarations (Must be at the top) ---
-    const [appSection, setAppSection] = useState('chat') // 'landing', 'auth', 'chat', 'checkout'
+    const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
     const [showInitialization, setShowInitialization] = useState(false);
     const [initializingModule, setInitializingModule] = useState(null);
     const [authModalSubtitle, setAuthModalSubtitle] = useState(null);
@@ -3886,6 +3886,14 @@ function App() {
     };
 
 
+
+    // Auto-redirect signed-in users from landing to chat
+    useEffect(() => {
+        if (isLoaded && isSignedIn && appSection === 'landing') {
+            console.log("[App] Redirecting signed-in user to chat hub");
+            setAppSection('chat');
+        }
+    }, [isLoaded, isSignedIn, appSection]);
 
     // Forced Auth Popup on mount
     useEffect(() => {
@@ -4941,10 +4949,22 @@ IMPORTANT OVERRIDE RULES FOR PDF:
     };
 
     const renderActiveSection = () => {
-        // LandingPage is disabled for launch
         if (appSection === 'landing') {
-            setAppSection('chat');
-            return null;
+            return <LandingPage 
+                setAppSection={setAppSection} 
+                setAuthType={setAuthType} 
+                onSelectPlan={handlePlanSelect} 
+                onLaunchEngine={() => {
+                    setAppSection('chat');
+                    if (messages.length === 1 && messages[0].content.includes('Welcome')) {
+                        // Keep initial message or create new chat if needed
+                    }
+                }}
+                supaLoaded={supaLoaded}
+                openLogin={handleSignInClick}
+                openSignup={handleSignUpClick}
+                setIsAccountModalOpen={setIsAccountModalOpen}
+            />;
         }
 
         if (appSection === 'onboarding' || (isSignedIn && supaLoaded && !profile.onboarded && appSection !== 'landing' && appSection !== 'checkout')) return (
