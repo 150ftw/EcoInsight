@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Github, Chrome, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const AuthModal = ({ isOpen, onClose, initialView = 'login' }) => {
+const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = null }) => {
   const [view, setView] = useState(initialView); // 'login-email', 'login-password', 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -112,7 +112,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login' }) => {
             {view === 'signup' ? 'Create Account' : 'Welcome Back'}
           </h2>
           <p className="auth-subtitle">
-            {view === 'signup' ? 'Join EcoInsight for elite intelligence' : 'Continue your economic research'}
+            {subtitleOverride || (view === 'signup' ? 'Join EcoInsight for elite intelligence' : 'Continue your economic research')}
           </p>
         </div>
 

@@ -3609,22 +3609,24 @@ function App() {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [authModalView, setAuthModalView] = useState('login-email');
 
-    const openLogin = () => {
+    const openLogin = (customSubtitle = null) => {
         setAuthModalView('login-email');
+        setAuthModalSubtitle(customSubtitle);
         setIsAuthModalOpen(true);
     };
 
-    const openSignup = () => {
+    const openSignup = (customSubtitle = null) => {
         setAuthModalView('signup');
+        setAuthModalSubtitle(customSubtitle);
         setIsAuthModalOpen(true);
     };
 
     // --- State Declarations (Must be at the top) ---
     const [appSection, setAppSection] = useState('chat') // 'landing', 'auth', 'chat', 'checkout'
-    const [guestMessageCount, setGuestMessageCount] = useState(0);
-    const [showGuestPrompt, setShowGuestPrompt] = useState(false);
     const [showInitialization, setShowInitialization] = useState(false);
     const [initializingModule, setInitializingModule] = useState(null);
+    const [authModalSubtitle, setAuthModalSubtitle] = useState(null);
+    const [hasAutoOpenedAuth, setHasAutoOpenedAuth] = useState(false);
     const [authType, setAuthType] = useState('login') // 'login', 'signup'
     const [selectedPlan, setSelectedPlan] = useState(null)
     const [forceEntry, setForceEntry] = useState(false);
@@ -3883,6 +3885,15 @@ function App() {
     };
 
 
+
+    // Forced Auth Popup on mount
+    useEffect(() => {
+        if (isLoaded && !isSignedIn && !hasAutoOpenedAuth && appSection === 'chat') {
+            console.log("[App] Auto-opening auth modal for guest user");
+            openSignup("Please log in to save your chat history and access elite intelligence.");
+            setHasAutoOpenedAuth(true);
+        }
+    }, [isLoaded, isSignedIn, hasAutoOpenedAuth, appSection]);
 
     // --- Side Effects ---
 
@@ -4219,15 +4230,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         const isFirstQuery = activeChat.messages.length === 1;
 
-        // Anonymous Search Logic
+        // Forced Authentication Check
         if (!isSignedIn) {
-            if (guestMessageCount >= 1) {
-                // Already used the free search
-                setAuthModalView('signup');
-                setIsAuthModalOpen(true);
-                return;
-            }
-            // Allow the first one, but will follow up with prompt
+            setAuthModalView('signup');
+            setIsAuthModalOpen(true);
+            setIsLoading(false);
+            setIsNeuralSearching(false);
+            return;
         }
 
         if (isFirstQuery) {
@@ -4331,11 +4340,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 } : c));
             }, getGenerationOptions());
 
-            // After successful response for a guest user
-            if (!isSignedIn && guestMessageCount === 0) {
-                setGuestMessageCount(1);
-                setShowGuestPrompt(true);
-            }
+
         } catch (error) {
             console.error('Failed to send message:', error)
             const errorMessage = {
@@ -4638,59 +4643,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </div>
 
                         <div className="input-container">
-                            <AnimatePresence>
-                                {showGuestPrompt && (
-                                    <motion.div 
-                                        className="guest-conversion-prompt"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 20 }}
-                                        style={{
-                                            position: 'absolute',
-                                            bottom: '100%',
-                                            left: '50%',
-                                            transform: 'translateX(-50%)',
-                                            width: '90%',
-                                            maxWidth: '500px',
-                                            background: 'rgba(15, 15, 20, 0.95)',
-                                            backdropFilter: 'blur(20px)',
-                                            border: '1px solid rgba(139, 92, 246, 0.3)',
-                                            borderRadius: '16px',
-                                            padding: '1.25rem',
-                                            marginBottom: '1rem',
-                                            boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(139,92,246,0.1)',
-                                            zIndex: 100,
-                                            textAlign: 'center'
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '0.75rem', color: '#c084fc' }}>
-                                            <Sparkles size={18} />
-                                            <span style={{ fontWeight: '700', fontSize: '0.9rem', letterSpacing: '0.05em' }}>SAVE YOUR ANALYTICS</span>
-                                        </div>
-                                        <p style={{ margin: '0 0 1.25rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>
-                                            This chat session is temporary and won't be saved. <strong>Sign in</strong> to preserve your history and unlock elite market intelligence.
-                                        </p>
-                                        <div style={{ display: 'flex', gap: '10px' }}>
-                                            <button 
-                                                className="btn-shine-primary" 
-                                                style={{ flex: 1, padding: '10px' }}
-                                                onClick={() => {
-                                                    setShowGuestPrompt(false);
-                                                    openSignup();
-                                                }}
-                                            >
-                                                Sign Up Free
-                                            </button>
-                                            <button 
-                                                onClick={() => setShowGuestPrompt(false)}
-                                                style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', cursor: 'pointer' }}
-                                            >
-                                                Maybe later
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+
                             <AnimatePresence>
                                 {rateLimitActive && (
                                     <motion.div 
@@ -5339,8 +5292,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             <CookieConsent />
             <AuthModal 
                 isOpen={isAuthModalOpen} 
-                onClose={() => setIsAuthModalOpen(false)} 
+                onClose={() => {
+                    setIsAuthModalOpen(false);
+                    setAuthModalSubtitle(null);
+                }} 
                 initialView={authModalView}
+                subtitleOverride={authModalSubtitle}
             />
             <AccountSettingsModal 
                 isOpen={isAccountModalOpen}
