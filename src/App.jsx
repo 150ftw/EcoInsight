@@ -4695,67 +4695,69 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </div>
 
                         <div className="input-container">
-
-                            <AnimatePresence>
-                                {rateLimitActive && (
-                                    <motion.div 
-                                        className="rate-limit-warning"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        style={{
-                                            position: 'absolute',
-                                            top: '-30px',
-                                            left: '50%',
-                                            transform: 'translateX(-50%)',
-                                            background: 'rgba(239, 68, 68, 0.2)',
-                                            color: '#ef4444',
-                                            padding: '4px 12px',
-                                            borderRadius: '20px',
-                                            fontSize: '0.75rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            border: '1px solid rgba(239, 68, 68, 0.3)',
-                                            backdropFilter: 'blur(4px)',
-                                            zIndex: 5
-                                        }}
-                                    >
-                                        <AlertCircle size={12} /> Please wait 5 seconds between messages.
-                                    </motion.div>
-                                )}
-                                {showUploadSoon && (
-                                    <motion.div 
-                                        className="rate-limit-warning"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        style={{
-                                            position: 'absolute',
-                                            top: '-35px',
-                                            left: '50%',
-                                            transform: 'translateX(-50%)',
-                                            background: 'rgba(139, 92, 246, 0.2)',
-                                            color: '#c084fc',
-                                            padding: '6px 16px',
-                                            borderRadius: '20px',
-                                            fontSize: '0.75rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            border: '1px solid rgba(139, 92, 246, 0.4)',
-                                            backdropFilter: 'blur(12px)',
-                                            zIndex: 100,
-                                            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                    >
-                                        <Zap size={14} className="text-purple-400" /> 
-                                        <span>Pro Feature: File Analysis coming in next update</span>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                            <motion.div className="input-wrapper" style={{ zIndex: 10 }}>
+                            <motion.div className="input-wrapper" style={{ zIndex: 10, position: 'relative' }}>
+                                <AnimatePresence mode="wait">
+                                    {rateLimitActive && (
+                                        <motion.div 
+                                            key="rate-limit"
+                                            className="rate-limit-warning"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '-45px',
+                                                left: '50%',
+                                                transform: 'translateX(-50%)',
+                                                background: 'rgba(239, 68, 68, 0.2)',
+                                                color: '#ef4444',
+                                                padding: '4px 12px',
+                                                borderRadius: '20px',
+                                                fontSize: '0.75rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                                backdropFilter: 'blur(8px)',
+                                                zIndex: 100,
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            <AlertCircle size={12} /> Please wait 5 seconds between messages.
+                                        </motion.div>
+                                    )}
+                                    {showUploadSoon && (
+                                        <motion.div 
+                                            key="upload-soon"
+                                            className="rate-limit-warning"
+                                            initial={{ opacity: 0, y: 15 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '-55px',
+                                                left: '50%',
+                                                transform: 'translateX(-50%)',
+                                                background: 'rgba(139, 92, 246, 0.3)',
+                                                color: '#c084fc',
+                                                padding: '8px 16px',
+                                                borderRadius: '24px',
+                                                fontSize: '0.8rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px',
+                                                border: '1px solid rgba(139, 92, 246, 0.4)',
+                                                backdropFilter: 'blur(16px)',
+                                                zIndex: 105,
+                                                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            <Zap size={14} className="text-purple-400" /> 
+                                            <span>Pro Feature: File Analysis coming in next update</span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                                 <motion.button 
                                     type="button"
                                     className="file-upload-btn" 
