@@ -4755,13 +4755,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                     </motion.div>
                                 )}
                             </AnimatePresence>
-                            <motion.div className="input-wrapper">
-                                <button 
+                            <motion.div className="input-wrapper" style={{ zIndex: 10 }}>
+                                <motion.button 
                                     type="button"
                                     className="file-upload-btn" 
                                     title="Upload PDF Analysis"
+                                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
+                                    whileTap={{ scale: 0.9 }}
                                     onClick={(e) => {
-                                        e.preventDefault();
+                                        e.stopPropagation();
                                         setShowUploadSoon(true);
                                         setTimeout(() => setShowUploadSoon(false), 3000);
                                     }}
@@ -4773,13 +4775,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        marginRight: '4px',
-                                        borderRadius: '8px',
-                                        transition: 'all 0.2s ease'
+                                        marginRight: '8px',
+                                        borderRadius: '10px',
+                                        position: 'relative',
+                                        zIndex: 20,
+                                        color: 'var(--text-secondary)'
                                     }}
                                 >
-                                    <FilePlus size={20} style={{ opacity: 0.7 }} />
-                                </button>
+                                    <FilePlus size={20} />
+                                </motion.button>
                                 <input
                                     placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "Query economic trends, theories, or data..."}
                                     value={input}
