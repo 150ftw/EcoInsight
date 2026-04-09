@@ -3620,7 +3620,9 @@ function App() {
     };
 
     // --- State Declarations (Must be at the top) ---
-    const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
+    const [appSection, setAppSection] = useState('chat') // 'landing', 'auth', 'chat', 'checkout'
+    const [guestMessageCount, setGuestMessageCount] = useState(0);
+    const [showGuestPrompt, setShowGuestPrompt] = useState(false);
     const [showInitialization, setShowInitialization] = useState(false);
     const [initializingModule, setInitializingModule] = useState(null);
     const [authType, setAuthType] = useState('login') // 'login', 'signup'
@@ -4217,6 +4219,17 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         const isFirstQuery = activeChat.messages.length === 1;
 
+        // Anonymous Search Logic
+        if (!isSignedIn) {
+            if (guestMessageCount >= 1) {
+                // Already used the free search
+                setAuthModalView('signup');
+                setIsAuthModalOpen(true);
+                return;
+            }
+            // Allow the first one, but will follow up with prompt
+        }
+
         if (isFirstQuery) {
             // Trigger the cinematic star animation only on the first query for a premium branded feel
             setShowStarFly(true);
@@ -4238,7 +4251,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         if (!customText) setInput('')
 
-        // Credit Enforcement
+        // Credit Enforcement (Only for signed in users)
         if (isSignedIn && profile.tier === 'Free') {
             if (profile.credits <= 0) {
                 setModalType('credits');
@@ -4251,7 +4264,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 setProfile(prev => ({ ...prev, credits: creditRes.data.credits }));
             } catch (err) {
                 console.error("Failed to decrement credits:", err);
-                // Optionally block if decrement fails
             }
         }
 
@@ -4318,6 +4330,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     ]
                 } : c));
             }, getGenerationOptions());
+
+            // After successful response for a guest user
+            if (!isSignedIn && guestMessageCount === 0) {
+                setGuestMessageCount(1);
+                setShowGuestPrompt(true);
+            }
         } catch (error) {
             console.error('Failed to send message:', error)
             const errorMessage = {
@@ -4511,7 +4529,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     const renderView = () => {
         if (SUBPAGE_DATA[view]) {
-            return <SubpageRenderer view={view} onBack={() => setAppSection('landing')} />;
+            return <SubpageRenderer view={view} onBack={() => setAppSection('chat')} />;
         }
 
         switch (view) {
@@ -4620,6 +4638,59 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </div>
 
                         <div className="input-container">
+                            <AnimatePresence>
+                                {showGuestPrompt && (
+                                    <motion.div 
+                                        className="guest-conversion-prompt"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 20 }}
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: '100%',
+                                            left: '50%',
+                                            transform: 'translateX(-50%)',
+                                            width: '90%',
+                                            maxWidth: '500px',
+                                            background: 'rgba(15, 15, 20, 0.95)',
+                                            backdropFilter: 'blur(20px)',
+                                            border: '1px solid rgba(139, 92, 246, 0.3)',
+                                            borderRadius: '16px',
+                                            padding: '1.25rem',
+                                            marginBottom: '1rem',
+                                            boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(139,92,246,0.1)',
+                                            zIndex: 100,
+                                            textAlign: 'center'
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '0.75rem', color: '#c084fc' }}>
+                                            <Sparkles size={18} />
+                                            <span style={{ fontWeight: '700', fontSize: '0.9rem', letterSpacing: '0.05em' }}>SAVE YOUR ANALYTICS</span>
+                                        </div>
+                                        <p style={{ margin: '0 0 1.25rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>
+                                            This chat session is temporary and won't be saved. <strong>Sign in</strong> to preserve your history and unlock elite market intelligence.
+                                        </p>
+                                        <div style={{ display: 'flex', gap: '10px' }}>
+                                            <button 
+                                                className="btn-shine-primary" 
+                                                style={{ flex: 1, padding: '10px' }}
+                                                onClick={() => {
+                                                    setShowGuestPrompt(false);
+                                                    openSignup();
+                                                }}
+                                            >
+                                                Sign Up Free
+                                            </button>
+                                            <button 
+                                                onClick={() => setShowGuestPrompt(false)}
+                                                style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', cursor: 'pointer' }}
+                                            >
+                                                Maybe later
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                             <AnimatePresence>
                                 {rateLimitActive && (
                                     <motion.div 
@@ -4782,34 +4853,11 @@ IMPORTANT OVERRIDE RULES FOR PDF:
     };
 
     const renderActiveSection = () => {
-        if (appSection === 'landing') return (
-            <LandingPage
-                supaLoaded={supaLoaded}
-                setAppSection={setAppSection}
-                setAuthType={setAuthType}
-                onLaunchEngine={() => {
-                    if (isSignedIn && supaLoaded && !profile.onboarded) {
-                        setAppSection('onboarding');
-                    } else if (isSignedIn && supaLoaded) {
-                        createNewChat();
-                        setAppSection('chat');
-                    } else if (!isSignedIn) {
-                        openLogin();
-                    }
-                }}
-                onSelectPlan={(plan) => {
-                    setSelectedPlan(plan);
-                    if (isSignedIn) {
-                        setAppSection('checkout');
-                    } else {
-                        openSignup();
-                    }
-                }}
-                openLogin={openLogin}
-                openSignup={openSignup}
-                setIsAccountModalOpen={setIsAccountModalOpen}
-            />
-        );
+        // LandingPage is disabled for launch
+        if (appSection === 'landing') {
+            setAppSection('chat');
+            return null;
+        }
 
         if (appSection === 'onboarding' || (isSignedIn && supaLoaded && !profile.onboarded && appSection !== 'landing' && appSection !== 'checkout')) return (
             <OnboardingView 
@@ -4839,12 +4887,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             />
         );
 
-        if (appSection === 'capabilities') return <CapabilitiesPage onBack={() => setAppSection('landing')} onInit={onInit} />;
-        if (appSection === 'security') return <SecurityPage onBack={() => setAppSection('landing')} onInit={onInit} />;
-        if (appSection === 'enterprise') return <EnterprisePage onBack={() => setAppSection('landing')} onInit={onInit} />;
-        if (appSection === 'documentation') return <DocumentationPage onBack={() => setAppSection('landing')} onInit={onInit} />;
-        if (appSection === 'support') return <SupportPage onBack={() => setAppSection('landing')} onInit={onInit} />;
-        if (appSection === 'api') return <APIPage onBack={() => setAppSection('landing')} onInit={onInit} />;
+        if (appSection === 'capabilities') return <CapabilitiesPage onBack={() => setAppSection('chat')} onInit={onInit} />;
+        if (appSection === 'security') return <SecurityPage onBack={() => setAppSection('chat')} onInit={onInit} />;
+        if (appSection === 'enterprise') return <EnterprisePage onBack={() => setAppSection('chat')} onInit={onInit} />;
+        if (appSection === 'documentation') return <DocumentationPage onBack={() => setAppSection('chat')} onInit={onInit} />;
+        if (appSection === 'support') return <SupportPage onBack={() => setAppSection('chat')} onInit={onInit} />;
+        if (appSection === 'api') return <APIPage onBack={() => setAppSection('chat')} onInit={onInit} />;
 
         if (SUBPAGE_DATA[appSection]) {
             return <SubpageRenderer view={appSection} onBack={() => setAppSection('landing')} />;
