@@ -3652,6 +3652,7 @@ function App() {
     const [isIntelHubExpanded, setIsIntelHubExpanded] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+    const [showUploadSoon, setShowUploadSoon] = useState(false);
 
     const messagesEndRef = useRef(null)
     const userScrolledUp = useRef(false)
@@ -4723,12 +4724,46 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         <AlertCircle size={12} /> Please wait 5 seconds between messages.
                                     </motion.div>
                                 )}
+                                {showUploadSoon && (
+                                    <motion.div 
+                                        className="rate-limit-warning"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '-30px',
+                                            left: '30%',
+                                            transform: 'translateX(-50%)',
+                                            background: 'rgba(139, 92, 246, 0.2)',
+                                            color: '#c084fc',
+                                            padding: '4px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '0.75rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            border: '1px solid rgba(139, 92, 246, 0.3)',
+                                            backdropFilter: 'blur(4px)',
+                                            zIndex: 5
+                                        }}
+                                    >
+                                        <Info size={12} /> File upload in development — releasing very soon.
+                                    </motion.div>
+                                )}
                             </AnimatePresence>
                             <motion.div className="input-wrapper">
-                                <label className="file-upload-btn" title="Upload PDF Analysis">
-                                    <input type="file" accept=".pdf" onChange={handleFileUpload} style={{ display: 'none' }} />
-                                    {isUploading ? <Loader2 size={20} className="animate-spin text-accent" /> : <FilePlus size={20} />}
-                                </label>
+                                <button 
+                                    className="file-upload-btn" 
+                                    title="Upload PDF Analysis"
+                                    onClick={() => {
+                                        setShowUploadSoon(true);
+                                        setTimeout(() => setShowUploadSoon(false), 3000);
+                                    }}
+                                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+                                >
+                                    <FilePlus size={20} />
+                                </button>
                                 <input
                                     placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "Query economic trends, theories, or data..."}
                                     value={input}
