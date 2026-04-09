@@ -5131,7 +5131,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             </button>
                         </div>
                     </nav>
-                    <div className="sidebar-footer">
+                        <div className="sidebar-footer">
                         {user ? (
                             <div className="user-profile-custom" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
                                 <UserAccountMenu 
@@ -5150,13 +5150,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 </div>
                             </div>
                         ) : (
-                            <button 
+                            <motion.button 
                                 onClick={openLogin}
                                 className="sidebar-btn sidebar-btn-primary"
                                 style={{ width: '100%', justifyContent: 'center' }}
+                                whileHover={{ scale: 1.02, translateY: -2 }}
+                                whileTap={{ scale: 0.98 }}
                             >
                                 <Lock size={16} /> Sign In
-                            </button>
+                            </motion.button>
                         )}
                     </div>
                     <AnimatePresence>
