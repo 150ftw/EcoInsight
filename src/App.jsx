@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useId, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft } from 'lucide-react'
+import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { streamMessage } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
@@ -4557,7 +4557,33 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         // Note: The profile sync effect will automatically save these updates to Supabase
     };
 
+    const MobileDashboardLock = () => (
+        <div className="mobile-dashboard-lock">
+            <motion.div 
+                className="lock-card"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            >
+                <div className="status-capsule">In Development</div>
+                <div className="lock-icon-container">
+                    <Smartphone size={32} />
+                    <div className="lock-badge"><Lock size={12} /></div>
+                </div>
+                <h2>Desktop Exclusive</h2>
+                <p>
+                    The institutional-grade Market Dashboard is optimized for Large-Density displays.
+                </p>
+                <div className="lock-tip">
+                    <Laptop size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+                    Released for Laptop & PC users.
+                </div>
+            </motion.div>
+        </div>
+    );
+
     const renderView = () => {
+
         if (SUBPAGE_DATA[view]) {
             return <SubpageRenderer view={view} onBack={() => setAppSection('chat')} />;
         }
@@ -4723,7 +4749,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             case 'dashboard':
                 return (
                     <div className="view-content dashboard-view" key={view}>
-                        <LiveMarketDashboard user={user} />
+                        {isMobile ? <MobileDashboardLock /> : <LiveMarketDashboard user={user} />}
                     </div>
                 );
             case 'heatmap':
