@@ -3896,6 +3896,14 @@ function App() {
         }
     }, [isLoaded, isSignedIn, appSection]);
 
+    // Sync profile state with authenticated user
+    useEffect(() => {
+        if (isLoaded && user) {
+            console.log("[App] Syncing local profile with user data");
+            setProfile(user);
+        }
+    }, [isLoaded, user]);
+
     // Forced Auth Popup on mount
     useEffect(() => {
         if (isLoaded && !isSignedIn && !hasAutoOpenedAuth && appSection === 'chat') {
@@ -4968,7 +4976,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             />;
         }
 
-        if (appSection === 'onboarding' || (isSignedIn && supaLoaded && !profile.onboarded && appSection !== 'landing' && appSection !== 'checkout')) return (
+        if (appSection === 'onboarding' || (isSignedIn && supaLoaded && !profile?.onboarded && appSection !== 'landing' && appSection !== 'checkout')) return (
             <OnboardingView 
                 user={user} 
                 onComplete={(data) => {
