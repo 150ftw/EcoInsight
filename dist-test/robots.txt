@@ -1,0 +1,6 @@
+# EcoInsight Robots.txt
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://www.ecoinsight.online/sitemap.xml
