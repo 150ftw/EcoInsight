@@ -15,6 +15,7 @@ import UserAccountMenu from './components/UserAccountMenu'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import { Bug } from 'lucide-react'
+import axios from 'axios'
 
 import CreditModal from './components/CreditModal';
 import BugReportModal from './components/BugReportModal';
@@ -3622,7 +3623,7 @@ function App() {
     };
 
     // --- State Declarations (Must be at the top) ---
-    const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
+    const [appSection, setAppSection] = useState('chat') // 'landing', 'auth', 'chat', 'checkout'
     const [showInitialization, setShowInitialization] = useState(false);
     const [initializingModule, setInitializingModule] = useState(null);
     const [authModalSubtitle, setAuthModalSubtitle] = useState(null);
