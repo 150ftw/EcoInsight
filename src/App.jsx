@@ -4956,7 +4956,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 onSelectPlan={handlePlanSelect} 
                 onLaunchEngine={() => {
                     setAppSection('chat');
-                    if (messages.length === 1 && messages[0].content.includes('Welcome')) {
+                    if (messages?.length === 1 && messages[0]?.content?.includes('Welcome')) {
                         // Keep initial message or create new chat if needed
                     }
                 }}
@@ -5348,7 +5348,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 isOpen={showCreditModal}
                 type={modalType}
                 onClose={() => setShowCreditModal(false)}
-                lastRechargeDate={profile.lastRechargeDate}
+                lastRechargeDate={profile?.lastRechargeDate}
                 onUpgrade={() => {
                     setShowCreditModal(false);
                     setAppSection('landing');
@@ -5459,12 +5459,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 profile={profile}
                 onSave={handleAccountSave}
             />
-            <CreditModal 
-                isOpen={showCreditModal}
-                onClose={() => setShowCreditModal(false)}
-                lastRechargeDate={profile?.lastRechargeDate}
-                type={modalType}
-            />
+
         </>
     );
 };
