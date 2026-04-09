@@ -5204,14 +5204,14 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <div className="header-content">
                                 <EcoInsightLogo size={28} />
                                 <h2>{
-                                    view === 'chat' ? 'Indian Market Analyst' : 
+                                    view === 'chat' ? 'Eko AI - Indian Market Analyst' : 
                                     view === 'heatmap' ? 'Sector Sentiment' :
                                     view === 'portfolio' ? 'Neural Portfolio' :
                                     view === 'market-pulse' ? 'Quick Market Pulse' :
                                     view === 'insights' ? 'Elite AI Insights' :
                                     view === 'trends' ? 'Market Intelligence' : 'Account Settings'
                                 }</h2>
-                                <div className="badge">{view === 'chat' ? 'Expert Mode' : 'Beta'}</div>
+                                {view !== 'chat' && <div className="badge">Beta</div>}
                                 <div className="header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
                                     <button className="header-action-btn" onClick={downloadChatAsPDF} disabled={isExporting}>
                                         {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
