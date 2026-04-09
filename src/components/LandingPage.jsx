@@ -11,6 +11,7 @@ import {
 import { useUser, useAuth } from '../context/AuthContext';
 import Threads from './Threads';
 import UserAccountMenu from './UserAccountMenu';
+import MarketTicker from './MarketTicker';
 
 const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = false }) => {
     const id = useId();
@@ -415,7 +416,7 @@ const DetailedFooter = ({ setAppSection }) => {
     const footerSections = [
         { title: "PLATFORM", links: [{ label: "Help Center", id: "help-center" }, { label: "Knowledge Base", id: "knowledge-base" }, { label: "Network Status", id: "network-status" }, { label: "Security Advisories", id: "security-advisories" }] },
         { title: "COMPANY", links: [{ label: "About Us", id: "about-us" }, { label: "Careers", id: "careers" }, { label: "Partners", id: "partners" }, { label: "Referral Program", id: "referral" }, { label: "Contact", id: "contact" }] },
-        { title: "LEGAL", links: [{ label: "Privacy Policy", id: "privacy-policy" }, { label: "Terms of Service", id: "terms-of-service" }, { label: "Acceptable Use Policy", id: "acceptable-use" }, { label: "Payment & Refund", id: "payment-refund" }, { label: "Report Abuse", id: "report-abuse" }] }
+        { title: "LEGAL", links: [{ label: "Privacy Policy", id: "privacy-policy" }, { label: "Terms of Service", id: "terms-of-service" }, { label: "Acceptable Use Policy", id: "acceptable-use" }, { label: "Report Abuse", id: "report-abuse" }] }
     ];
     return (
         <footer className="detailed-footer">
@@ -448,6 +449,22 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
     const [hoveredPlanIndex, setHoveredPlanIndex] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [authTimeout, setAuthTimeout] = useState(false);
+    const [showEnginePopup, setShowEnginePopup] = useState(false);
+
+    useEffect(() => {
+        if (!isSignedIn && isLoaded) {
+            const timer = setTimeout(() => {
+                setShowEnginePopup(true);
+            }, 10000); // 10 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [isSignedIn, isLoaded]);
+
+    useEffect(() => {
+        if (isSignedIn && showEnginePopup) {
+            setShowEnginePopup(false);
+        }
+    }, [isSignedIn, showEnginePopup]);
 
     useEffect(() => {
         const timer = setTimeout(() => { if (!isLoaded) setAuthTimeout(true); }, 25000);
@@ -459,6 +476,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
 
     return (
         <div className="landing-container">
+            <MarketTicker />
             <header className="landing-header">
                 <div className="logo" onClick={() => setAppSection('landing')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <EcoInsightLogo size={48} /> <span>EcoInsight</span>
@@ -492,7 +510,9 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
             </header>
 
             <main className="landing-hero" style={{ position: 'relative', overflow: 'hidden' }}>
-                <div className="hero-threads-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 1.0 }}><Threads amplitude={1.5} distance={0.2} enableMouseInteraction={false} color={[0.4, 0.2, 0.8]} /></div>
+                <div className="hero-threads-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 1.0 }}>
+                    <Threads amplitude={1.5} distance={0.2} enableMouseInteraction={false} color={[0.4, 0.2, 0.8]} />
+                </div>
                 <div className="purple-pulse-glow" aria-hidden="true" />
                 <div className="hero-content">
                     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="hero-badge"><Sparkles size={14} /> Intelligence for Bharat's Markets</motion.div>
@@ -546,15 +566,23 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                 <div className="section-title"><h2>The Elite Member Club</h2><p>Transparency at the speed of light</p></div>
                 <motion.div className="pricing-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={containerVariants}>
                     {[
-                        { plan: "Observer", price: "Free", feat: ["Daily Market Pulse", "10 Simulations/day", "Standard Data Feed"], priceValue: 0 },
-                        { plan: "Sentinel", price: "Coming Soon", feat: ["Full Simulation Suite", "Daily Insight Reports", "Priority Neural Compute"], featured: true, priceValue: 19.99, isComingSoon: true },
+                        { plan: "Sentinel", price: "Coming Soon", feat: ["Full Simulation Suite", "Daily Insight Reports", "Priority Neural Compute"], priceValue: 19.99, isComingSoon: true },
+                        { plan: "Observer", price: "Free", feat: ["Daily Market Pulse", "Unlimited Simulations", "Standard Data Feed"], featured: true, priceValue: 0 },
                         { plan: "Strategist", price: "Coming Soon", feat: ["Quantum Trend Modeling", "Real-time Fiscal Alerts", "Unlimited Deep Analysis"], priceValue: 24.99, isComingSoon: true }
                     ].map((p, i) => (
                         <TiltCard key={i} className={`pricing-card ${p.featured ? 'featured' : ''} ${hoveredPlanIndex === i ? 'active' : ''} ${hoveredPlanIndex !== null && hoveredPlanIndex !== i ? 'dimmed' : ''} ${p.isComingSoon ? 'coming-soon' : ''}`} onMouseEnter={() => setHoveredPlanIndex(i)} onMouseLeave={() => setHoveredPlanIndex(null)} style={p.isComingSoon ? { opacity: 0.8, cursor: 'not-allowed' } : {}}>
                             <motion.div variants={itemVariants}>
                                 <h3>{p.plan}</h3><div className="price">{p.price}{!p.isComingSoon && <span>/mo</span>}</div>
                                 <ul>{p.feat.map((f, j) => <li key={j}><Sparkles size={16} /> {f}</li>)}</ul>
-                                <Magnetic distance={0.3}><button className={p.isComingSoon ? "btn-secondary" : "btn-shine-primary"} onClick={() => !p.isComingSoon && onSelectPlan(p)} disabled={p.isComingSoon}>{p.isComingSoon ? "Coming Soon" : "Select Plan"}</button></Magnetic>
+                                <Magnetic distance={0.3}>
+                                    <button 
+                                        className={p.isComingSoon ? "btn-secondary" : "btn-shine-primary"} 
+                                        onClick={() => !p.isComingSoon && onSelectPlan(p)} 
+                                        disabled={p.isComingSoon || (isSignedIn && p.plan === 'Observer')}
+                                    >
+                                        {p.isComingSoon ? "Coming Soon" : (isSignedIn && p.plan === 'Observer' ? "Selected Plan" : "Select Plan")}
+                                    </button>
+                                </Magnetic>
                             </motion.div>
                         </TiltCard>
                     ))}
@@ -569,6 +597,163 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
             </section>
             
             <DetailedFooter setAppSection={setAppSection} />
+
+            <AnimatePresence>
+                {showEnginePopup && (
+                    <div className="engine-invite-overlay" onClick={() => setShowEnginePopup(false)}>
+                        <motion.div 
+                            className="engine-invite-modal"
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button className="close-popup-btn" onClick={() => setShowEnginePopup(false)}>
+                                <X size={20} />
+                            </button>
+                            
+                            <div className="popup-brand">
+                                <EcoInsightLogo size={40} />
+                                <div className="brand-glow" />
+                            </div>
+                            
+                            <h2>Experience the Future of Economic Intelligence</h2>
+                            <p>
+                                You've explored the surface. Now, step inside the engine that power-users use to decode India's complex market dynamics.
+                            </p>
+                            
+                            <div className="popup-features">
+                                <div className="feat-item">
+                                    <Sparkles size={16} className="text-purple-400" />
+                                    <span>Real-time Neural Analysis</span>
+                                </div>
+                                <div className="feat-item">
+                                    <Globe size={16} className="text-blue-400" />
+                                    <span>Institutional Grade Data</span>
+                                </div>
+                            </div>
+                            
+                            <button 
+                                className="btn-shine-primary full-width"
+                                onClick={() => {
+                                    setShowEnginePopup(false);
+                                    openSignup("Unlock the full power of EcoInsight by creating your account.");
+                                }}
+                            >
+                                <Zap size={18} /> Check out Engine
+                            </button>
+                            
+                            <p className="popup-footer-text">Join 10,000+ elite analysts today.</p>
+                        </motion.div>
+                        
+                        <style dangerouslySetInnerHTML={{ __html: `
+                            .engine-invite-overlay {
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100vw;
+                                height: 100vh;
+                                background: rgba(0, 0, 0, 0.6);
+                                backdrop-filter: blur(12px);
+                                z-index: 20000;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 20px;
+                            }
+                            .engine-invite-modal {
+                                width: 100%;
+                                max-width: 480px;
+                                background: rgba(15, 15, 20, 0.9);
+                                border: 1px solid rgba(139, 92, 246, 0.3);
+                                border-radius: 24px;
+                                padding: 40px;
+                                position: relative;
+                                text-align: center;
+                                box-shadow: 0 0 100px rgba(139, 92, 246, 0.15), 0 20px 50px rgba(0,0,0,0.5);
+                            }
+                            .close-popup-btn {
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                background: none;
+                                border: none;
+                                color: rgba(255, 255, 255, 0.3);
+                                cursor: pointer;
+                                transition: color 0.2s;
+                            }
+                            .close-popup-btn:hover {
+                                color: white;
+                            }
+                            .popup-brand {
+                                margin: 0 auto 24px;
+                                width: 80px;
+                                height: 80px;
+                                background: rgba(139, 92, 246, 0.1);
+                                border-radius: 20px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                position: relative;
+                                border: 1px solid rgba(139, 92, 246, 0.2);
+                            }
+                            .brand-glow {
+                                position: absolute;
+                                width: 120%;
+                                height: 120%;
+                                background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+                                z-index: -1;
+                            }
+                            .engine-invite-modal h2 {
+                                font-size: 1.8rem;
+                                font-weight: 800;
+                                margin-bottom: 16px;
+                                line-height: 1.2;
+                                color: #fff;
+                            }
+                            .engine-invite-modal p {
+                                font-size: 1rem;
+                                color: rgba(255, 255, 255, 0.6);
+                                line-height: 1.6;
+                                margin-bottom: 24px;
+                            }
+                            .popup-features {
+                                display: flex;
+                                justify-content: center;
+                                gap: 20px;
+                                margin-bottom: 32px;
+                            }
+                            .feat-item {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                font-size: 0.8rem;
+                                color: rgba(255, 255, 255, 0.8);
+                                font-weight: 600;
+                                background: rgba(255, 255, 255, 0.05);
+                                padding: 6px 12px;
+                                border-radius: 20px;
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                            }
+                            .full-width {
+                                width: 100%;
+                                justify-content: center;
+                                gap: 10px;
+                                font-size: 1.1rem;
+                                padding: 16px;
+                            }
+                            .popup-footer-text {
+                                margin-top: 20px !important;
+                                font-size: 0.75rem !important;
+                                opacity: 0.4 !important;
+                                font-weight: 600 !important;
+                                text-transform: uppercase !important;
+                                letter-spacing: 0.1em !important;
+                            }
+                        `}} />
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

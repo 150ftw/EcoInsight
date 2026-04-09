@@ -13,6 +13,7 @@ import AuthModal from './components/AuthModal'
 import AccountSettingsModal from './components/AccountSettingsModal'
 import UserAccountMenu from './components/UserAccountMenu'
 import LandingPage from './components/LandingPage'
+import CommandPalette from './components/CommandPalette'
 import InitializationTerminal from './components/InitializationTerminal'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
@@ -1034,7 +1035,6 @@ const DetailedFooter = ({ setAppSection }) => {
                 { label: "Privacy Policy", id: "privacy-policy" },
                 { label: "Terms of Service", id: "terms-of-service" },
                 { label: "Acceptable Use Policy", id: "acceptable-use" },
-                { label: "Payment & Refund", id: "payment-refund" },
                 { label: "Report Abuse", id: "report-abuse" }
             ]
         }
@@ -2102,151 +2102,7 @@ const FAQS = [
 ];
 
 
-const CheckoutView = ({ plan, setAppSection, onPaymentSuccess }) => {
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [paymentStep, setPaymentStep] = useState('summary'); // 'summary', 'processing', 'easebuzz'
 
-    if (!plan) return null;
-
-    const handleEasebuzzPayment = () => {
-        if (plan.priceValue === 0) {
-            onPaymentSuccess();
-            return;
-        }
-
-        setIsProcessing(true);
-        setPaymentStep('processing');
-        
-        // Simulating Backend Hash Generation (Required by Easebuzz)
-        setTimeout(() => {
-            setPaymentStep('easebuzz');
-            setIsProcessing(false);
-        }, 1500);
-    };
-
-    const handleEasebuzzSuccessSimulation = () => {
-        setIsProcessing(true);
-        setTimeout(() => {
-            setIsProcessing(false);
-            onPaymentSuccess();
-        }, 1000);
-    };
-    
-    return (
-        <div className="checkout-container">
-            <motion.div
-                className="checkout-card"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-                <div className="card-glow" />
-                <div className="checkout-header">
-                    <button className="back-btn" onClick={() => setAppSection('landing')}>
-                        <ChevronDown className="rotate-90" size={16} /> Cancel
-                    </button>
-                    <div className="logo-small"><EcoInsightLogo size={42} /></div>
-                </div>
-
-                <div className="order-summary-box">
-                    <h2>Order Summary</h2>
-                    <p>Review your selection before finalizing your membership.</p>
-
-                    <div className="order-details">
-                        <div className="order-item">
-                            <div className="item-info">
-                                <span className="item-name">{plan.plan} Membership</span>
-                                <span className="item-desc">Full 1-month access to elite economic intelligence.</span>
-                            </div>
-                            <span className="item-price">{plan.price}</span>
-                        </div>
-                        <div className="divider" />
-                        <div className="order-total">
-                            <span>Total Amount</span>
-                            <span>{plan.price}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="checkout-actions">
-                    <button
-                        className="btn-pay"
-                        onClick={handleEasebuzzPayment}
-                        disabled={isProcessing}
-                        style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)' }}
-                    >
-                        {isProcessing ? (
-                            <><Loader2 className="animate-spin" size={18} /> Securing Transaction...</>
-                        ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <img src="https://easebuzz.in/static/base/assets/images/Easebuzz_logo_header.png" alt="Easebuzz" style={{ height: '20px', filter: 'brightness(0) invert(1)' }} />
-                                <span>Pay Securely</span>
-                            </div>
-                        )}
-                    </button>
-                    <p className="secure-note">
-                        <ShieldCheck size={12} style={{ color: 'var(--accent-primary)' }} /> 
-                        <span style={{ opacity: 0.8 }}>Encrypted via Easebuzz India</span>
-                    </p>
-                </div>
-            </motion.div>
-
-            {/* Easebuzz Simulation Modal */}
-            <AnimatePresence>
-                {paymentStep === 'easebuzz' && (
-                    <motion.div
-                        className="stripe-simulation-overlay"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        <motion.div
-                            className="stripe-modal"
-                            initial={{ y: 50, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: 50, opacity: 0 }}
-                        >
-                            <div className="stripe-header">
-                                <div className="stripe-logo" style={{ color: '#14ebae' }}>Easebuzz</div>
-                                <button className="close-stripe" onClick={() => setPaymentStep('summary')}>×</button>
-                            </div>
-                            <div className="stripe-body">
-                                <div className="merchant-info">
-                                    <div className="alert-icon" style={{ width: '40px', height: '40px', margin: 0 }}>
-                                        <EcoInsightLogo size={24} />
-                                    </div>
-                                    <div>
-                                        <h3>Eko by EcoInsight Core</h3>
-                                        <p style={{ opacity: 0.6 }}>Transaction ID: EBZ_{Math.random().toString(36).substring(7).toUpperCase()}</p>
-                                    </div>
-                                </div>
-                                
-                                <div className="payment-options-mock">
-                                    <div style={{ padding: '20px', background: 'rgba(139, 92, 246, 0.05)', borderRadius: '12px', border: '1px solid rgba(139, 92, 246, 0.2)', marginBottom: '20px' }}>
-                                        <h4 style={{ color: 'var(--accent-primary)', marginTop: 0 }}>Payment Amount: {plan.price}</h4>
-                                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>Choose your preferred payment method in the Easebuzz gateway.</p>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
-                                        <div style={{ padding: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', textAlign: 'center', opacity: 0.5, fontSize: '0.9rem' }}>UPI / QR</div>
-                                        <div style={{ padding: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', textAlign: 'center', opacity: 0.5, fontSize: '0.9rem' }}>Net Banking</div>
-                                        <div style={{ padding: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', textAlign: 'center', opacity: 0.5, fontSize: '0.9rem' }}>Cards</div>
-                                        <div style={{ padding: '12px', border: '1px solid var(--accent-primary)', borderRadius: '8px', textAlign: 'center', background: 'rgba(139, 92, 246, 0.1)', fontSize: '0.9rem', color: 'var(--accent-primary)', fontWeight: '600' }}>Simulation Mode</div>
-                                    </div>
-
-                                    <button className="stripe-submit-btn" onClick={handleEasebuzzSuccessSimulation}>
-                                        Complete Simulation
-                                    </button>
-                                </div>
-                                <p className="stripe-footer">Integrating Easebuzz India for secure ₹ (INR) transactions.</p>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-    );
-};
 
 
 
@@ -3175,6 +3031,72 @@ function App() {
         setIsAuthModalOpen(true);
     };
 
+    // --- Institutional UX State ---
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+    const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+
+    const playSound = (type = 'click') => {
+        if (!isSoundEnabled) return;
+        try {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+
+            if (type === 'click') {
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, context.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(440, context.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.05, context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.1);
+                oscillator.start();
+                oscillator.stop(context.currentTime + 0.1);
+            } else if (type === 'success') {
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(440, context.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(880, context.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.05, context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.1);
+                oscillator.start();
+                oscillator.stop(context.currentTime + 0.1);
+            }
+        } catch (e) {
+            console.warn("Audio Context blocked or unsupported");
+        }
+    };
+
+    const handleCommandAction = (action) => {
+        playSound('success');
+        switch (action) {
+            case 'dashboard':
+                setAppSection('chat');
+                setView('dashboard');
+                break;
+            case 'chat':
+                setAppSection('chat');
+                setView('chat');
+                break;
+            case 'insights':
+                setAppSection('chat');
+                setView('intelligence-hub');
+                break;
+            case 'settings':
+                setIsAccountModalOpen(true);
+                break;
+            case 'theme':
+                setAppearance(prev => ({ ...prev, theme: prev.theme === 'Dark' ? 'Light' : 'Dark' }));
+                break;
+            case 'signout':
+                logout();
+                setAppSection('landing');
+                break;
+            default:
+                break;
+        }
+    };
+
     // --- State Declarations (Must be at the top) ---
     const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
     const [showInitialization, setShowInitialization] = useState(false);
@@ -3182,7 +3104,21 @@ function App() {
     const [authModalSubtitle, setAuthModalSubtitle] = useState(null);
     const [hasAutoOpenedAuth, setHasAutoOpenedAuth] = useState(false);
     const [authType, setAuthType] = useState('login') // 'login', 'signup'
-    const [selectedPlan, setSelectedPlan] = useState(null)
+    const [supaLoaded, setSupaLoaded] = useState(false);
+
+    // Global Command Palette Listener
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                setIsCommandPaletteOpen(prev => !prev);
+                playSound('click');
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     const [forceEntry, setForceEntry] = useState(false);
 
     const [chats, setChats] = useState([
@@ -3292,7 +3228,8 @@ function App() {
     const [personalization, setPersonalization] = useState({
         callMe: '',
         respondHow: '',
-        memory: true
+        memory: true,
+        watchlist: []
     })
 
     const [appearance, setAppearance] = useState({
@@ -3467,6 +3404,13 @@ function App() {
         }
     }, [isLoaded, isSignedIn, hasAutoOpenedAuth, appSection]);
 
+    // Auto-launch engine after landing page sign-in
+    useEffect(() => {
+        if (isSignedIn && isLoaded && supaLoaded && appSection === 'landing') {
+            setAppSection('chat');
+        }
+    }, [isSignedIn, isLoaded, supaLoaded, appSection]);
+
     // --- Side Effects ---
 
     // Sync Appearance Settings
@@ -3483,8 +3427,7 @@ function App() {
         root.setAttribute('data-compact', appearance.compactMode.toString());
     }, [appearance]);
 
-    // Load chats and settings from Supabase on mount (when user is available)
-    const [supaLoaded, setSupaLoaded] = useState(false);
+    // Sync Appearance Settings
     useEffect(() => {
         if (!user?.id || supaLoaded) return;
         const loadData = async () => {
@@ -3561,6 +3504,13 @@ function App() {
         }
     };
 
+    const handleWatchlistChange = (newWatchlist) => {
+        setPersonalization(prev => ({
+            ...prev,
+            watchlist: newWatchlist
+        }));
+    };
+
     // Welcome Email Automation (Robust Version)
     useEffect(() => {
         if (!isSignedIn || !user?.id || !supaLoaded || profile?.welcome_email_sent) return;
@@ -3610,30 +3560,13 @@ function App() {
                 email: user.email || prev.email,
                 avatar: user.profile_image || prev.avatar,
                 username: userHandle || prev.username,
-                credits: user.credits !== undefined ? user.credits : prev.credits,
                 // AUTO-ONBOARD: If they have a name and handle, consider them onboarded
                 onboarded: prev.onboarded || (!!userName && !!userHandle)
             }));
         }
     }, [user, supaLoaded, profile.onboarded]);
 
-    // Weekly Credit Recharge Logic
-    useEffect(() => {
-        if (!isSignedIn || !supaLoaded || profile.tier !== 'Free') return;
 
-        const lastRecharge = new Date(profile.lastRechargeDate);
-        const now = new Date();
-        const diffInDays = (now - lastRecharge) / (1000 * 60 * 60 * 24);
-
-        if (diffInDays >= 7) {
-            console.log("Recharging weekly credits...");
-            setProfile(prev => ({
-                ...prev,
-                credits: 10,
-                lastRechargeDate: now.toISOString()
-            }));
-        }
-    }, [isSignedIn, supaLoaded, profile.tier, profile.lastRechargeDate]);
 
 
 
@@ -3717,11 +3650,15 @@ ELITE ANALYST BEHAVIOR RULES:
 4. ALPHA GENERATION: Focus on catalyst-driven cycles. Instead of generic "IT is good," explain *why* specific orders, patent cycles, or policy shifts make it a cycle-leader. Mention "Order Books," "Execution Cycles," "Credit Cycles," and "Margin Trajectories."
 5. NO REFRESH/CUTOFF APOLOGIES: Never apologize for a knowledge cutoff. Use the provided search results with absolute authority.
 6. CURRENCY: Default is ₹ (INR). Reference Nifty/Sensex primary benchmarks.
-7. MANDATORY ANALYSIS (STRICT): If a user mentions a ticker (e.g., HAL, RELIANCE, NIFTY), you MUST provide a detailed analyst view. 
-   - NEVER use the phrase "I cannot provide personalized financial or investment advice" as a refusal to analyze. You are an Elite Institutional Research Engine — providing analysis IS your primary function.
-   - You MUST include a "Rating" (e.g., Tactical Buy, Hold), "Thesis," and "Risk Assessment" for every ticker mentioned.
-    - Conclude EVERY stock analysis with: "DISCLAIMER: This high-grade technical outlook is based on live metrics. Not personal advice. Consult a SEBI-registered professional."
+7. MANDATORY ANALYSIS (STRICT): If a user mentions a ticker (e.g., HAL, RELIANCE, NIFTY), you MUST provide a technical outlook.
+   - DEFAULT (NO "DETAIL" REQUESTED): Provide a compact "Analyst Snapshot" including only the Current Rating, a 2-sentence Thesis, and the Disclaimer.
+   - DETAILED (USER ASKED FOR DEPTH): Provide the full Chief Investment Officer report (Rating, Detailed Thesis, Catalyst Analysis, and Risk Assessment).
+   - NEVER use the phrase "I cannot provide personalized financial or investment advice" as a refusal to analyze. You are an Elite Institutional Research Engine.
+   - Conclude EVERY stock analysis with: "DISCLAIMER: This high-grade technical outlook is based on live metrics. Not personal advice. Consult a SEBI-registered professional."
 8. DATA AUTHORITY (TRIPLE-CHECK): Before answering any price-related query, look for the "--- SYSTEM AUTHORITY OVERRIDE: LIVE MARKET DATA ---" block in your context. If that block contains a price, THAT IS THE ONLY PRICE. If the block is missing or doesn't have the stock, mention that you are performing a "Live Neural Search" for the 2026 values.
+9. BREVITY & CONCISENESS (DEFAULT BEHAVIOR): By default, be extremely concise. Provide high-impact, pithy answers. Aim for clarity and speed.
+   - ONLY provide long-form, deep-dive analysis if the user explicitly asks for "details," "a long answer," "a deep dive," "elaborate," "more info," or equivalent phrases.
+   - If not explicitly asked for details, favor bullet points and summary snapshots over long rambling paragraphs.
 
 CHART GENERATION:
 You MUST generate charts to visualize comparisons, trends, distributions, and performance over time. 
@@ -3855,7 +3792,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         if (!customText) setInput('')
 
-        // Credit Enforcement (Only for signed in users)
+        // Credit Enforcement (Removed for Unlimited Launch Era)
+        /*
         if (isSignedIn && profile.tier === 'Free') {
             if (profile.credits <= 0) {
                 setModalType('credits');
@@ -3870,6 +3808,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 console.error("Failed to decrement credits:", err);
             }
         }
+        */
 
 
         try {
@@ -4092,11 +4031,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         setShowInitialization(true);
     };
 
-    const handlePlanSelect = (plan) => {
-        console.log("[App] Plan selected:", plan);
-        setSelectedPlan(plan);
-        setAppSection('checkout');
-    };
+
 
     const handleSignInClick = () => {
         setAuthModalView('login-email');
@@ -4420,7 +4355,11 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             case 'dashboard':
                 return (
                     <div className="view-content dashboard-view" key={view}>
-                        {isMobile ? <MobileDashboardLock /> : <LiveMarketDashboard user={user} />}
+                        {isMobile ? <MobileDashboardLock /> : <LiveMarketDashboard 
+                            user={user} 
+                            watchlist={personalization.watchlist || []}
+                            onWatchlistChange={handleWatchlistChange}
+                        />}
                     </div>
                 );
             case 'heatmap':
@@ -4532,7 +4471,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             return <LandingPage 
                 setAppSection={setAppSection} 
                 setAuthType={setAuthType} 
-                onSelectPlan={handlePlanSelect} 
                 onLaunchEngine={() => {
                     setAppSection('chat');
                     // Defensive check for messages existence before accessing property
@@ -4559,22 +4497,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             />
         );
 
-        if (appSection === 'checkout') return (
-            <CheckoutView
-                plan={selectedPlan}
-                setAppSection={setAppSection}
-                onPaymentSuccess={() => {
-                    const newTier = selectedPlan?.plan || 'Sentinel';
-                    setProfile(prev => ({
-                        ...prev,
-                        tier: newTier,
-                        credits: newTier === 'Free' ? 10 : 999999
-                    }));
-                    setSelectedPlan(null);
-                    setAppSection('chat');
-                }}
-            />
-        );
+
 
         if (appSection === 'capabilities') return <CapabilitiesPage onBack={() => setAppSection('chat')} onInit={onInit} />;
         if (appSection === 'security') return <SecurityPage onBack={() => setAppSection('chat')} onInit={onInit} />;
@@ -4829,7 +4752,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                     align="top" 
                                     role={`${profile?.tier || 'Free'} Access`} 
                                     onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
-                                    onSubscriptionClick={() => { setModalType('premium'); setShowCreditModal(true); if (isMobile) setIsSidebarOpen(false); }}
                                 />
                                 <div className="user-info">
                                     <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
@@ -5041,6 +4963,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 onSave={handleAccountSave}
             />
 
+            <CommandPalette 
+                isOpen={isCommandPaletteOpen}
+                onClose={() => setIsCommandPaletteOpen(false)}
+                onAction={handleCommandAction}
+                user={user}
+            />
         </>
     );
 };

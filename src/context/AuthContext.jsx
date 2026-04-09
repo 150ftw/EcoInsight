@@ -13,7 +13,6 @@ const MOCK_USER = {
   first_name: 'Local',
   last_name: 'Developer',
   username: 'local_dev',
-  credits: 999,
   tier: 'Pro',
   onboarded: true
 };

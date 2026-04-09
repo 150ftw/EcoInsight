@@ -1,3 +1,12 @@
+-- 0. UTILITY FUNCTIONS
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
 -- 1. USERS TABLE
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY, -- We'll use UUID strings or custom IDs

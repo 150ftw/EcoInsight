@@ -80,7 +80,7 @@ const WatchlistCard = ({ data, onClick, onRemove, active, isUserAdded }) => (
     </motion.div>
 );
 
-const LiveMarketDashboard = () => {
+const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
     // State for Data
     const [indices, setIndices] = useState([]);
     const [macro, setMacro] = useState([]);
@@ -168,9 +168,8 @@ const LiveMarketDashboard = () => {
     }, [chartTimeframe]);
 
     useEffect(() => {
-        const saved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
-        loadAllData(saved, true);
-    }, [syncKey]);
+        loadAllData(watchlist, true);
+    }, [syncKey, watchlist]);
 
     // Handle timeframe changes
     useEffect(() => {
@@ -200,10 +199,9 @@ const LiveMarketDashboard = () => {
     };
 
     const addToWatchlist = async (symbol) => {
-        const saved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
-        if (!saved.includes(symbol)) {
-            const newSaved = [...saved, symbol];
-            localStorage.setItem('eco_watchlist', JSON.stringify(newSaved));
+        if (!watchlist.includes(symbol)) {
+            const newSaved = [...watchlist, symbol];
+            onWatchlistChange(newSaved);
             const newItem = await fetchHistory(symbol);
             if (newItem) {
                 setUserWatchlist(prev => [...prev, newItem]);
@@ -215,9 +213,8 @@ const LiveMarketDashboard = () => {
     };
 
     const removeFromWatchlist = (symbol) => {
-        const saved = JSON.parse(localStorage.getItem('eco_watchlist') || '[]');
-        const newSaved = saved.filter(s => s !== symbol);
-        localStorage.setItem('eco_watchlist', JSON.stringify(newSaved));
+        const newSaved = watchlist.filter(s => s !== symbol);
+        onWatchlistChange(newSaved);
         setUserWatchlist(prev => prev.filter(item => item.fullSymbol !== symbol));
     };
 

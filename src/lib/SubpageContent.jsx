@@ -294,25 +294,6 @@ export const SUBPAGE_DATA = {
             }
         ]
     },
-    'payment-refund': {
-        icon: <CreditCard size={32} />,
-        title: "Payment & Refund",
-        description: "Transparent billing protocols for professional and institutional subscriptions.",
-        sections: [
-            {
-                heading: "Billing Cycle",
-                content: "Enterprise and Pro plans are billed on a monthly or annual cadence. All transactions are processed through encrypted, SEC-compliant gateways."
-            },
-            {
-                heading: "Refund Protocol",
-                content: "Standard subscriptions carry a 14-day no-questions-asked refund policy. Enterprise contracts follow specific negotiated termination terms."
-            },
-            {
-                heading: "Tax Compliance",
-                content: "Our system automatically calculates VAT and regional taxes based on your corporate nexus, ensuring seamless fiscal reconciliation."
-            }
-        ]
-    },
     'report-abuse': {
         icon: <AlertTriangle size={32} />,
         title: "Report Abuse",

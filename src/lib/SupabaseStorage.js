@@ -124,7 +124,8 @@ const DEFAULT_SETTINGS = {
     personalization: {
         callMe: '',
         respondHow: '',
-        memory: true
+        memory: true,
+        watchlist: []
     },
     appearance: {
         theme: 'dark',
@@ -138,8 +139,6 @@ const DEFAULT_SETTINGS = {
         email: 'analyst@ecoinsight.ai',
         avatar: null,
         tier: 'Free',
-        credits: 10,
-        lastRechargeDate: new Date().toISOString(),
         onboarded: false,
         welcome_email_sent: false
     }
