@@ -4442,59 +4442,85 @@ html {
     font-style: italic;
 }
 
-/* --- CHAT MOBILE OPTIMIZATION --- */
+
+/* --- CHAT MOBILE OPTIMIZATION (ADVANCED LOCK) --- */
 @media (max-width: 640px) {
-    .empty-chat-hero {
-        margin-top: 6vh !important;
-        margin-bottom: 1.5rem !important;
+    html, body, #root, .app-container {
+        height: 100vh !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Force main to occupy remaining space */
+    main {
+        height: 100% !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .messages-list {
+        flex: 1 !important;
+        overflow-y: auto !important;
         padding: 1rem !important;
+        gap: 1rem !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .empty-chat-hero {
+        margin-top: 2vh !important; /* Minimal top margin */
+        margin-bottom: 1rem !important;
+        padding: 0.5rem !important;
     }
 
     .empty-chat-greeting {
-        font-size: 1.25rem !important;
-        gap: 0.5rem !important;
-        margin-bottom: 0.4rem !important;
+        font-size: 1.1rem !important;
+        gap: 0.4rem !important;
+        margin-bottom: 0.3rem !important;
     }
 
     .empty-chat-headline {
-        font-size: 1.75rem !important;
-        margin-bottom: 1.25rem !important;
-        line-height: 1.2 !important;
+        font-size: 1.5rem !important;
+        margin-bottom: 1rem !important;
+        line-height: 1.1 !important;
     }
 
     .suggestion-chips {
-        gap: 0.4rem !important;
-        padding: 0 1rem !important;
+        gap: 0.3rem !important;
+        padding: 0 0.5rem !important;
     }
 
     .suggestion-chip {
-        padding: 0.5rem 0.9rem !important;
-        font-size: 0.75rem !important;
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.7rem !important;
     }
 
     .input-container {
-        padding: 0 1rem 0.5rem !important;
-        gap: 0.4rem !important;
+        padding: 0.5rem 1rem 0.4rem !important;
+        gap: 0.3rem !important;
+        background: var(--bg-dark);
+        border-top: 1px solid var(--glass-border);
+        flex-shrink: 0 !important;
     }
 
     .input-wrapper {
-        padding: 0.4rem 0.4rem 0.4rem 0.9rem !important;
-        border-radius: 16px !important;
+        padding: 0.35rem 0.35rem 0.35rem 0.8rem !important;
+        border-radius: 12px !important;
     }
 
     input {
-        font-size: 0.9rem !important;
-        padding: 0.4rem 0 !important;
+        font-size: 0.85rem !important;
+        padding: 0.3rem 0 !important;
     }
 
     .input-footer {
-        font-size: 0.65rem !important;
-        margin-top: 0.2rem !important;
-        opacity: 0.5 !important;
-    }
-    
-    .messages-list {
-        padding: 1rem 1rem !important;
-        gap: 1rem !important;
+        font-size: 0.6rem !important;
+        margin-top: 0.15rem !important;
+        opacity: 0.4 !important;
+        text-align: center !important;
     }
 }
+
