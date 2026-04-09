@@ -3441,19 +3441,20 @@ function App() {
 
 
 
-    // Auto-redirect signed-in users from landing to chat
-    useEffect(() => {
-        if (isLoaded && isSignedIn && appSection === 'landing') {
-            console.log("[App] Redirecting signed-in user to chat hub");
-            setAppSection('chat');
-        }
-    }, [isLoaded, isSignedIn, appSection]);
+    // Update initial app section to landing
 
     // Sync profile state with authenticated user
     useEffect(() => {
         if (isLoaded && user) {
             console.log("[App] Syncing local profile with user data");
-            setProfile(user);
+            setProfile(prev => ({
+                ...prev,
+                ...user,
+                // Ensure critical fields are preserved if user object is partial
+                tier: user.tier || prev.tier || 'Free',
+                credits: typeof user.credits === 'number' ? user.credits : (prev.credits ?? 10),
+                onboarded: user.onboarded ?? prev.onboarded ?? false
+            }));
         }
     }, [isLoaded, user]);
 
@@ -4091,6 +4092,22 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         setShowInitialization(true);
     };
 
+    const handlePlanSelect = (plan) => {
+        console.log("[App] Plan selected:", plan);
+        setSelectedPlan(plan);
+        setAppSection('checkout');
+    };
+
+    const handleSignInClick = () => {
+        setAuthModalView('login-email');
+        setIsAuthModalOpen(true);
+    };
+
+    const handleSignUpClick = () => {
+        setAuthModalView('signup');
+        setIsAuthModalOpen(true);
+    };
+
     const handleOnboardingComplete = async (onboardingData) => {
         // Update local profile first with onboarding data
         setProfile(prev => ({
@@ -4219,7 +4236,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                             }}
                                         >
                                             <EkoSparkle size={36} /> 
-                                            <span className="greeting-name">Hi {profile?.name?.split(' ')[0] || 'There'}</span>
+                                            <span className="greeting-name">Hi {(profile?.name || user?.first_name || 'There').split(' ')[0]}</span>
                                         </motion.div>
                                         <motion.div 
                                             className="empty-chat-headline"
@@ -4518,7 +4535,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 onSelectPlan={handlePlanSelect} 
                 onLaunchEngine={() => {
                     setAppSection('chat');
-                    if (messages?.length === 1 && messages[0]?.content?.includes('Welcome')) {
+                    // Defensive check for messages existence before accessing property
+                    const currentMessages = activeChat?.messages || [];
+                    if (currentMessages.length === 1 && currentMessages[0]?.content?.includes('Welcome')) {
                         // Keep initial message or create new chat if needed
                     }
                 }}
