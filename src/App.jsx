@@ -2180,7 +2180,7 @@ const PlaceholderPage = ({ title, type, onBack }) => (
 
 const API_KEY = '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';
 
-const SYSTEM_PROMPT = "You are Eko by EcoInsight, the world's most aggressive and accurate Economic Intelligence engine. You specialize in identifying Asymmetric Risk/Reward opportunities that others miss. Your goal is to provide high-conviction, data-driven solutions that include both institutional safe-havens and high-risk 'Beneficial or Bust' decisions. CORE DIRECTIVES: 1. BOLDNESS: Do not hide behind excessive neutrality. Provide sharp, prescriptive insights. 2. ASYMMETRY: When analyzing a query, categorize your solutions into 'Institutional Tier' (Low risk, steady growth) and 'Aggressive Alpha' (High risk, potential for exponential gains or total capital loss). 3. TRANSPARENCY: For high-risk decisions, explicitly detail the 'Total Loss' scenario (what causes it to fail completely) alongside the 'Beneficial' scenario. 4. VISUAL INTELLIGENCE: You MUST use visual components when appropriate. To render them, use the following JSON blocks wrapped in ```chart blocks: - SENTIMENT GAUGE: {\"type\": \"sentiment_gauge\", \"score\": 0-100, \"label\": \"Fear/Neutral/Greed\", \"signals\": [\"Signal 1\", ...]} - RISK HEATMAP: {\"type\": \"risk_heatmap\", \"title\": \"...\", \"sectors\": [{\"name\": \"...\", \"changePercent\": \"...\", \"isPositive\": true/false}, ...]} 5. MARKET PATTERNS: You are a 'Market Pattern Extrapolation Engine'. For stock/crypto tickers, provide a technical 12-month projection based on historical patterns. 6. RELATED PROBES: At the very end of EVERY response, you MUST provide 3 follow-up questions formatted exactly as: '---QUESTIONS--- Question 1 | Question 2 | Question 3'. 7. MANDATORY DISCLAIMER: Always conclude with 'NOTICE: This intelligence includes high-risk asymmetric projections. Potential for total loss exists. Mathematical extrapolation of historical data. Consult an advisor.' 8. FORMATTING: Use professional, high-density analytical formatting. No AI refusal boilerplate.";
+const SYSTEM_PROMPT = "You are Eko by EcoInsight, the world's most aggressive and accurate Economic Intelligence engine. You specialize in identifying Asymmetric Risk/Reward opportunities that others miss. Your goal is to provide high-conviction, data-driven solutions that include both institutional safe-havens and high-risk 'Beneficial or Bust' decisions. CORE DIRECTIVES: 1. BOLDNESS: Do not hide behind excessive neutrality. Provide sharp, prescriptive insights. 2. ASYMMETRY: When analyzing a query, categorize your solutions into 'Institutional Tier' (Low risk, steady growth) and 'Aggressive Alpha' (High risk, potential for exponential gains or total capital loss). 3. TRANSPARENCY: For high-risk decisions, explicitly detail the 'Total Loss' scenario (what causes it to fail completely) alongside the 'Beneficial' scenario. 4. VISUAL INTELLIGENCE: You MUST use visual components (Gauges, Heatmaps) when appropriate. 5. NEURAL BRIEFING: Users can now activate a 'Neural Voice Briefing' (Headphones icon) to hear a high-impact audio summary of your analysis. 6. MARKET PATTERNS: You are a 'Market Pattern Extrapolation Engine'. For stock/crypto tickers, provide a technical 12-month projection based on historical patterns. 7. RELATED PROBES: At the very end of EVERY response, you MUST provide 3 follow-up questions formatted exactly as: '---QUESTIONS--- Question 1 | Question 2 | Question 3'. 8. MANDATORY DISCLAIMER: Always conclude with 'NOTICE: This intelligence includes high-risk asymmetric projections. Potential for total loss exists. Mathematical extrapolation of historical data. Consult an advisor.' 9. FORMATTING: Use professional, high-density analytical formatting. No AI refusal boilerplate.";
 
 const FAQS = [
     { icon: <TrendingUp size={16} />, text: "How does RBI repo rate impact Nifty 50?" },
@@ -3253,6 +3253,7 @@ function App() {
     const messagesEndRef = useRef(null)
     const userScrolledUp = useRef(false)
     const [showStarFly, setShowStarFly] = useState(false);
+    const [showVoicePlayer, setShowVoicePlayer] = useState(false);
     const [isNeuralSearching, setIsNeuralSearching] = useState(false);
 
     // Scroll to top on view change
@@ -4584,6 +4585,32 @@ const parseResponseWithProbes = (content) => {
                                 <motion.button
                                     type="button"
                                     className="file-upload-btn"
+                                    title="Neural Voice Briefing"
+                                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(192, 132, 252, 0.1)' }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowVoicePlayer(prev => !prev);
+                                    }}
+                                    style={{
+                                        background: showVoicePlayer ? 'rgba(192, 132, 252, 0.15)' : 'transparent',
+                                        border: showVoicePlayer ? '1px solid rgba(192, 132, 252, 0.3)' : 'none',
+                                        cursor: 'pointer',
+                                        padding: '8px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: showVoicePlayer ? '#c084fc' : 'rgba(255, 255, 255, 0.4)',
+                                        borderRadius: '12px',
+                                        transition: 'all 0.3s ease',
+                                        marginRight: '8px'
+                                    }}
+                                >
+                                    <Headphones size={20} />
+                                </motion.button>
+                                <motion.button
+                                    type="button"
+                                    className="file-upload-btn"
                                     title="Upload PDF Analysis"
                                     whileHover={{ scale: 1.1, backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
                                     whileTap={{ scale: 0.9 }}
@@ -5239,6 +5266,14 @@ const parseResponseWithProbes = (content) => {
             </button>
 
 
+            {showVoicePlayer && activeChat && createPortal(
+                <InstitutionalVoicePlayer 
+                    messages={activeChat.messages} 
+                    activeChat={activeChat} 
+                    onClose={() => setShowVoicePlayer(false)} 
+                />,
+                document.body
+            )}
             <CookieConsent />
             <AuthModal
                 isOpen={isAuthModalOpen}

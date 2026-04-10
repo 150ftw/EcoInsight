@@ -170,7 +170,36 @@ const fetchAngelOnePrices = async () => {
     return commodityData.gold || commodityData.silver ? commodityData : null;
 };
 
-// Main function: fetch all data with caching and Supabase-backed Alpha Vantage Prices
+/**
+ * Public fetcher for the Institutional Pulse Score (0-100)
+ */
+export const fetchInstitutionalPulse = async () => {
+    try {
+        const stocks = [
+            'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'BHARTIARTL',
+            'SBIN', 'LTIM', 'ITC', 'KOTAKBANK', 'LT', 'AXISBANK'
+        ];
+        
+        // Fetch a small subset to calculate pulse quickly
+        const results = await Promise.all(stocks.slice(0, 6).map(s => fetchVerifiedPrice(s)));
+        const validResults = results.filter(r => r && r.price);
+        
+        if (validResults.length === 0) return 50;
+        
+        const advances = validResults.filter(r => r.isPositive).length;
+        const ratio = (advances / (validResults.length - advances || 1)).toFixed(2);
+        
+        return calculateInstitutionalSentiment(validResults, ratio);
+    } catch (e) {
+        console.warn('Pulse fetch failed:', e);
+        return 50;
+    }
+};
+
+/**
+ * Main context generator for the AI system prompt.
+ * Fetches real-time stock prices, exchange rates, and commodities.
+ */
 export const fetchMarketContext = async () => {
     // Fetch exchange rates (free API)
     const exchangeRates = await fetchExchangeRates();

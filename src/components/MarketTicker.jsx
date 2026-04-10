@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown, RefreshCw, Zap } from 'lucide-react';
 import { fetchHistory, fetchCryptoData } from '../lib/DashboardData';
+import { fetchInstitutionalPulse } from '../lib/MarketData';
 
 const MarketTicker = () => {
     const [stats, setStats] = useState([]);
@@ -9,15 +10,23 @@ const MarketTicker = () => {
 
     const loadData = async () => {
         try {
-            const [indices, crypto] = await Promise.all([
+            const [indices, crypto, pulse] = await Promise.all([
                 Promise.all([
                     fetchHistory('^NSEI'), // Nifty 50
                     fetchHistory('^BSESN') // Sensex
                 ]),
-                fetchCryptoData()
+                fetchCryptoData(),
+                fetchInstitutionalPulse()
             ]);
 
             const allStats = [
+                {
+                    name: "INSTITUTIONAL PULSE",
+                    price: `${pulse}/100`,
+                    change: pulse > 70 ? 'Extreme Bulish' : (pulse < 30 ? 'High Risk' : 'Neutral'),
+                    isPositive: pulse >= 50,
+                    isPulse: true
+                },
                 ...(indices.filter(i => i !== null).map(i => ({
                     name: i.name || 'Nifty 50',
                     price: i.price,
@@ -70,12 +79,15 @@ const MarketTicker = () => {
                     }}
                 >
                     {displayStats.map((stat, i) => (
-                        <div key={i} className="ticker-item">
-                            <span className="ticker-name">{stat.name}</span>
+                        <div key={i} className={`ticker-item ${stat.isPulse ? 'pulse-item' : ''}`}>
+                            <span className="ticker-name">
+                                {stat.isPulse && <Zap size={10} style={{ marginRight: '4px', color: '#c084fc' }} />}
+                                {stat.name}
+                            </span>
                             <span className="ticker-price">{stat.price}</span>
                             <span className={`ticker-change ${stat.isPositive ? 'positive' : 'negative'}`}>
-                                {stat.isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                                {stat.change}%
+                                {!stat.isPulse && (stat.isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />)}
+                                {stat.change}{!stat.isPulse ? '%' : ''}
                             </span>
                         </div>
                     ))}
