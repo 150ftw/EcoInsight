@@ -9342,3 +9342,62 @@ select {
         padding-bottom: env(safe-area-inset-bottom, 20px) !important;
     }
 }
+
+/* --- VISUAL VIEWPORT STABILIZATION --- */
+:root {
+    --vv-height: 100vh;
+    --vv-offset: 0px;
+}
+
+@media (max-width: 640px) {
+    /* Prevent body from shifting or scrolling when keyboard is active */
+    html, body {
+        overflow: hidden !important;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overscroll-behavior: none !important;
+    }
+
+    /* Anchor the app to the VISUAL viewport height */
+    .app-container, 
+    .chat-container,
+    .main-content {
+        height: var(--vv-height) !important;
+        min-height: var(--vv-height) !important;
+        max-height: var(--vv-height) !important;
+        top: var(--vv-offset) !important;
+        position: fixed !important;
+        overflow: hidden !important;
+    }
+
+    /* Fix the Chat Header to stay relative to the visible window */
+    .chat-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+    }
+
+    /* Ensure message list uses remaining space without pushing headers out */
+    .messages-list {
+        height: calc(var(--vv-height) - 130px) !important; /* Offset for Header (56px) + Input (~70px) */
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 56px !important;
+    }
+
+    /* Keep input area anchored at the bottom of the visible screen */
+    .input-container {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: rgba(0, 0, 0, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+        z-index: 1001;
+    }
+}

@@ -4296,6 +4296,24 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         return firstUser ? firstUser.content.substring(0, 180) + "..." : "Neural Session active.";
     };
 
+    useEffect(() => {
+        if (!window.visualViewport) return;
+        
+        const handleVVResize = () => {
+            document.documentElement.style.setProperty('--vv-height', `${window.visualViewport.height}px`);
+            document.documentElement.style.setProperty('--vv-offset', `${window.visualViewport.offsetTop}px`);
+        };
+
+        window.visualViewport.addEventListener('resize', handleVVResize);
+        window.visualViewport.addEventListener('scroll', handleVVResize);
+        handleVVResize();
+
+        return () => {
+            window.visualViewport.removeEventListener('resize', handleVVResize);
+            window.visualViewport.removeEventListener('scroll', handleVVResize);
+        };
+    }, []);
+
 
 
     const onInit = (name) => {
