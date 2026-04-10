@@ -4468,7 +4468,16 @@ const parseResponseWithProbes = (content) => {
                                 <AnimatePresence initial={false}>
                                     {messages.map((msg, i) => {
                                         if (msg.role === 'assistant' && msg.content === '') {
-                                            return <ThinkingIndicator key={`thinking-${i}`} />;
+                                            return (
+                                                <div key={`thinking-${i}`} className="message-wrapper assistant">
+                                                    <div className="message-icon">
+                                                        <EkoSparkle size={20} />
+                                                    </div>
+                                                    <div className="message-container">
+                                                        <ThinkingIndicator />
+                                                    </div>
+                                                </div>
+                                            );
                                         }
                                         return (
                                             <motion.div
