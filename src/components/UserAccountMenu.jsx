@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Settings, User as UserIcon, CreditCard, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -6,13 +7,15 @@ import { useAuth } from '../context/AuthContext';
 const UserAccountMenu = ({ 
   hideName = false, 
   role = "Economic Analyst", 
-  side = "right", 
-  align = "bottom",
+  side = "left", 
+  align = "top",
   onSettingsClick = () => {},
   onSubscriptionClick = () => {}
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
   const menuRef = useRef(null);
+  const triggerRef = useRef(null);
   const { user, logout } = useAuth();
 
   useEffect(() => {
@@ -25,11 +28,36 @@ const UserAccountMenu = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const updateCoords = () => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      updateCoords();
+      window.addEventListener('resize', updateCoords);
+      window.addEventListener('scroll', updateCoords, true);
+    }
+    return () => {
+      window.removeEventListener('resize', updateCoords);
+      window.removeEventListener('scroll', updateCoords, true);
+    };
+  }, [isOpen]);
+
   if (!user) return null;
 
   return (
     <div className="user-menu-container" ref={menuRef}>
       <button 
+        ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
         className={`user-menu-trigger ${isOpen ? 'active' : ''} ${hideName ? 'compact' : ''} group`}
         aria-expanded={isOpen}
@@ -53,19 +81,23 @@ const UserAccountMenu = ({
         )}
       </button>
 
-      <AnimatePresence>
-        {isOpen && (
+      {isOpen && createPortal(
+        <AnimatePresence>
           <motion.div
-            initial={{ opacity: 0, y: align === 'top' ? -10 : 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: align === 'top' ? -10 : 10, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-            className="user-menu-dropdown"
+            className="user-menu-dropdown portal-menu"
             style={{ 
-                top: align === 'bottom' ? 'calc(100% + 10px)' : 'auto',
-                bottom: align === 'top' ? 'calc(100% + 10px)' : 'auto',
-                left: side === 'left' ? '0' : 'auto',
-                right: side === 'right' ? '0' : 'auto'
+                position: 'fixed',
+                top: align === 'top' ? 'auto' : `${coords.top + coords.height + 10}px`,
+                bottom: align === 'top' ? `${window.innerHeight - coords.top + 10}px` : 'auto',
+                left: side === 'left' ? `${coords.left}px` : 'auto',
+                right: side === 'right' ? `${window.innerWidth - (coords.left + coords.width)}px` : 'auto',
+                zIndex: 9999,
+                width: 'max-content',
+                minWidth: '220px'
             }}
           >
             <div className="user-menu-header">
@@ -87,20 +119,6 @@ const UserAccountMenu = ({
                 <span>Account Settings</span>
               </button>
               
-              {/* Hiding for launch - will return with subscription tiers */}
-              {/* <button 
-                onClick={() => { 
-                  setIsOpen(false); 
-                  onSubscriptionClick();
-                }}
-                className="user-menu-item"
-              >
-                <div className="user-menu-icon">
-                  <CreditCard size={18} />
-                </div>
-                <span>Subscription</span>
-              </button> */}
-              
               <div className="user-menu-divider" />
               
               <button 
@@ -114,8 +132,9 @@ const UserAccountMenu = ({
               </button>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };
