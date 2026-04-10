@@ -548,7 +548,7 @@ const fetchGoogleFinancePrice = async (nseSymbol) => {
  * TRIPLE-CHECK VERIFICATION ENGINE
  * Fetches from NSE, BSE, and Yahoo to ensure absolute accuracy.
  */
-const fetchVerifiedPrice = async (symbol) => {
+export const fetchVerifiedPrice = async (symbol) => {
     try {
         // Parallel fetch for speed
         const [nseData, bseData, yahooData] = await Promise.all([
