@@ -4639,6 +4639,23 @@ html {
   font-weight: 700;
 }
 
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  scrollbar-width: none; /* Hide for Firefox */
+  -ms-overflow-style: none; /* Hide for IE/Edge */
+}
+
+@media (max-width: 768px) {
+  .sidebar-nav {
+    padding-bottom: 200px !important; /* Huge buffer for account visibility */
+  }
+}
+
 .source-carousel {
   display: flex;
   gap: 12px;
