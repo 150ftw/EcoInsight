@@ -5076,7 +5076,7 @@ const parseResponseWithProbes = (content) => {
                                 <div className="user-profile-custom-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
                                     <UserAccountMenu
                                         hideName={true}
-                                        side="right"
+                                        side="left"
                                         align="top"
                                         role={`${profile?.tier || 'Free'} Access`}
                                         onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
