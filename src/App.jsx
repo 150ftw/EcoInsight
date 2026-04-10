@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useId, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, ChevronUp, Database, CheckCircle2, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft, Headphones } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
@@ -5263,7 +5264,7 @@ const parseResponseWithProbes = (content) => {
             />
 
             <AnimatePresence>
-                {showEnginePopup && (
+                {showEnginePopup && createPortal(
                     <div className="engine-invite-overlay" onClick={() => setShowEnginePopup(false)}>
                         <motion.div 
                             className="engine-invite-modal"
@@ -5415,7 +5416,8 @@ const parseResponseWithProbes = (content) => {
                                 letter-spacing: 0.1em !important;
                             }
                         `}} />
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </AnimatePresence>
         </>
