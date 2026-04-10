@@ -98,13 +98,6 @@ export const AuthProvider = ({ children }) => {
     window.location.href = '/api/auth/google';
   };
 
-  const loginWithApple = () => {
-    if (IS_LOCALHOST) {
-      setUser(MOCK_USER);
-      return;
-    }
-    window.location.href = '/api/auth/apple';
-  };
   
   const updateProfile = async (profileData) => {
     if (IS_LOCALHOST) {
@@ -146,7 +139,6 @@ export const AuthProvider = ({ children }) => {
       signup, 
       logout,
       loginWithGoogle,
-      loginWithApple,
       updateProfile,
       updatePassword,
       requestPasswordReset,
