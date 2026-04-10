@@ -4594,32 +4594,6 @@ const parseResponseWithProbes = (content) => {
                                 <motion.button
                                     type="button"
                                     className="file-upload-btn"
-                                    title="Neural Voice Briefing"
-                                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(192, 132, 252, 0.1)' }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowVoicePlayer(prev => !prev);
-                                    }}
-                                    style={{
-                                        background: showVoicePlayer ? 'rgba(192, 132, 252, 0.15)' : 'transparent',
-                                        border: showVoicePlayer ? '1px solid rgba(192, 132, 252, 0.3)' : 'none',
-                                        cursor: 'pointer',
-                                        padding: '8px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: showVoicePlayer ? '#c084fc' : 'rgba(255, 255, 255, 0.4)',
-                                        borderRadius: '12px',
-                                        transition: 'all 0.3s ease',
-                                        marginRight: '8px'
-                                    }}
-                                >
-                                    <Headphones size={20} />
-                                </motion.button>
-                                <motion.button
-                                    type="button"
-                                    className="file-upload-btn"
                                     title="Upload PDF Analysis"
                                     whileHover={{ scale: 1.1, backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
                                     whileTap={{ scale: 0.9 }}
@@ -5131,14 +5105,17 @@ const parseResponseWithProbes = (content) => {
                                 {view !== 'chat' && <div className="badge">Beta</div>}
                                 <div className="header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
                                     <button 
-                                        className="header-action-btn disabled" 
-                                        disabled
-                                        style={{ position: 'relative' }}
+                                        className={`header-action-btn ${showVoicePlayer ? 'active' : ''}`} 
+                                        onClick={() => setShowVoicePlayer(prev => !prev)}
+                                        style={{ 
+                                            position: 'relative',
+                                            color: showVoicePlayer ? 'var(--accent-primary)' : 'inherit',
+                                            background: showVoicePlayer ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
+                                            borderColor: showVoicePlayer ? 'rgba(139, 92, 246, 0.3)' : 'transparent'
+                                        }}
                                     >
-                                        <div className="in-dev-badge">IN-DEV</div>
-                                        <Lock size={12} style={{ marginRight: '4px', opacity: 0.6 }} />
-                                        <Headphones size={16} style={{ opacity: 0.5 }} />
-                                        <span style={{ opacity: 0.5 }}>Institutional Voice Brief</span>
+                                        <Headphones size={16} />
+                                        <span>Neural Briefing</span>
                                     </button>
                                     <button className="header-action-btn" onClick={downloadChatAsPDF} disabled={isExporting}>
                                         {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
