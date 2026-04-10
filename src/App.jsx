@@ -81,8 +81,33 @@ const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = fa
 const ThinkingIndicator = () => {
   const [seconds, setSeconds] = useState(0);
   const [step, setStep] = useState(0);
+  const [activeSteps, setActiveSteps] = useState([]);
 
   useEffect(() => {
+    // Definining a robust pool of institutional analytical steps
+    const stepPool = [
+      { label: "Decoding institutional query", tool: null },
+      { label: "Scanning financial databases & documentation", tool: "Company Fundamental Data" },
+      { label: "Synthesizing market correlations", tool: null },
+      { label: "Drafting executive intelligence report", tool: null },
+      { label: "Aggregating FII/DII flow dynamics", tool: "Real-time Flows" },
+      { label: "Analyzing technical divergence signals", tool: "Alpha Signals" },
+      { label: "Cross-referencing historical Nifty 50 volatility", tool: null },
+      { label: "Evaluating macro-economic headwind impact", tool: "Macro Pulse" },
+      { label: "Parsing real-time derivative chain data", tool: "Option Chain" },
+      { label: "Scouring sector-specific fundamental indicators", tool: null },
+      { label: "Optimizing asymmetric risk-weighted outcomes", tool: "Risk Engine" },
+      { label: "Calibrating institutional sentiment breadth", tool: null },
+      { label: "Simulating black-swan probability models", tool: "Stress Test" },
+      { label: "Extracting alpha from high-conviction sources", tool: null },
+      { label: "Mapping global algorithmic trade velocity", tool: "Trade Vectors" },
+      { label: "Verifying reliability of provenance sources", tool: null }
+    ];
+
+    // Shuffle and pick 4 random steps
+    const shuffled = [...stepPool].sort(() => 0.5 - Math.random());
+    setActiveSteps(shuffled.slice(0, 4));
+
     const timer = setInterval(() => {
       setSeconds(prev => +(prev + 0.1).toFixed(1));
     }, 100);
@@ -98,12 +123,7 @@ const ThinkingIndicator = () => {
     };
   }, []);
 
-  const steps = [
-    { label: "Decoding institutional query", tool: null },
-    { label: "Scanning financial databases & documentation", tool: "Company Fundamental Data" },
-    { label: "Synthesizing market correlations", tool: null },
-    { label: "Drafting executive intelligence report", tool: null }
-  ];
+  if (activeSteps.length === 0) return null;
 
   return (
     <motion.div 
@@ -123,7 +143,7 @@ const ThinkingIndicator = () => {
       <div className="thought-steps">
         <div className="thought-timeline-line" />
         
-        {steps.map((s, idx) => {
+        {activeSteps.map((s, idx) => {
           const isActive = step === idx;
           const isCompleted = step > idx;
           
