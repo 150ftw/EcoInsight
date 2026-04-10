@@ -9384,10 +9384,11 @@ select {
 
     /* Ensure message list uses remaining space without pushing headers out */
     .messages-list {
-        height: calc(var(--vv-height) - 130px) !important; /* Offset for Header (56px) + Input (~70px) */
+        height: calc(var(--vv-height) - 56px) !important; /* Total visual viewport minus header */
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch;
         margin-top: 56px !important;
+        padding-bottom: 120px !important; /* Generous clearance for the input bar */
     }
 
     /* Keep input area anchored at the bottom of the visible screen */
