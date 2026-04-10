@@ -5077,7 +5077,7 @@ const parseResponseWithProbes = (content) => {
                                     <UserAccountMenu
                                         hideName={true}
                                         side="right"
-                                        align="bottom"
+                                        align="top"
                                         role={`${profile?.tier || 'Free'} Access`}
                                         onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
                                     />
