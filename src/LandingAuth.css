@@ -1431,12 +1431,28 @@ select {
 .apple-btn {
     background: #000 !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
+    justify-content: space-between !important;
+    padding-right: 1.25rem !important;
 }
 
 .apple-btn:hover {
     background: #080808 !important;
     border-color: #fff !important;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.05) !important;
+}
+
+.in-dev-tag {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
 }
 
 .google-icon {
