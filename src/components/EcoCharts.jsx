@@ -297,7 +297,7 @@ export const parseChartBlocks = (text) => {
     const parts = [];
     // Extremely resilient regex:
     // Matches ```chart { ... } ``` OR raw unformatted { "type": "line", ... }
-    const chartRegex = /```(?:chart|json)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area)"\s*,[\s\S]*?"data"\s*:\s*\[[\s\S]*?\]\s*\})/gi;
+    const chartRegex = /```(?:chart|json)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap)"\s*,[\s\S]*?(?:"data"|"score"|"sectors")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})/gi;
 
     let lastIndex = 0;
     let match;
@@ -353,11 +353,14 @@ export const parseChartBlocks = (text) => {
     return parts;
 };
 
+import SentimentGauge from './SentimentGauge';
+import SectorHeatmap from './SectorHeatmap';
+
 /**
- * Renders a chart based on the parsed config
+ * Renders a chart or visual intelligence component based on the parsed config
  */
 export const EcoChartRenderer = ({ config }) => {
-    if (!config || !config.data) return null;
+    if (!config || (!config.data && !config.score && !config.sectors)) return null;
 
     const chartType = (config.type || 'line').toLowerCase();
 
@@ -370,6 +373,24 @@ export const EcoChartRenderer = ({ config }) => {
             return <EcoPieChart data={config.data} title={config.title} />;
         case 'area':
             return <EcoAreaChart data={config.data} title={config.title} dataKeys={config.dataKeys} />;
+        case 'sentiment_gauge':
+            return (
+                <SentimentGauge 
+                    score={config.score} 
+                    label={config.label} 
+                    signals={config.signals} 
+                    type={config.gaugeType || 'market'} 
+                />
+            );
+        case 'risk_heatmap':
+            return (
+                <SectorHeatmap 
+                    sectors={config.sectors} 
+                    title={config.title || "Institutional Risk Heatmap"} 
+                    subtitle={config.subtitle || "AI Asymmetric Projection"}
+                    compact={true}
+                />
+            );
         default:
             return <EcoLineChart data={config.data} title={config.title} dataKeys={config.dataKeys} />;
     }
