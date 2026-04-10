@@ -4399,6 +4399,16 @@ const parseResponseWithProbes = (content) => {
         </div>
     );
 
+    const handlePortfolioAnalyze = (stocks) => {
+        if (!stocks || stocks.length === 0) return;
+        
+        const holdingsStr = stocks.map(s => `- ${s.symbol}: ${s.quantity} units (@ ₹${s.price.toLocaleString()})`).join('\n');
+        const auditPrompt = `Initiate Institutional Portfolio Audit for the following holdings:\n\n${holdingsStr}\n\nPlease provide an asymmetric risk assessment, sector exposure analysis, and high-conviction optimization suggestions.`;
+        
+        setAppSection('chat');
+        handleSend(auditPrompt);
+    };
+
     const renderView = () => {
 
         if (SUBPAGE_DATA[view]) {
@@ -4659,11 +4669,7 @@ const parseResponseWithProbes = (content) => {
             case 'portfolio':
                 return (
                     <div className="view-content" key={view}>
-                        <div className="view-header">
-                            <h1>Portfolio Analyzer</h1>
-                            <p>Neural risk simulation & sector allocation analyzer.</p>
-                        </div>
-                        <PortfolioAnalyzer />
+                        <PortfolioAnalyzer onAnalyze={handlePortfolioAnalyze} />
                     </div>
                 );
             case 'insights':
