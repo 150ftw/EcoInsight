@@ -9178,3 +9178,135 @@ select {
 .neural-bottom-light {
     animation: neural-pulse 4s ease-in-out infinite;
 }
+
+/* --- MOBILE INTERFACE OVERHAUL --- */
+@media (max-width: 640px) {
+    /* Clear interaction zone overlap */
+    .bug-fab {
+        top: 20px !important;
+        bottom: auto !important;
+        right: 80px !important;
+        transform: scale(0.85);
+        z-index: 1000;
+    }
+
+    /* Refine Sidebar Ergonomics */
+    .chat-sidebar {
+        width: 85% !important;
+        max-width: 320px;
+    }
+
+    .sidebar-menu-item {
+        padding: 14px 20px !important; /* Larger touch target */
+        margin: 4px 10px !important;
+        border-radius: 16px !important;
+    }
+
+    .sidebar-close-btn {
+        right: -50px !important;
+        top: 20px !important;
+    }
+
+    /* Optimization for Thought Tracer */
+    .thought-tracer-container {
+        padding: 0.8rem !important;
+        margin: 0.5rem 0 !important;
+    }
+
+    .thought-step-label {
+        font-size: 0.8rem !important;
+        line-height: 1.3 !important;
+    }
+
+    /* Refine Neural Light for mobile clutter */
+    .neural-bottom-light {
+        height: 1px !important;
+        opacity: 0.4 !important;
+        bottom: 2px !important;
+        box-shadow: 0 -5px 20px rgba(139, 92, 246, 0.2);
+    }
+
+    /* Header Action Button spacing */
+    .header-actions {
+        gap: 6px !important;
+    }
+
+    .header-action-btn span {
+        display: none; /* Hide text on mobile for brevity */
+    }
+
+    .header-action-btn {
+        padding: 8px !important;
+        border-radius: 12px !important;
+    }
+}
+
+/* --- PORTFOLIO ANALYZER MOBILE STACKING --- */
+@media (max-width: 640px) {
+    .analyzer-layout {
+        flex-direction: column !important;
+        gap: 1.5rem;
+    }
+
+    .analyzer-controls {
+        order: 2;
+    }
+
+    .analyzer-visualization {
+        order: 1;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 1.5rem;
+        border-radius: 20px;
+        margin-bottom: 1rem;
+    }
+
+    .portfolio-total-card .value {
+        font-size: 1.8rem !important;
+    }
+
+    .input-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .add-stock-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px !important;
+    }
+
+    .holding-item {
+        padding: 0.8rem !important;
+    }
+
+    .holding-main .symbol {
+        font-size: 0.9rem !important;
+    }
+
+    .holding-value .total {
+        font-size: 0.9rem !important;
+    }
+}
+
+/* --- INTELLIGENCE PROVENANCE MOBILE WRAPPING --- */
+@media (max-width: 640px) {
+    .sources-carousel {
+        margin: 1rem -1rem !important; /* Bleed to edges */
+        padding: 0 1rem !important;
+    }
+
+    .source-card {
+        min-width: 240px !important;
+        max-width: 240px !important;
+        padding: 12px !important;
+    }
+
+    .source-title {
+        font-size: 0.85rem !important;
+    }
+
+    .source-snippet {
+        font-size: 0.75rem !important;
+        -webkit-line-clamp: 2 !important;
+    }
+}
