@@ -34,7 +34,6 @@ import FiiDiiAnalyzer from './FiiDiiAnalyzer';
 import EconomicCalendar from './EconomicCalendar';
 import TechnicalPulse from './TechnicalPulse';
 import EarningsWatch from './EarningsWatch';
-import './Dashboard.css';
 
 
 

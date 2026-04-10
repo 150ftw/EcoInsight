@@ -455,7 +455,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
         if (!isSignedIn && isLoaded) {
             const timer = setTimeout(() => {
                 setShowEnginePopup(true);
-            }, 10000); // 10 seconds
+            }, 5000); // 5 seconds
             return () => clearTimeout(timer);
         }
     }, [isSignedIn, isLoaded]);

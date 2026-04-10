@@ -32,7 +32,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 import { fetchNewsTickerData } from './lib/MarketData'
 
 
-import './LandingAuth.css'
 import Threads from './components/Threads'
 import { SUBPAGE_DATA } from './lib/SubpageContent'
 import CookieConsent from './components/CookieConsent'
