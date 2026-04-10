@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useId, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft } from 'lucide-react'
+import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft, Headphones } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { streamMessage } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
@@ -23,6 +23,7 @@ import axios from 'axios'
 import CreditModal from './components/CreditModal';
 import BugReportModal from './components/BugReportModal';
 import OnboardingView from './components/OnboardingView';
+import InstitutionalVoicePlayer from './components/InstitutionalVoicePlayer';
 import * as pdfjs from 'pdfjs-dist'
 // Set worker for pdfjs (using a static file from the public directory to bypass Vite bundler issues)
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
@@ -3157,6 +3158,7 @@ function App() {
     const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
     const [showInitialization, setShowInitialization] = useState(false);
     const [initializingModule, setInitializingModule] = useState(null);
+    const [isVoiceBriefingActive, setIsVoiceBriefingActive] = useState(false);
     const [authModalSubtitle, setAuthModalSubtitle] = useState(null);
     const [hasAutoOpenedAuth, setHasAutoOpenedAuth] = useState(false);
     const [authType, setAuthType] = useState('login') // 'login', 'signup'
@@ -5015,6 +5017,16 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 }</h2>
                                 {view !== 'chat' && <div className="badge">Beta</div>}
                                 <div className="header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+                                    <button 
+                                        className="header-action-btn disabled" 
+                                        disabled
+                                        style={{ position: 'relative' }}
+                                    >
+                                        <div className="in-dev-badge">IN-DEV</div>
+                                        <Lock size={12} style={{ marginRight: '4px', opacity: 0.6 }} />
+                                        <Headphones size={16} style={{ opacity: 0.5 }} />
+                                        <span style={{ opacity: 0.5 }}>Institutional Voice Brief</span>
+                                    </button>
                                     <button className="header-action-btn" onClick={downloadChatAsPDF} disabled={isExporting}>
                                         {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                                         <span>Export Pro Report</span>
@@ -5025,6 +5037,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     )}
                     {renderView()}
                 </main>
+                <AnimatePresence>
+                    {isVoiceBriefingActive && view === 'chat' && (
+                        <InstitutionalVoicePlayer 
+                            messages={activeChat?.messages || []}
+                            activeChat={activeChat}
+                            onClose={() => setIsVoiceBriefingActive(false)}
+                        />
+                    )}
+                </AnimatePresence>
                 {!isMobile && <NewsTicker />}
             </div>
         );
