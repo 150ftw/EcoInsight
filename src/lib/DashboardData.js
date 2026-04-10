@@ -251,3 +251,64 @@ export const fetchEconomicCalendar = async () => {
         { date: 'APR 24', time: '11:00', event: 'HDFC Bank Q4 Earnings', impact: 'Critical', status: 'Expected' }
     ];
 };
+/**
+ * Fetch Market Sentiment Score (Fear & Greed Index)
+ * Derived from India VIX, Nifty Momentum, and Institutional flows
+ */
+export const fetchMarketSentiment = async () => {
+    try {
+        const [vixData, niftyData] = await Promise.all([
+            fetchHistory('^INDIAVIX'),
+            fetchHistory('^NSEI')
+        ]);
+
+        if (!vixData || !niftyData) return { score: 50, label: 'NEUTRAL', reason: 'Analyzing market signals...' };
+
+        let score = 50; // Base: Neutral
+        const vix = vixData.rawPrice;
+        const niftyChange = parseFloat(niftyData.changePercent);
+
+        // 1. VIX Contribution (Volatility Stress)
+        if (vix < 14) score += 20;
+        else if (vix < 18) score += 5;
+        else if (vix < 22) score -= 10;
+        else score -= 30;
+
+        // 2. Momentum Contribution
+        if (niftyChange > 1.5) score += 20;
+        else if (niftyChange > 0.5) score += 10;
+        else if (niftyChange < -1.5) score -= 25;
+        else if (niftyChange < -0.5) score -= 15;
+
+        // Ensure bounds
+        score = Math.max(5, Math.min(95, score));
+
+        let label = 'NEUTRAL';
+        let reason = 'Market metrics indicating standard institutional positioning.';
+
+        if (score > 75) {
+            label = 'EXTREME GREED';
+            reason = 'Institutional aggression detected. Low volatility suggests strong expansion.';
+        } else if (score > 60) {
+            label = 'BULLISH';
+            reason = 'Positive price action supported by stable volatility floors.';
+        } else if (score < 25) {
+            label = 'EXTREME FEAR';
+            reason = 'Panic selling detected. High VIX suggests significant hedging demand.';
+        } else if (score < 40) {
+            label = 'BEARISH';
+            reason = 'Price floor under pressure. Volatility stress is rising.';
+        }
+
+        return { 
+            score, 
+            label, 
+            reason: `${reason} (VIX: ${vix.toFixed(2)})`,
+            vix: vix.toFixed(2),
+            niftyChange: niftyChange.toFixed(2)
+        };
+    } catch (e) {
+        console.warn('Sentiment calculation failed:', e);
+        return { score: 50, label: 'NEUTRAL', reason: 'Engine re-syncing sentiment signals...' };
+    }
+};

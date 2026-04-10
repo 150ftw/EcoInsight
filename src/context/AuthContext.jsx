@@ -93,6 +93,14 @@ export const AuthProvider = ({ children }) => {
     }
     window.location.href = '/api/auth/google';
   };
+
+  const loginWithApple = () => {
+    if (IS_LOCALHOST) {
+      setUser(MOCK_USER);
+      return;
+    }
+    window.location.href = '/api/auth/apple';
+  };
   
   const updateProfile = async (profileData) => {
     if (IS_LOCALHOST) {
@@ -113,6 +121,18 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
+  const requestPasswordReset = async (email) => {
+    if (IS_LOCALHOST) return { message: 'Reset link generated (Mock)' };
+    const res = await axios.post('/api/auth/forgot-password', { email });
+    return res.data;
+  };
+
+  const resetPassword = async (token, newPassword) => {
+    if (IS_LOCALHOST) return { message: 'Password reset successful (Mock)' };
+    const res = await axios.post('/api/auth/reset-password', { token, newPassword });
+    return res.data;
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -122,8 +142,11 @@ export const AuthProvider = ({ children }) => {
       signup, 
       logout,
       loginWithGoogle,
+      loginWithApple,
       updateProfile,
       updatePassword,
+      requestPasswordReset,
+      resetPassword,
       refreshUser: fetchUser 
     }}>
       {children}

@@ -25,7 +25,8 @@ import {
     fetchIndianEquities,
     fetchNiftySectors,
     fetchTopMovers,
-    fetchFiiDiiFlows
+    fetchFiiDiiFlows,
+    fetchMarketSentiment
 } from '../lib/DashboardData';
 import SectorHeatmap from './SectorHeatmap';
 import MarketPulse from './MarketPulse';
@@ -97,6 +98,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
     const [fiiDiiFlows, setFiiDiiFlows] = useState([]);
     const [technicalSignals, setTechnicalSignals] = useState(null);
     const [earningsWatch, setEarningsWatch] = useState([]);
+    const [marketSentiment, setMarketSentiment] = useState({ score: 50, label: 'NEUTRAL', reason: 'Initializing...' });
     const [isLoading, setIsLoading] = useState(true);
     const [lastUpdated, setLastUpdated] = useState(new Date());
     const [selectedAsset, setSelectedAsset] = useState(null);
@@ -130,6 +132,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                 fetchNiftySectors(),
                 fetchTopMovers(),
                 fetchFiiDiiFlows(),
+                fetchMarketSentiment(),
                 // Simulated technical signals and earnings for now to ensure stability
                 Promise.resolve({ rsi: 68, macd: 'Bullish', trend: 'Strong Buy' }),
                 Promise.resolve([
@@ -148,6 +151,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
             setNiftySectors(sec || []);
             setTopMovers(mov || []);
             setFiiDiiFlows(fii || []);
+            setMarketSentiment(snt || { score: 50, label: 'NEUTRAL', reason: 'Error syncing signals' });
             setTechnicalSignals(tech);
             setEarningsWatch(earn);
 
@@ -467,15 +471,16 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                     <section className="panel-card">
                         <h3><Activity size={16} /> Sentiment Analysis</h3>
                         <div className="sentiment-container">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 800 }}>
-                                <span style={{ color: '#ef4444' }}>BEARISH</span>
-                                <span style={{ color: '#22c55e' }}>BULLISH</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.5rem' }}>
+                                <span style={{ color: '#ef4444' }}>FEAR</span>
+                                <span style={{ color: 'rgba(255,255,255,0.4)' }}>{marketSentiment.label}</span>
+                                <span style={{ color: '#22c55e' }}>GREED</span>
                             </div>
                             <div className="gauge-track">
-                                <div className="gauge-pointer" style={{ left: `${selectedAsset?.isPositive ? 85 : 15}%` }}></div>
+                                <div className="gauge-pointer" style={{ left: `${marketSentiment.score}%` }}></div>
                             </div>
-                            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center', margin: '0.5rem 0 0' }}>
-                                {selectedAsset?.isPositive ? 'Strong technical signals for expansion' : 'Asset is currently retesting critical floor'}
+                            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center', margin: '0.8rem 0 0', lineHeight: 1.4 }}>
+                                {marketSentiment.reason}
                             </p>
                         </div>
                     </section>

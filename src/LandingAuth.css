@@ -1428,6 +1428,17 @@ select {
     border-color: rgba(255, 255, 255, 0.15);
 }
 
+.apple-btn {
+    background: #000 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.apple-btn:hover {
+    background: #080808 !important;
+    border-color: #fff !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05) !important;
+}
+
 .google-icon {
     margin-right: 10px;
 }

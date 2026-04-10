@@ -1,6 +1,7 @@
-import axios from 'axios';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import { Resend } from 'resend';
 import { supabase } from '../lib/db.js';
 import { 
   signToken, 
@@ -13,6 +14,11 @@ import {
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
+const APPLE_CLIENT_ID = process.env.APPLE_ID_CLIENT_ID;
+const APPLE_TEAM_ID = process.env.APPLE_ID_TEAM_ID;
+const APPLE_KEY_ID = process.env.APPLE_ID_KEY_ID;
+const APPLE_PRIVATE_KEY = process.env.APPLE_ID_PRIVATE_KEY;
+
 // Helper for dynamic Google Callback URL
 function getCallbackUrl(req) {
   if (process.env.VITE_APP_URL) {
@@ -22,6 +28,44 @@ function getCallbackUrl(req) {
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const host = req.headers.host || 'localhost:5173';
   return `${protocol}://${host}/api/auth/google-callback`;
+}
+
+function getAppleCallbackUrl(req) {
+  if (process.env.VITE_APP_URL) {
+    const baseUrl = process.env.VITE_APP_URL.replace(/\/+$/, '');
+    return `${baseUrl}/api/auth/apple-callback`;
+  }
+  const protocol = req.headers['x-forwarded-proto'] || 'http';
+  const host = req.headers.host || 'localhost:5173';
+  return `${protocol}://${host}/api/auth/apple-callback`;
+}
+
+/**
+ * Generates the signed Client Secret JWT required by Apple.
+ */
+function getAppleClientSecret() {
+  const timeNow = Math.floor(Date.now() / 1000);
+  
+  const payload = {
+    iss: APPLE_TEAM_ID,
+    iat: timeNow,
+    exp: timeNow + (86400 * 180), // 6 months expiration
+    aud: 'https://appleid.apple.com',
+    sub: APPLE_CLIENT_ID,
+  };
+
+  const header = {
+    alg: 'ES256',
+    kid: APPLE_KEY_ID,
+  };
+
+  // Convert raw private key to standard format if needed (handle newlines)
+  const privateKey = APPLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+  return jwt.sign(payload, privateKey, {
+    algorithm: 'ES256',
+    header: header,
+  });
 }
 
 export default async function handler(req, res) {
@@ -43,10 +87,18 @@ export default async function handler(req, res) {
         return await handleGoogleInit(req, res);
       case 'google-callback':
         return await handleGoogleCallback(req, res);
+      case 'apple':
+        return await handleAppleInit(req, res);
+      case 'apple-callback':
+        return await handleAppleCallback(req, res);
       case 'update-profile':
         return await handleUpdateProfile(req, res);
       case 'update-password':
         return await handleUpdatePassword(req, res);
+      case 'forgot-password':
+        return await handleForgotPassword(req, res);
+      case 'reset-password':
+        return await handleResetPassword(req, res);
       case 'decrement-credits':
         return await handleDecrementCredits(req, res);
       default:
@@ -318,6 +370,224 @@ async function handleUpdatePassword(req, res) {
 
   if (error) throw error;
   return res.status(200).json({ message: 'Password updated successfully' });
+}
+
+async function handleForgotPassword(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+
+  // 1. Check if user exists
+  const { data: user, error: fetchError } = await supabase
+    .from('users')
+    .select('id, email, first_name')
+    .eq('email', email.toLowerCase())
+    .single();
+
+  if (fetchError || !user) {
+    // Return success even if user not found for security (obscurity)
+    return res.status(200).json({ message: 'If an account exists, a reset link has been sent.' });
+  }
+
+  // 2. Generate Token
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 3600000); // 1 hour from now
+
+  // 3. Save to DB
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ 
+      reset_token: token,
+      reset_expires_at: expires.toISOString()
+    })
+    .eq('id', user.id);
+
+  if (updateError) throw updateError;
+
+  // 4. Send Email via Resend
+  const apiKey = process.env.VITE_RESEND_API_KEY || process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[handleForgotPassword] No Resend API Key found. Reset link:', token);
+    return res.status(200).json({ message: 'Reset link generated (Mock send - check logs)' });
+  }
+
+  const resend = new Resend(apiKey);
+  const resetLink = `${process.env.VITE_APP_URL || 'https://www.ecoinsight.online'}/?action=reset&token=${token}`;
+
+  await resend.emails.send({
+    from: 'EcoInsight Security <security@ecoinsight.online>',
+    to: [user.email],
+    subject: 'Reset your EcoInsight Intelligence access',
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; line-height: 1.6;">
+        <h2>Password Reset Requested</h2>
+        <p>Hello ${user.first_name || 'Analyst'},</p>
+        <p>We received a request to reset your EcoInsight password. Click the link below to authorize this change:</p>
+        <div style="margin: 2rem 0;">
+          <a href="${resetLink}" style="background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; borderRadius: 8px;">Reset Password</a>
+        </div>
+        <p>This link will expire in 1 hour. If you did not request this, please ignore this email.</p>
+        <p>Best Regards,<br/>EcoInsight Security Team</p>
+      </div>
+    `
+  });
+
+  return res.status(200).json({ message: 'Reset link sent successfully' });
+}
+
+async function handleResetPassword(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword || newPassword.length < 8) {
+    return res.status(400).json({ message: 'Invalid token or password too short' });
+  }
+
+  // 1. Verify token
+  const { data: user, error: fetchError } = await supabase
+    .from('users')
+    .select('id, reset_expires_at')
+    .eq('reset_token', token)
+    .single();
+
+  if (fetchError || !user) {
+    return res.status(400).json({ message: 'Invalid or expired reset token' });
+  }
+
+  const isExpired = new Date(user.reset_expires_at) < new Date();
+  if (isExpired) {
+    return res.status(400).json({ message: 'Reset token has expired' });
+  }
+
+  // 2. Hash new password
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash(newPassword, salt);
+
+  // 3. Update DB
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ 
+      password_hash: passwordHash,
+      reset_token: null,
+      reset_expires_at: null,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', user.id);
+
+  if (updateError) throw updateError;
+
+  return res.status(200).json({ message: 'Password reset successful. You can now log in.' });
+}
+
+async function handleAppleInit(req, res) {
+  const callbackUrl = getAppleCallbackUrl(req);
+  const scope = encodeURIComponent('name email');
+  const appleAuthUrl = `https://appleid.apple.com/auth/authorize?client_id=${APPLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(callbackUrl)}&response_type=code&scope=${scope}&response_mode=form_post`;
+  return res.redirect(appleAuthUrl);
+}
+
+async function handleAppleCallback(req, res) {
+  // Apple uses POST form_post for callbacks when scopes like 'email' or 'name' are requested
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
+  
+  // body will contain 'code' and 'user' (user only on first registration)
+  const { code, user } = req.body;
+  
+  if (!code) {
+    return res.status(400).json({ message: 'No authorization code received from Apple' });
+  }
+
+  try {
+    const clientSecret = getAppleClientSecret();
+    const callbackUrl = getAppleCallbackUrl(req);
+
+    // Exchange code for tokens
+    const response = await axios.post('https://appleid.apple.com/auth/token', new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: callbackUrl,
+      client_id: APPLE_CLIENT_ID,
+      client_secret: clientSecret,
+    }).toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+
+    const { id_token } = response.data;
+    const decodedToken = jwt.decode(id_token);
+    const appleUserEmail = decodedToken.email?.toLowerCase();
+    const appleUserId = decodedToken.sub;
+
+    if (!appleUserEmail) {
+      return res.status(400).json({ message: 'Could not retrieve email from Apple ID' });
+    }
+
+    // Parse 'user' if present (contains name)
+    let firstName = 'Apple';
+    let lastName = 'User';
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        firstName = userData.name?.firstName || firstName;
+        lastName = userData.name?.lastName || lastName;
+      } catch (e) { console.error('Error parsing Apple user data:', e); }
+    }
+
+    // Sync with Supabase
+    const { data: existingUser, error: fetchError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', appleUserEmail)
+      .single();
+
+    let finalUser;
+    if (fetchError || !existingUser) {
+      // Create new user
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert({
+          email: appleUserEmail,
+          first_name: firstName,
+          last_name: lastName,
+          provider: 'apple',
+          provider_id: appleUserId,
+          credits: 100,
+          onboarded: false
+        })
+        .select()
+        .single();
+      
+      if (createError) throw createError;
+      finalUser = newUser;
+    } else {
+      // Update existing user (link provider if needed)
+      const { data: updatedUser, error: updateError } = await supabase
+        .from('users')
+        .update({
+          provider: 'apple',
+          provider_id: appleUserId,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingUser.id)
+        .select()
+        .single();
+      
+      if (updateError) throw updateError;
+      finalUser = updatedUser;
+    }
+
+    // Set auth cookie and redirect to engine
+    const token = signToken({ id: finalUser.id, email: finalUser.email });
+    setAuthCookie(res, token);
+    
+    // Redirect back to main dashboard
+    const baseUrl = process.env.VITE_APP_URL || 'https://www.ecoinsight.online';
+    return res.redirect(`${baseUrl}/?auth_success=true`);
+
+  } catch (error) {
+    console.error('Apple Callback Error:', error.response?.data || error.message);
+    const baseUrl = process.env.VITE_APP_URL || 'https://www.ecoinsight.online';
+    return res.redirect(`${baseUrl}/?auth_error=${encodeURIComponent(error.message)}`);
+  }
 }
 
 async function handleDecrementCredits(req, res) {

@@ -11,13 +11,23 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = 
   const [lastName, setLastName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [resetToken, setResetToken] = useState('');
   
-  const { checkUser, login, signup, loginWithGoogle } = useAuth();
+  const { checkUser, login, signup, loginWithGoogle, loginWithApple, requestPasswordReset, resetPassword } = useAuth();
   
   // Synchronize internal view with parent-controlled initialView when modal opens
   useEffect(() => {
     if (isOpen) {
       setView(initialView);
+      setError('');
+      setSuccessMessage('');
+      
+      // If we are resetting, extract token from URL if not already provided
+      if (initialView === 'reset-password') {
+        const params = new URLSearchParams(window.location.search);
+        setResetToken(params.get('token') || '');
+      }
     }
   }, [isOpen, initialView]);
 
@@ -85,6 +95,39 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = 
     }
   };
 
+  const handleForgotSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    setSuccessMessage('');
+    try {
+      const res = await requestPasswordReset(email);
+      setSuccessMessage(res.message);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send reset link');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    try {
+      await resetPassword(resetToken, password);
+      setSuccessMessage('Password reset successful. Redirecting to login...');
+      setTimeout(() => {
+        setView('login-email');
+        setSuccessMessage('');
+      }, 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to reset password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -109,10 +152,20 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = 
           </div>
           
           <h2 className="auth-title">
-            {view === 'signup' ? 'Create Account' : 'Welcome Back'}
+            {view === 'signup' ? 'Create Account' : 
+             view === 'forgot-password' ? 'Reset Password' :
+             view === 'reset-password' ? 'Set New Password' : 
+             'Welcome Back'}
           </h2>
           <p className="auth-subtitle">
-            {subtitleOverride || (view === 'signup' ? 'Join EcoInsight for elite intelligence' : 'Continue your economic research')}
+            {successMessage ? (
+              <span style={{ color: '#10b981' }}>{successMessage}</span>
+            ) : subtitleOverride || (
+              view === 'signup' ? 'Join EcoInsight for elite intelligence' : 
+              view === 'forgot-password' ? 'Enter your email to receive a reset link' :
+              view === 'reset-password' ? 'Secure your account with a new password' :
+              'Continue your economic research'
+            )}
           </p>
         </div>
 
@@ -176,7 +229,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = 
                 <div className="auth-input-group">
                   <div className="auth-label-row">
                     <label className="auth-label">Password</label>
-                    <button type="button" className="auth-forgot-link">Forgot password?</button>
+                    <button type="button" onClick={() => setView('forgot-password')} className="auth-forgot-link">Forgot password?</button>
                   </div>
                   <div className="auth-input-wrapper">
                     <Lock size={18} className="auth-input-icon" />
@@ -281,6 +334,68 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = 
                 </button>
               </motion.form>
             )}
+
+            {view === 'forgot-password' && (
+              <motion.form 
+                key="forgot"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onSubmit={handleForgotSubmit}
+                className="auth-form"
+              >
+                <div className="auth-input-group">
+                  <label className="auth-label">Recovery Email</label>
+                  <div className="auth-input-wrapper">
+                    <Mail size={18} className="auth-input-icon" />
+                    <input 
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="name@company.com"
+                      className="auth-input with-icon"
+                    />
+                  </div>
+                </div>
+                <button type="submit" disabled={isLoading} className="auth-primary-btn">
+                  {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Send Reset Link'}
+                </button>
+                <button type="button" onClick={() => setView('login-email')} className="auth-back-link">
+                  Back to login
+                </button>
+              </motion.form>
+            )}
+
+            {view === 'reset-password' && (
+              <motion.form 
+                key="reset"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onSubmit={handleResetSubmit}
+                className="auth-form"
+              >
+                <div className="auth-input-group">
+                  <label className="auth-label">New Secure Password</label>
+                  <div className="auth-input-wrapper">
+                    <Lock size={18} className="auth-input-icon" />
+                    <input 
+                      type="password"
+                      required
+                      minLength={8}
+                      autoFocus
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="auth-input with-icon"
+                    />
+                  </div>
+                </div>
+                <button type="submit" disabled={isLoading || !resetToken} className="auth-primary-btn">
+                  {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Update Password'}
+                </button>
+                {!resetToken && <p className="auth-error-text" style={{ fontSize: '0.8rem', marginTop: '0.5rem', textAlign: 'center' }}>Invalid or missing reset token.</p>}
+              </motion.form>
+            )}
           </AnimatePresence>
 
           <div className="auth-divider">
@@ -302,6 +417,16 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = 
                 <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C40.483,35.463,44,30.36,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
               </svg>
               <span>Google</span>
+            </button>
+
+            <button 
+              onClick={loginWithApple}
+              className="auth-social-btn apple-btn"
+            >
+              <svg viewBox="0 0 384 512" width="18" height="18" fill="currentColor">
+                <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+              </svg>
+              <span>Apple</span>
             </button>
           </div>
         </div>

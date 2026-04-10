@@ -143,6 +143,50 @@ const FAST_GREETINGS = {
     'good evening': 'Good evening, Analyst. Markets may be closed, but the intelligence flow never stops. Reviewing today\'s shifts?'
 };
 
+const SourceCard = ({ source }) => {
+    const domain = new URL(source.url).hostname;
+    const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+
+    return (
+        <motion.a
+            href={source.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="source-card"
+            whileHover={{ y: -4, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+        >
+            <div className="source-card-header">
+                <img src={faviconUrl} alt="" className="source-favicon" onError={(e) => e.target.style.display='none'} />
+                <span className="source-name">{source.source}</span>
+                <ExternalLink size={12} className="source-external-icon" />
+            </div>
+            <h4 className="source-title">{source.title}</h4>
+            <p className="source-snippet">{source.snippet}</p>
+        </motion.a>
+    );
+};
+
+const SourceCarousel = ({ sources }) => {
+    if (!sources || sources.length === 0) return null;
+
+    return (
+        <div className="source-carousel-wrapper">
+            <div className="source-carousel-header">
+                <div className="source-header-line" />
+                <span className="source-header-text">Intelligence Provenance</span>
+            </div>
+            <div className="source-carousel">
+                {sources.map((source, idx) => (
+                    <SourceCard key={idx} source={source} />
+                ))}
+            </div>
+        </div>
+    );
+};
+
 const EcoInsightLogo = ({ size = 24, className = "" }) => {
     const id = useId();
     const gradientId = `logoGradientMain-${id.replace(/:/g, '')}`;
@@ -3423,6 +3467,22 @@ function App() {
         }
     }, [isSignedIn, isLoaded, supaLoaded, appSection]);
 
+    // Password Reset Entry Logic
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const action = params.get('action');
+        const token = params.get('token');
+
+        if (action === 'reset' && token) {
+            console.log("[App] Password reset token detected");
+            setAuthModalView('reset-password');
+            setIsAuthModalOpen(true);
+            
+            // Clean the URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, []);
+
     // --- Side Effects ---
 
     // Sync Appearance Settings
@@ -3847,6 +3907,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         try {
             let liveContext = '';
+            let currentSources = [];
 
             if (isComplex) {
                 // Fetch live market data, on-demand stock data, AND web search results in parallel only for complex queries
@@ -3869,7 +3930,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 }
 
                 if (webSearchData.status === 'fulfilled' && webSearchData.value) {
-                    liveContext += webSearchData.value;
+                    liveContext += webSearchData.value.context;
+                    currentSources = webSearchData.value.sources || [];
                 } else if (webSearchData.status === 'rejected') {
                     console.warn('Web search failed:', webSearchData.reason);
                 }
@@ -3905,7 +3967,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     ...c,
                     messages: [
                         ...c.messages.slice(0, -1),
-                        { role: 'assistant', content: assistantContent }
+                        { role: 'assistant', content: assistantContent, sources: currentSources }
                     ]
                 } : c));
             }, getGenerationOptions());
@@ -3926,63 +3988,161 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         }
     }
 
-    // --- PREMIUM FEATURE: PDF EXPORT ---
+    // --- PREMIUM FEATURE: INSTITUTIONAL PDF EXPORT ---
     const downloadChatAsPDF = async () => {
-        if (isExporting) return;
+        if (isExporting || !activeChat) return;
         setIsExporting(true);
         try {
-            const chatElement = document.querySelector('.messages-list');
-            if (!chatElement) return;
-
-            // Temporarily modify styles to capture full scroll height
-            const originalOverflow = chatElement.style.overflow;
-            const originalHeight = chatElement.style.height;
-            chatElement.style.overflow = 'visible';
-            chatElement.style.height = 'auto';
-
-            const canvas = await html2canvas(chatElement, {
-                backgroundColor: '#0a0a0c',
-                scale: 2,
-                logging: false,
-                useCORS: true,
-                windowHeight: chatElement.scrollHeight
-            });
-
-            // Restore original styles immediately
-            chatElement.style.overflow = originalOverflow;
-            chatElement.style.height = originalHeight;
-
-            const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 20;
+            const contentWidth = pageWidth - (margin * 2);
+            let y = margin;
 
-            const imgProps = pdf.getImageProperties(imgData);
-            const imgHeightInMm = (imgProps.height * pdfWidth) / imgProps.width;
+            // 1. Institutional Header
+            pdf.setFillColor(0, 0, 0);
+            pdf.rect(0, 0, pageWidth, 40, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(22);
+            pdf.text('ECOINSIGHT', margin, 20);
+            
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('INTELLIGENCE UNIT // INSTITUTIONAL BRIEF', margin, 28);
+            
+            pdf.setFontSize(8);
+            pdf.text('CONFIDENTIAL // FOR INTERNAL ADVISORY ONLY', pageWidth - margin, 20, { align: 'right' });
+            
+            pdf.setDrawColor(255, 255, 255);
+            pdf.setLineWidth(0.5);
+            pdf.line(margin, 32, pageWidth - margin, 32);
 
-            let heightLeft = imgHeightInMm;
-            let position = 0;
+            y = 55;
 
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightInMm);
-            heightLeft -= pdfHeight;
+            // 2. Metadata Section
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(14);
+            pdf.text(activeChat.title.toUpperCase(), margin, y);
+            y += 8;
 
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeightInMm;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightInMm);
-                heightLeft -= pdfHeight;
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'normal');
+            pdf.setTextColor(100, 100, 100);
+            const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short' });
+            pdf.text(`REPORT ID: ${activeChat.id.slice(0, 8).toUpperCase()}`, margin, y);
+            pdf.text(`ANALYST: ${user?.firstName || 'Authenticated User'}`, pageWidth / 2, y);
+            pdf.text(`GENERATED: ${dateStr} IST`, pageWidth - margin, y, { align: 'right' });
+            y += 12;
+
+            // Visual Divider
+            pdf.setDrawColor(230, 230, 230);
+            pdf.line(margin, y, pageWidth - margin, y);
+            y += 15;
+
+            // 3. Conversation Content
+            const checkPageBreak = (neededHeight) => {
+                if (y + neededHeight > pageHeight - margin) {
+                    pdf.addPage();
+                    y = margin + 10;
+                    // Add "Continued" header on new page
+                    pdf.setFont('helvetica', 'italic');
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(150, 150, 150);
+                    pdf.text(`Intelligence Brief (Continued) - Ref: ${activeChat.title}`, margin, y);
+                    y += 10;
+                    return true;
+                }
+                return false;
+            };
+
+            const allSources = [];
+
+            for (const msg of activeChat.messages) {
+                // Collect sources for bibliography
+                if (msg.sources && msg.sources.length > 0) {
+                    msg.sources.forEach(s => {
+                        if (!allSources.find(as => as.url === s.url)) allSources.push(s);
+                    });
+                }
+
+                const isUser = msg.sender === 'user';
+                
+                // Header for message
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(10);
+                pdf.setTextColor(isUser ? 100 : 0);
+                const senderLabel = isUser ? 'ANALYST QUERY:' : 'AI INTELLIGENCE:';
+                checkPageBreak(15);
+                pdf.text(senderLabel, margin, y);
+                y += 6;
+
+                // Message Text
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(11);
+                pdf.setTextColor(30, 30, 30);
+                
+                // Remove basic markdown backticks for cleaner PDF
+                const cleanText = msg.text.replace(/```[\s\S]*?```/g, '[Code Block Omitted in Print]').replace(/\*\*/g, '');
+                const textLines = pdf.splitTextToSize(cleanText, contentWidth);
+                const blockHeight = textLines.length * 5.5;
+
+                checkPageBreak(blockHeight);
+                pdf.text(textLines, margin, y);
+                y += blockHeight + 10;
             }
 
+            // 4. Intelligence Bibliography (Appendix)
+            if (allSources.length > 0) {
+                checkPageBreak(40);
+                y += 10;
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(14);
+                pdf.setTextColor(0, 0, 0);
+                pdf.text('APPENDIX: INTELLIGENCE BIBLIOGRAPHY', margin, y);
+                y += 10;
+
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(9);
+                pdf.setTextColor(80, 80, 80);
+
+                allSources.forEach((s, i) => {
+                    const sourceText = `[${i + 1}] ${s.title} (${s.source}) - ${s.url}`;
+                    const sourceLines = pdf.splitTextToSize(sourceText, contentWidth);
+                    checkPageBreak(sourceLines.length * 5);
+                    pdf.text(sourceLines, margin, y);
+                    y += (sourceLines.length * 5) + 2;
+                });
+            }
+
+            // 5. Final Disclaimer
+            checkPageBreak(30);
+            y += 15;
+            pdf.setDrawColor(200, 200, 200);
+            pdf.rect(margin, y, contentWidth, 25);
+            pdf.setFont('helvetica', 'italic');
+            pdf.setFontSize(7);
+            pdf.setTextColor(120, 120, 120);
+            const disclaimerLines = pdf.splitTextToSize(
+                'LEGAL DISCLAIMER: This intelligence brief is generated by the EcoInsight AI Engine. Information provided is for educational and advisory purposes only and does not constitute formal financial, investment, or tax advice. Market conditions are volatile; consult with a SEBI-registered professional before making financial decisions in the Indian market.',
+                contentWidth - 10
+            );
+            pdf.text(disclaimerLines, margin + 5, y + 8);
+
+            // Analytics
             if (window.gtag) {
-                window.gtag('event', 'pdf_download', {
+                window.gtag('event', 'pdf_download_institutional', {
                     'event_category': 'Engagement',
                     'event_label': activeChat.title
                 });
             }
 
-            pdf.save(`Eko_by_EcoInsight_Report_${activeChat.title.replace(/\s+/g, '_')}.pdf`);
+            pdf.save(`EcoInsight_Brief_${activeChat.title.replace(/\s+/g, '_')}.pdf`);
         } catch (error) {
-            console.error("PDF Export Failed:", error);
+            console.error("Institutional PDF Export Failed:", error);
         } finally {
             setIsExporting(false);
         }
@@ -4268,6 +4428,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                                                 : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
                                                         ))}
                                                     </div>
+                                                    {msg.sources && <SourceCarousel sources={msg.sources} />}
                                                 </div>
                                             </motion.div>
                                         );
