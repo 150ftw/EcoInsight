@@ -4,7 +4,11 @@ import axios from 'axios';
 const AuthContext = createContext(null);
 
 // Detect if we are running in a local development environment
-const IS_LOCALHOST = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const IS_LOCALHOST = 
+  window.location.hostname === 'localhost' || 
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname.startsWith('192.168.') || 
+  window.location.hostname.endsWith('.local');
 
 // Mock user for local development
 const MOCK_USER = {

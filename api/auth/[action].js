@@ -105,8 +105,13 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: 'Action not found' });
     }
   } catch (err) {
-    console.error(`[Auth API: ${action}] Error:`, err);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error(`[Auth API: ${action}] CRITICAL ERROR:`, err.message);
+    if (err.stack) console.error(err.stack); // Full stack trace for production debugging
+    
+    return res.status(500).json({ 
+      message: 'Internal server error',
+      error: process.env.NODE_ENV !== 'production' ? err.message : undefined 
+    });
   }
 }
 
