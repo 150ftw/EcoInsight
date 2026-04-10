@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import axios from 'axios';
 import { Resend } from 'resend';
 import { supabase } from '../lib/db.js';
 import { 
@@ -11,8 +12,8 @@ import {
   getAuthToken 
 } from '../lib/auth-util.js';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || process.env.VITE_GOOGLE_CLIENT_SECRET;
 
 const APPLE_CLIENT_ID = process.env.APPLE_ID_CLIENT_ID;
 const APPLE_TEAM_ID = process.env.APPLE_ID_TEAM_ID;
