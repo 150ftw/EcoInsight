@@ -5169,6 +5169,7 @@ const parseResponseWithProbes = (content) => {
 
     return (
         <>
+            <div className="neural-bottom-light" />
             {renderActiveSection()}
             <AnimatePresence>
                 {showInitialization && (

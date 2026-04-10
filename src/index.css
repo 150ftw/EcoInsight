@@ -9144,3 +9144,37 @@ select {
     border-color: var(--accent-primary);
     background: rgba(139, 92, 246, 0.05);
 }
+
+/* --- NEURAL BOTTOM EDGE LIGHT --- */
+.neural-bottom-light {
+    position: fixed;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(139, 92, 246, 0.4) 20%, 
+        rgba(217, 70, 239, 0.6) 50%, 
+        rgba(139, 92, 246, 0.4) 80%, 
+        transparent 100%
+    );
+    filter: blur(1px);
+    box-shadow: 
+        0 -10px 40px rgba(139, 92, 246, 0.3),
+        0 -20px 80px rgba(217, 70, 239, 0.2),
+        0 0 10px rgba(139, 92, 246, 0.5);
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+@keyframes neural-pulse {
+    0% { opacity: 0.6; transform: scaleX(0.95); }
+    50% { opacity: 0.9; transform: scaleX(1); }
+    100% { opacity: 0.6; transform: scaleX(0.95); }
+}
+
+.neural-bottom-light {
+    animation: neural-pulse 4s ease-in-out infinite;
+}
