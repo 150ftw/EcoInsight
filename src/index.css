@@ -5469,7 +5469,6 @@ html {
     z-index: 5;
     font-family: var(--font-main);
     scroll-behavior: smooth;
-    contain: paint;
 }
 
 .custom-cursor-container {
