@@ -5071,36 +5071,38 @@ const parseResponseWithProbes = (content) => {
                                 <Lock size={12} color="#a78bfa" />
                             </button>
                         </div>
-                    </nav>
-                    <div className="sidebar-footer">
-                        {user ? (
-                            <div className="user-profile-custom" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
-                                <UserAccountMenu
-                                    hideName={true}
-                                    side="left"
-                                    align="top"
-                                    role={`${profile?.tier || 'Free'} Access`}
-                                    onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
-                                />
-                                <div className="user-info">
-                                    <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
-                                    <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                        {profile?.tier || 'Free'} Access
-                                    </span>
+                        <div className="sidebar-section user-section-mobile" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginBottom: '1rem' }}>
+                            {user ? (
+                                <div className="user-profile-custom-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
+                                    <UserAccountMenu
+                                        hideName={true}
+                                        side="right"
+                                        align="bottom"
+                                        role={`${profile?.tier || 'Free'} Access`}
+                                        onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
+                                    />
+                                    <div className="user-info">
+                                        <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
+                                        <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                            {profile?.tier || 'Free'} Access
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        ) : (
-                            <motion.button
-                                onClick={openLogin}
-                                className="sidebar-btn sidebar-btn-primary"
-                                style={{ width: '100%', justifyContent: 'center' }}
-                                whileHover={{ scale: 1.02, translateY: -2 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <Lock size={16} /> Sign In
-                            </motion.button>
-                        )}
-                    </div>
+                            ) : (
+                                <motion.div style={{ padding: '0 0.75rem' }}>
+                                    <motion.button
+                                        onClick={openLogin}
+                                        className="sidebar-btn sidebar-btn-primary"
+                                        style={{ width: '100%', justifyContent: 'center' }}
+                                        whileHover={{ scale: 1.02, translateY: -2 }}
+                                        whileTap={{ scale: 0.98 }}
+                                    >
+                                        <Lock size={16} /> Sign In
+                                    </motion.button>
+                                </motion.div>
+                            )}
+                        </div>
+                    </nav>
                     <AnimatePresence>
                         {hoveredChatId && (
                             <motion.div
