@@ -45,7 +45,7 @@ import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-remo
 const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = false }) => {
     const id = useId();
     const gradientId = `eko_gradient_${id.replace(/:/g, '')}`;
-    
+
     return (
         <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
             <defs>
@@ -55,7 +55,7 @@ const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = fa
                     <stop offset="1" stopColor="#c084fc" />
                 </linearGradient>
             </defs>
-            <motion.path 
+            <motion.path
                 d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
                 fill="transparent"
                 stroke={cinematic ? `url(#${gradientId})` : "rgba(255,255,255,0.4)"}
@@ -64,7 +64,7 @@ const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = fa
                 animate={animate ? { pathLength: 1, opacity: 1 } : {}}
                 transition={animate ? { duration: cinematic ? 2.5 : 1.2, ease: "easeInOut" } : {}}
             />
-            <motion.path 
+            <motion.path
                 d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
                 fill={`url(#${gradientId})`}
                 initial={animate ? { opacity: 0 } : {}}
@@ -77,14 +77,14 @@ const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = fa
 
 
 const ThinkingIndicator = () => (
-    <motion.div 
-        className="message-wrapper assistant" 
-        initial={{ opacity: 0, y: 10 }} 
+    <motion.div
+        className="message-wrapper assistant"
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, transition: { duration: 0.6 } }}
     >
         <div className="message-icon" style={{ position: 'relative' }}>
-            <motion.div 
+            <motion.div
                 animate={{ opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
@@ -92,8 +92,8 @@ const ThinkingIndicator = () => (
             >
                 <EkoSparkle size={18} animate={true} />
             </motion.div>
-            
-            <motion.div 
+
+            <motion.div
                 style={{ position: 'absolute', inset: -20, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0 }}
@@ -105,9 +105,9 @@ const ThinkingIndicator = () => (
                         <motion.div
                             key={i}
                             initial={{ x: 0, y: 0, scale: 0 }}
-                            exit={{ 
-                                x: Math.cos(angle * Math.PI / 180) * 40, 
-                                y: Math.sin(angle * Math.PI / 180) * 40, 
+                            exit={{
+                                x: Math.cos(angle * Math.PI / 180) * 40,
+                                y: Math.sin(angle * Math.PI / 180) * 40,
                                 scale: [0, 1.5, 0],
                                 opacity: [1, 1, 0]
                             }}
@@ -785,22 +785,22 @@ const ReviewsSection = () => {
         REVIEWS.forEach(r => {
             if (counts[r.rating] !== undefined) counts[r.rating]++;
         });
-        
+
         const stats = [5, 4, 3, 2, 1].map(stars => ({
             stars,
             count: counts[stars],
             percent: REVIEWS.length > 0 ? Math.round((counts[stars] / REVIEWS.length) * 100) : 0
         }));
-        
+
         const totalValue = REVIEWS.reduce((acc, r) => acc + r.rating, 0);
         const avg = REVIEWS.length > 0 ? (totalValue / REVIEWS.length).toFixed(1) : "0.0";
-        
+
         return { stats, avg, total: REVIEWS.length };
     }, []);
-    
+
     // Filter logic
     const filteredReviews = useMemo(() => {
-        return selectedRating 
+        return selectedRating
             ? REVIEWS.filter(r => r.rating === selectedRating)
             : REVIEWS;
     }, [selectedRating]);
@@ -822,7 +822,7 @@ const ReviewsSection = () => {
         }
         setCurrentPage(1); // Reset to first page on filter change
     };
-    
+
     return (
         <section id="reviews" className="reviews-section">
             <div className="section-title" style={{ textAlign: 'center', marginBottom: '3rem' }}>
@@ -834,9 +834,9 @@ const ReviewsSection = () => {
                         Alpha Stage
                     </span>
                 </div>
-                <p style={{ 
-                    margin: '0 auto', 
-                    color: 'var(--text-secondary)', 
+                <p style={{
+                    margin: '0 auto',
+                    color: 'var(--text-secondary)',
                     fontSize: '1rem',
                     maxWidth: '600px',
                     lineHeight: '1.6'
@@ -845,10 +845,10 @@ const ReviewsSection = () => {
                 </p>
             </div>
 
-            <div className="reviews-overview" style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center', 
+            <div className="reviews-overview" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '2.5rem',
                 scale: '0.85'
@@ -859,11 +859,11 @@ const ReviewsSection = () => {
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <div style={{ display: 'flex', gap: '2px' }}>
                                 {[1, 2, 3, 4, 5].map(s => (
-                                    <Star 
-                                        key={s} 
-                                        size={16} 
-                                        fill={s <= Math.round(parseFloat(ratingStats.avg)) ? "#f59e0b" : "transparent"} 
-                                        color="#f59e0b" 
+                                    <Star
+                                        key={s}
+                                        size={16}
+                                        fill={s <= Math.round(parseFloat(ratingStats.avg)) ? "#f59e0b" : "transparent"}
+                                        color="#f59e0b"
                                     />
                                 ))}
                             </div>
@@ -872,7 +872,7 @@ const ReviewsSection = () => {
                             </span>
                         </div>
                     </div>
-                    
+
                     {selectedRating && (
                         <motion.button
                             initial={{ opacity: 0, x: -10 }}
@@ -895,16 +895,16 @@ const ReviewsSection = () => {
                         </motion.button>
                     )}
                 </div>
-                
+
                 <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {ratingStats.stats.map(row => (
-                        <motion.div 
+                        <motion.div
                             key={row.stars}
                             whileHover={{ x: 5 }}
                             onClick={() => handleFilter(row.stars)}
-                            style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
                                 gap: '12px',
                                 cursor: 'pointer',
                                 opacity: (selectedRating && selectedRating !== row.stars) ? 0.4 : 1,
@@ -916,14 +916,14 @@ const ReviewsSection = () => {
                         >
                             <span style={{ color: '#a1a1aa', fontSize: '0.75rem', minWidth: '45px' }}>{row.stars} stars</span>
                             <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
-                                <motion.div 
+                                <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${row.percent}%` }}
                                     transition={{ duration: 1, ease: 'easeOut' }}
-                                    style={{ 
-                                        height: '100%', 
-                                        background: row.stars >= 4 ? '#8b5cf6' : (row.stars === 3 ? '#f59e0b' : '#3f3f46') 
-                                    }} 
+                                    style={{
+                                        height: '100%',
+                                        background: row.stars >= 4 ? '#8b5cf6' : (row.stars === 3 ? '#f59e0b' : '#3f3f46')
+                                    }}
                                 />
                             </div>
                             <span style={{ color: '#71717a', fontSize: '0.75rem', minWidth: '35px', textAlign: 'right' }}>{row.percent}%</span>
@@ -933,7 +933,7 @@ const ReviewsSection = () => {
             </div>
 
             <AnimatePresence mode="wait">
-                <motion.div 
+                <motion.div
                     key={currentPage}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -942,7 +942,7 @@ const ReviewsSection = () => {
                     className="reviews-grid"
                 >
                     {currentReviews.map((review, i) => (
-                        <motion.div 
+                        <motion.div
                             key={review.id}
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -953,11 +953,11 @@ const ReviewsSection = () => {
                             <div className="review-header" style={{ marginBottom: '-0.5rem' }}>
                                 <div className="stars-row">
                                     {[...Array(5)].map((_, idx) => (
-                                        <Star 
-                                            key={idx} 
-                                            size={12} 
-                                            fill={idx < review.rating ? "#f59e0b" : "transparent"} 
-                                            color={idx < review.rating ? "#f59e0b" : "#3f3f46"} 
+                                        <Star
+                                            key={idx}
+                                            size={12}
+                                            fill={idx < review.rating ? "#f59e0b" : "transparent"}
+                                            color={idx < review.rating ? "#f59e0b" : "#3f3f46"}
                                         />
                                     ))}
                                 </div>
@@ -984,26 +984,26 @@ const ReviewsSection = () => {
                     ))}
                 </motion.div>
             </AnimatePresence>
-            
+
             <div className="pagination-controls" style={{ marginTop: '2.5rem' }}>
-                <button 
-                    className="page-btn" 
+                <button
+                    className="page-btn"
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
                 >
                     Prev
                 </button>
                 {[...Array(totalPages)].map((_, i) => (
-                    <button 
-                        key={i} 
+                    <button
+                        key={i}
                         className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`}
                         onClick={() => paginate(i + 1)}
                     >
                         {i + 1}
                     </button>
                 ))}
-                <button 
-                    className="page-btn" 
+                <button
+                    className="page-btn"
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage === totalPages}
                 >
@@ -1020,7 +1020,7 @@ const ReviewsSection = () => {
 
 const DetailedFooter = ({ setAppSection }) => {
     const currentYear = new Date().getFullYear();
-    
+
     const footerSections = [
         {
             title: "PLATFORM",
@@ -1073,8 +1073,8 @@ const DetailedFooter = ({ setAppSection }) => {
                             <ul>
                                 {section.links.map((link, lIdx) => (
                                     <li key={lIdx}>
-                                        <button 
-                                            key={link.id} 
+                                        <button
+                                            key={link.id}
                                             className="footer-link-btn"
                                             onClick={() => {
                                                 setAppSection(link.id);
@@ -1259,7 +1259,7 @@ const SubpageRenderer = ({ view, onBack }) => {
         setIsSubmitting(true);
 
         const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || "f439bd5e-b5ed-4660-8a7d-6f88a1f2a195";
-        
+
         try {
             const response = await fetch("https://api.web3forms.com/submit", {
                 method: "POST",
@@ -1341,32 +1341,32 @@ const SubpageRenderer = ({ view, onBack }) => {
                                             <div className="field-group">
                                                 <div className="form-field">
                                                     <label>Subject Protocol</label>
-                                                    <input 
-                                                        type="text" 
-                                                        placeholder="Institutional Inquiry" 
-                                                        required 
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Institutional Inquiry"
+                                                        required
                                                         value={formData.subject}
-                                                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                                                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                                                     />
                                                 </div>
                                                 <div className="form-field">
                                                     <label>Return Vector (Email)</label>
-                                                    <input 
-                                                        type="email" 
-                                                        placeholder="analyst@firm.com" 
-                                                        required 
+                                                    <input
+                                                        type="email"
+                                                        placeholder="analyst@firm.com"
+                                                        required
                                                         value={formData.email}
-                                                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="form-field">
                                                 <label>Intelligence Payload</label>
-                                                <textarea 
-                                                    placeholder="Specify your inquiry details..." 
+                                                <textarea
+                                                    placeholder="Specify your inquiry details..."
                                                     required
                                                     value={formData.message}
-                                                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                                                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                                 ></textarea>
                                             </div>
                                             <button type="submit" className="btn-primary" disabled={isSubmitting}>
@@ -3026,7 +3026,7 @@ const EventImpactPredictor = () => {
 function App() {
     const { logout, loginWithGoogle, loading: authLoading, updateProfile, updatePassword } = useAuth();
     const { user, isLoaded, isSignedIn } = useUser();
-    
+
     // Auth Modal State
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [authModalView, setAuthModalView] = useState('login-email');
@@ -3257,14 +3257,14 @@ function App() {
 
     const handleAccountSave = async (updatedData) => {
         setProfile(prev => ({ ...prev, ...updatedData }));
-        
+
         if (user?.id && supaLoaded) {
             try {
                 // 1. Sync identity fields (name) with Auth backend if changed
                 if (updatedData.name || updatedData.avatar) {
-                    await updateProfile({ 
+                    await updateProfile({
                         name: updatedData.name,
-                        profileImage: updatedData.avatar 
+                        profileImage: updatedData.avatar
                     });
                 }
 
@@ -3555,17 +3555,17 @@ function App() {
         if (!user || !supaLoaded) return;
 
         // Automatically update profile if it's currently at default state or missing real data
-        const isDefault = !profile.email || 
-                         profile.name === 'Professional Analyst' || 
-                         profile.name === 'Guest User' || 
-                         profile.name === '' ||
-                         profile.email === 'analyst@ecoinsight.ai' || 
-                         profile.email === 'guest@ecoinsight.ai';
-        
+        const isDefault = !profile.email ||
+            profile.name === 'Professional Analyst' ||
+            profile.name === 'Guest User' ||
+            profile.name === '' ||
+            profile.email === 'analyst@ecoinsight.ai' ||
+            profile.email === 'guest@ecoinsight.ai';
+
         if (isDefault || !profile.onboarded || (user.email && profile.email !== user.email)) {
             const userName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || user.email.split('@')[0];
             const userHandle = user.username ? `@${user.username}` : `@${user.email.split('@')[0]}`;
-            
+
             setProfile(prev => ({
                 ...prev,
                 name: userName || prev.name,
@@ -3729,15 +3729,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         return prompt;
     };
-    
+
     const isComplexQuery = (text) => {
         if (!text) return false;
         const lowText = text.toLowerCase().trim();
-        
+
         // Greetings and very short talk are NOT complex
         const greetings = ['hi', 'hello', 'hey', 'yo', 'good morning', 'good afternoon', 'good evening', 'how are you', 'howdy', 'sup'];
         if (greetings.includes(lowText)) return false;
-        if (lowText.length < 5 && !/\d/.test(lowText)) return false; 
+        if (lowText.length < 5 && !/\d/.test(lowText)) return false;
 
         // Keywords that MUST trigger a complex search
         const complexKeywords = [
@@ -3787,7 +3787,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             // Skip search indicator for simple queries
             setIsNeuralSearching(false);
         }
-        
+
         const userMessage = { role: 'user', content: textToSend }
 
         // FAST PATH: Handle greetings instantly (with platform-name stripping)
@@ -3795,7 +3795,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             .replace(/[^\w\s]/g, '')
             .replace(/\b(eko|ecoinsight|echo|heye|heyeko|helloeko|hi|hey)\b/g, '') // Strip fillers/platform names
             .trim();
-        
+
         // Also check raw phrases if stripped version is too short or empty
         const rawClean = textToSend.toLowerCase().replace(/[^\w\s]/g, '').trim();
         const finalMatch = FAST_GREETINGS[cleanText] || FAST_GREETINGS[rawClean];
@@ -3847,7 +3847,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
         try {
             let liveContext = '';
-            
+
             if (isComplex) {
                 // Fetch live market data, on-demand stock data, AND web search results in parallel only for complex queries
                 const [marketData, onDemandData, webSearchData] = await Promise.allSettled([
@@ -3878,12 +3878,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             const currentPdfContext = customPdfText !== null ? customPdfText : pdfText;
 
             const chatMessages = [
-                { 
-                    role: 'system', 
-                    content: generateSystemPrompt(currentPdfContext) + 
-                             "\n\n--- INJECTED AUTHORITY CONTEXT: SUPERSEDES ALL INTERNAL KNOWLEDGE ---\n" + 
-                             liveContext + 
-                             "\n--- END INJECTED AUTHORITY CONTEXT ---" 
+                {
+                    role: 'system',
+                    content: generateSystemPrompt(currentPdfContext) +
+                        "\n\n--- INJECTED AUTHORITY CONTEXT: SUPERSEDES ALL INTERNAL KNOWLEDGE ---\n" +
+                        liveContext +
+                        "\n--- END INJECTED AUTHORITY CONTEXT ---"
                 },
                 ...activeChat.messages.map(msg => ({ role: msg.role, content: msg.content })),
                 userMessage
@@ -4011,7 +4011,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         } : c));
     };
 
-        const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const [sidebarWidth, setSidebarWidth] = useState(() => {
         const saved = localStorage.getItem('ecoinsight_sidebar_width');
         return saved ? parseInt(saved, 10) : 280;
     });
@@ -4102,7 +4102,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     user.primaryEmailAddress.emailAddress,
                     onboardingData.name || user.firstName || user.fullName
                 );
-                
+
                 if (response.success) {
                     // Update state to reflect email sent
                     setProfile(prev => ({ ...prev, welcome_email_sent: true }));
@@ -4116,7 +4116,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     const MobileDashboardLock = () => (
         <div className="mobile-dashboard-lock">
-            <motion.div 
+            <motion.div
                 className="lock-card"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -4135,15 +4135,15 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 <div className="institutional-header">
                     <Monitor size={48} className="text-accent" style={{ opacity: 0.8, marginBottom: '1rem' }} />
                 </div>
-                <div style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '6px', 
-                    background: 'rgba(139, 92, 246, 0.1)', 
-                    color: '#c084fc', 
-                    padding: '4px 12px', 
-                    borderRadius: '20px', 
-                    fontSize: '0.7rem', 
+                <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'rgba(139, 92, 246, 0.1)',
+                    color: '#c084fc',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontSize: '0.7rem',
                     fontWeight: '600',
                     letterSpacing: '0.05em',
                     textTransform: 'uppercase',
@@ -4154,7 +4154,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 </div>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#fff' }}>Desktop Hub Gateway</h2>
                 <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '2rem' }}>
-                    The high-density Eko Intelligence Hub is purpose-built for ultra-wide precision displays. 
+                    The high-density Eko Intelligence Hub is purpose-built for ultra-wide precision displays.
                     Institutional access is currently restricted on mobile viewports.
                 </p>
                 <div className="lock-badges" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
@@ -4176,7 +4176,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             case 'chat':
                 return (
                     <div key={view} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-                        <div 
+                        <div
                             className="messages-list"
                             onScroll={(e) => {
                                 const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -4185,95 +4185,95 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         >
                             <div style={{ flex: 1 }} />
                             {messages.length === 1 ? (
-                                    <motion.div 
-                                        className="empty-chat-hero"
-                                        initial="hidden"
-                                        animate="visible"
+                                <motion.div
+                                    className="empty-chat-hero"
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: {
+                                            opacity: 1,
+                                            transition: { staggerChildren: 0.1, delayChildren: 0.05 }
+                                        }
+                                    }}
+                                >
+                                    <motion.div
+                                        className="empty-chat-greeting"
                                         variants={{
-                                            hidden: { opacity: 0 },
-                                            visible: { 
-                                                opacity: 1, 
-                                                transition: { staggerChildren: 0.1, delayChildren: 0.05 } 
-                                            }
+                                            hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                            visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
                                         }}
                                     >
-                                        <motion.div 
-                                            className="empty-chat-greeting"
-                                            variants={{
-                                                hidden: { opacity: 0, y: 40, scale: 0.95 },
-                                                visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-                                            }}
-                                        >
-                                            <EkoSparkle size={36} /> 
-                                            <span className="greeting-name">Hi {(profile?.name || user?.first_name || 'There').split(' ')[0]}</span>
-                                        </motion.div>
-                                        <motion.div 
-                                            className="empty-chat-headline"
-                                            variants={{
-                                                hidden: { opacity: 0, y: 40, scale: 0.95 },
-                                                visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-                                            }}
-                                        >
-                                            Where should we start?
-                                        </motion.div>
-
-                                        <motion.div 
-                                            className="suggestion-chips"
-                                            variants={{
-                                                hidden: { opacity: 0, y: 40, scale: 0.95 },
-                                                visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-                                            }}
-                                        >
-                                            {FAQS.map((faq, idx) => (
-                                                <button key={idx} className="suggestion-chip" onClick={() => handleSend(faq.text)} disabled={isLoading}>
-                                                    {faq.icon} <span>{faq.text}</span>
-                                                </button>
-                                            ))}
-                                        </motion.div>
+                                        <EkoSparkle size={36} />
+                                        <span className="greeting-name">Hi {(profile?.name || user?.first_name || 'There').split(' ')[0]}</span>
                                     </motion.div>
-                                ) : (
-                                    <AnimatePresence initial={false}>
-                                        {messages.map((msg, i) => {
-                                            if (msg.role === 'assistant' && msg.content === '') {
-                                                return <ThinkingIndicator key={`thinking-${i}`} />;
-                                            }
-                                            return (
-                                                <motion.div
-                                                    key={i}
-                                                    className={`message-wrapper ${msg.role}`}
-                                                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                    transition={{ duration: 0.3 }}
-                                                >
-                                                    <div className="message-icon" style={{ overflow: 'hidden' }}>
-                                                        {msg.role === 'assistant' ? (
-                                                            <EkoSparkle size={20} />
+                                    <motion.div
+                                        className="empty-chat-headline"
+                                        variants={{
+                                            hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                            visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                        }}
+                                    >
+                                        Where should we start?
+                                    </motion.div>
+
+                                    <motion.div
+                                        className="suggestion-chips"
+                                        variants={{
+                                            hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                            visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                        }}
+                                    >
+                                        {FAQS.map((faq, idx) => (
+                                            <button key={idx} className="suggestion-chip" onClick={() => handleSend(faq.text)} disabled={isLoading}>
+                                                {faq.icon} <span>{faq.text}</span>
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                </motion.div>
+                            ) : (
+                                <AnimatePresence initial={false}>
+                                    {messages.map((msg, i) => {
+                                        if (msg.role === 'assistant' && msg.content === '') {
+                                            return <ThinkingIndicator key={`thinking-${i}`} />;
+                                        }
+                                        return (
+                                            <motion.div
+                                                key={i}
+                                                className={`message-wrapper ${msg.role}`}
+                                                initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <div className="message-icon" style={{ overflow: 'hidden' }}>
+                                                    {msg.role === 'assistant' ? (
+                                                        <EkoSparkle size={20} />
+                                                    ) : (
+                                                        user?.profile_image ? (
+                                                            <img
+                                                                src={user.profile_image}
+                                                                alt="User"
+                                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                            />
                                                         ) : (
-                                                            user?.profile_image ? (
-                                                                <img 
-                                                                    src={user.profile_image} 
-                                                                    alt="User" 
-                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                                                                />
-                                                            ) : (
-                                                                <User size={18} />
-                                                            )
-                                                        )}
+                                                            <User size={18} />
+                                                        )
+                                                    )}
+                                                </div>
+                                                <div className="message-container">
+                                                    <div className="message-content">
+                                                        {parseChartBlocks(msg.content).map((block, bIdx) => (
+                                                            block.type === 'chart'
+                                                                ? <EcoChartRenderer key={bIdx} config={block.content} />
+                                                                : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
+                                                        ))}
                                                     </div>
-                                                    <div className="message-container">
-                                                        <div className="message-content">
-                                                            {parseChartBlocks(msg.content).map((block, bIdx) => (
-                                                                block.type === 'chart'
-                                                                    ? <EcoChartRenderer key={bIdx} config={block.content} />
-                                                                    : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            );
-                                        })}
-                                    </AnimatePresence>
-                                )}
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    })}
+                                </AnimatePresence>
+                            )}
                             <div ref={messagesEndRef} />
                         </div>
 
@@ -4281,7 +4281,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <motion.div className="input-wrapper" style={{ zIndex: 10, position: 'relative' }}>
                                 <AnimatePresence mode="wait">
                                     {rateLimitActive && (
-                                        <motion.div 
+                                        <motion.div
                                             key="rate-limit"
                                             className="rate-limit-warning"
                                             initial={{ opacity: 0, y: 10 }}
@@ -4310,7 +4310,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         </motion.div>
                                     )}
                                     {showUploadSoon && (
-                                        <motion.div 
+                                        <motion.div
                                             key="upload-soon"
                                             className="rate-limit-warning"
                                             initial={{ opacity: 0, y: 15 }}
@@ -4336,14 +4336,14 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                                 whiteSpace: 'nowrap'
                                             }}
                                         >
-                                            <Zap size={14} className="text-purple-400" /> 
+                                            <Zap size={14} className="text-purple-400" />
                                             <span>Pro Feature: File Analysis coming in next update</span>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-                                <motion.button 
+                                <motion.button
                                     type="button"
-                                    className="file-upload-btn" 
+                                    className="file-upload-btn"
                                     title="Upload PDF Analysis"
                                     whileHover={{ scale: 1.1, backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
                                     whileTap={{ scale: 0.9 }}
@@ -4352,10 +4352,10 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         setShowUploadSoon(true);
                                         setTimeout(() => setShowUploadSoon(false), 3000);
                                     }}
-                                    style={{ 
-                                        background: 'transparent', 
-                                        border: 'none', 
-                                        cursor: 'pointer', 
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
                                         padding: '8px',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -4370,7 +4370,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                     <FilePlus size={20} />
                                 </motion.button>
                                 <input
-                                    placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "Query economic trends, theories, or data..."}
+                                    placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "What's on your mind today?"}
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -4389,8 +4389,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             case 'dashboard':
                 return (
                     <div className="view-content dashboard-view" key={view}>
-                        {isMobile ? <MobileDashboardLock /> : <LiveMarketDashboard 
-                            user={user} 
+                        {isMobile ? <MobileDashboardLock /> : <LiveMarketDashboard
+                            user={user}
                             watchlist={personalization.watchlist || []}
                             onWatchlistChange={handleWatchlistChange}
                         />}
@@ -4474,22 +4474,22 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 <h1>Settings</h1>
                                 <p>Manage your EcoInsight profile and preferences.</p>
                             </div>
-                            <button 
-                                className={`btn-primary ${saveStatus === 'saved' ? 'success' : ''}`} 
+                            <button
+                                className={`btn-primary ${saveStatus === 'saved' ? 'success' : ''}`}
                                 onClick={handleSaveSettings}
                                 disabled={saveStatus === 'saving'}
                                 style={{ minWidth: '140px' }}
                             >
                                 {saveStatus === 'saving' ? <><Loader2 size={16} className="animate-spin" /> Saving...</> :
-                                 saveStatus === 'saved' ? <><Check size={16} /> Changes Saved</> :
-                                 saveStatus === 'error' ? <><AlertTriangle size={16} /> Error Saving</> :
-                                 <><Save size={16} /> Save Changes</>}
+                                    saveStatus === 'saved' ? <><Check size={16} /> Changes Saved</> :
+                                        saveStatus === 'error' ? <><AlertTriangle size={16} /> Error Saving</> :
+                                            <><Save size={16} /> Save Changes</>}
                             </button>
                         </div>
 
                         {/* Settings content omitted for brevity — it's handled in the full file */}
                         <div className="settings-footer" style={{ marginTop: '2rem', padding: '2rem 0', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                             <button className="secondary-btn" onClick={() => setView('chat')}>Back to Chat</button>
+                            <button className="secondary-btn" onClick={() => setView('chat')}>Back to Chat</button>
                         </div>
                     </div>
                 );
@@ -4502,9 +4502,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
     const renderActiveSection = () => {
         if (appSection === 'landing') {
-            return <LandingPage 
-                setAppSection={setAppSection} 
-                setAuthType={setAuthType} 
+            return <LandingPage
+                setAppSection={setAppSection}
+                setAuthType={setAuthType}
                 onLaunchEngine={() => {
                     setAppSection('chat');
                     // Defensive check for messages existence before accessing property
@@ -4521,13 +4521,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         }
 
         if (appSection === 'onboarding' || (isSignedIn && supaLoaded && !profile?.onboarded && appSection !== 'landing' && appSection !== 'checkout')) return (
-            <OnboardingView 
-                user={user} 
+            <OnboardingView
+                user={user}
                 onComplete={(data) => {
                     handleOnboardingComplete(data);
                     setAppSection('chat');
                     createNewChat();
-                }} 
+                }}
             />
         );
 
@@ -4561,9 +4561,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         </button>
                     </header>
                 )}
-                <aside 
+                <aside
                     className={`sidebar ${isSidebarOpen ? 'open' : ''}`}
-                    style={{ 
+                    style={{
                         '--sidebar-width': `${sidebarWidth}px`,
                         flexBasis: isMobile ? '280px' : 'var(--sidebar-width)',
                         width: isMobile ? '280px' : 'var(--sidebar-width)'
@@ -4578,9 +4578,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     <nav className="sidebar-nav">
                         <div className="sidebar-section">
                             <span className="section-label">Real-time Data</span>
-                            <button 
+                            <button
                                 className="nav-item"
-                                onClick={() => { 
+                                onClick={() => {
                                     setView('dashboard');
                                     if (isMobile) setIsSidebarOpen(false);
                                 }}
@@ -4595,7 +4595,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative' }}>
-                                    <BarChart3 size={18} className="text-purple-400" /> 
+                                    <BarChart3 size={18} className="text-purple-400" />
                                     <span>Eko Intelligence Hub</span>
                                 </div>
                             </button>
@@ -4606,7 +4606,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <button className="nav-item new-chat" onClick={() => { createNewChat(); if (isMobile) setIsSidebarOpen(false); }}>
                                 <EcoNewChatIcon size={18} /> <span>New Chat</span>
                             </button>
-                            <div 
+                            <div
                                 className="history-item-wrapper active-chat-item"
                                 onMouseEnter={() => {
                                     clearTimeout(hoverTimeout.current);
@@ -4633,8 +4633,8 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <span className="section-label">Chat History</span>
                             <div className="history-list">
                                 {chats.filter(c => c.id !== activeChatId && c.messages.length > 1).map(chat => (
-                                    <div 
-                                        key={chat.id} 
+                                    <div
+                                        key={chat.id}
                                         className="history-item-wrapper"
                                         onMouseEnter={() => {
                                             clearTimeout(hoverTimeout.current);
@@ -4686,36 +4686,36 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         style={{ overflow: 'hidden' }}
                                     >
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
-                                            <button 
-                                                className="nav-item sub-nav-item" 
-                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
+                                            <button
+                                                className="nav-item sub-nav-item"
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
                                                 onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
                                             >
-                                                <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><Sparkles size={16} /> Today's Insight</div> 
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={16} /> Today's Insight</div>
                                                 <Lock size={12} color="#a78bfa" />
                                             </button>
-                                            <button 
-                                                className="nav-item sub-nav-item" 
-                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
+                                            <button
+                                                className="nav-item sub-nav-item"
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
                                                 onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
                                             >
-                                                <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><Activity size={16} /> Market Pulse</div> 
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={16} /> Market Pulse</div>
                                                 <Lock size={12} color="#a78bfa" />
                                             </button>
-                                            <button 
-                                                className="nav-item sub-nav-item" 
-                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
+                                            <button
+                                                className="nav-item sub-nav-item"
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
                                                 onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
                                             >
-                                                <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><BarChart3 size={16} /> Sector Heatmap</div> 
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><BarChart3 size={16} /> Sector Heatmap</div>
                                                 <Lock size={12} color="#a78bfa" />
                                             </button>
-                                            <button 
-                                                className="nav-item sub-nav-item" 
-                                                style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} 
+                                            <button
+                                                className="nav-item sub-nav-item"
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
                                                 onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
                                             >
-                                                <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><PieChart size={16} /> Portfolio Analyzer</div> 
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><PieChart size={16} /> Portfolio Analyzer</div>
                                                 <Lock size={12} color="#a78bfa" />
                                             </button>
                                         </div>
@@ -4748,26 +4748,26 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                         style={{ overflow: 'hidden' }}
                                     >
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoTrendsIcon size={16} /> Market Trends</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoPulseIcon size={16} /> Economic Pulse</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoSimplifyIcon size={16} /> ELI5 Economics</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoSimulatorIcon size={16} /> What-If Simulator</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoNewsIcon size={16} /> News Analyzer</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{display:'flex',justifyContent:'space-between',alignItems:'center',opacity:0.6}} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}><EcoPredictorIcon size={16} /> Event Predictor</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoTrendsIcon size={16} /> Market Trends</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoPulseIcon size={16} /> Economic Pulse</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoSimplifyIcon size={16} /> ELI5 Economics</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoSimulatorIcon size={16} /> What-If Simulator</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoNewsIcon size={16} /> News Analyzer</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoPredictorIcon size={16} /> Event Predictor</div> <Lock size={12} color="#a78bfa" /></button>
                                         </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
 
-                            <button 
-                                className="nav-item" 
-                                onClick={() => { setModalType('premium'); setShowCreditModal(true); }} 
-                                style={{ 
-                                    marginTop: '0.5rem', 
-                                    opacity: 0.6, 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between', 
-                                    alignItems: 'center' 
+                            <button
+                                className="nav-item"
+                                onClick={() => { setModalType('premium'); setShowCreditModal(true); }}
+                                style={{
+                                    marginTop: '0.5rem',
+                                    opacity: 0.6,
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
                                 }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -4777,14 +4777,14 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             </button>
                         </div>
                     </nav>
-                        <div className="sidebar-footer">
+                    <div className="sidebar-footer">
                         {user ? (
                             <div className="user-profile-custom" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
-                                <UserAccountMenu 
-                                    hideName={true} 
-                                    side="left" 
-                                    align="top" 
-                                    role={`${profile?.tier || 'Free'} Access`} 
+                                <UserAccountMenu
+                                    hideName={true}
+                                    side="left"
+                                    align="top"
+                                    role={`${profile?.tier || 'Free'} Access`}
                                     onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
                                 />
                                 <div className="user-info">
@@ -4795,7 +4795,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                 </div>
                             </div>
                         ) : (
-                            <motion.button 
+                            <motion.button
                                 onClick={openLogin}
                                 className="sidebar-btn sidebar-btn-primary"
                                 style={{ width: '100%', justifyContent: 'center' }}
@@ -4808,7 +4808,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     </div>
                     <AnimatePresence>
                         {hoveredChatId && (
-                            <motion.div 
+                            <motion.div
                                 className="chat-summary-tooltip"
                                 initial={{ opacity: 0, x: 10, scale: 0.95 }}
                                 animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -4834,7 +4834,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                     </AnimatePresence>
                 </aside>
                 {!isMobile && (
-                    <div 
+                    <div
                         className={`sidebar-resizer ${isResizing ? 'active' : ''}`}
                         onMouseDown={startResizing}
                     />
@@ -4845,12 +4845,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                             <div className="header-content">
                                 <EcoInsightLogo size={28} />
                                 <h2>{
-                                    view === 'chat' ? 'Eko AI - Indian Market Analyst' : 
-                                    view === 'heatmap' ? 'Sector Sentiment' :
-                                    view === 'portfolio' ? 'Neural Portfolio' :
-                                    view === 'market-pulse' ? 'Quick Market Pulse' :
-                                    view === 'insights' ? 'Elite AI Insights' :
-                                    view === 'trends' ? 'Market Intelligence' : 'Account Settings'
+                                    view === 'chat' ? 'Eko AI - Indian Market Analyst' :
+                                        view === 'heatmap' ? 'Sector Sentiment' :
+                                            view === 'portfolio' ? 'Neural Portfolio' :
+                                                view === 'market-pulse' ? 'Quick Market Pulse' :
+                                                    view === 'insights' ? 'Elite AI Insights' :
+                                                        view === 'trends' ? 'Market Intelligence' : 'Account Settings'
                                 }</h2>
                                 {view !== 'chat' && <div className="badge">Beta</div>}
                                 <div className="header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
@@ -4901,38 +4901,38 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                         initial={{ backgroundColor: 'rgba(0,0,0,0)' }}
                         animate={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
                         exit={{ backgroundColor: 'rgba(0,0,0,0)', transition: { delay: 0.5 } }}
-                        style={{ 
+                        style={{
                             left: isMobile ? 0 : `${sidebarWidth}px`,
                             width: isMobile ? '100%' : `calc(100% - ${sidebarWidth}px)`
                         }}
                     >
                         <motion.div
                             className="star-fly-icon"
-                            initial={{ 
-                                x: 0, 
-                                y: '-12vh', 
-                                scale: 3, 
-                                opacity: 0, 
-                                rotate: -15 
+                            initial={{
+                                x: 0,
+                                y: '-12vh',
+                                scale: 3,
+                                opacity: 0,
+                                rotate: -15
                             }}
                             animate={{
                                 opacity: [0, 1, 1, 1, 0.6, 0],
                                 scale: [3, 2.8, 2.8, 2.8, 0.6, 0.2],
-                                rotate: [0, 45, 90, 720, 1440, 2160], 
-                                x: isMobile ? 
-                                    [0, 0, 0, 0, -window.innerWidth / 2 + 60, -window.innerWidth / 2 + 60] : 
+                                rotate: [0, 45, 90, 720, 1440, 2160],
+                                x: isMobile ?
+                                    [0, 0, 0, 0, -window.innerWidth / 2 + 60, -window.innerWidth / 2 + 60] :
                                     [0, 0, 0, 0, -(window.innerWidth - sidebarWidth) / 2 + 100, -(window.innerWidth - sidebarWidth) / 2 + 100],
                                 y: [
-                                    '-12vh', 
-                                    '-10vh', 
-                                    '-12vh', 
                                     '-12vh',
-                                    '38vh', 
+                                    '-10vh',
+                                    '-12vh',
+                                    '-12vh',
+                                    '38vh',
                                     '38vh'
                                 ]
                             }}
                             transition={{
-                                duration: 4.5, 
+                                duration: 4.5,
                                 times: [0, 0.2, 0.55, 0.75, 0.95, 1],
                                 ease: "easeInOut"
                             }}
@@ -4944,12 +4944,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 )}
             </AnimatePresence>
 
-            <BugReportModal 
+            <BugReportModal
                 isOpen={showBugModal}
                 onClose={() => setShowBugModal(false)}
             />
 
-            <button 
+            <button
                 className="bug-fab"
                 onClick={() => setShowBugModal(true)}
                 title="Report Bug / Feedback"
@@ -4981,23 +4981,23 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
 
             <CookieConsent />
-            <AuthModal 
-                isOpen={isAuthModalOpen} 
+            <AuthModal
+                isOpen={isAuthModalOpen}
                 onClose={() => {
                     setIsAuthModalOpen(false);
                     setAuthModalSubtitle(null);
-                }} 
+                }}
                 initialView={authModalView}
                 subtitleOverride={authModalSubtitle}
             />
-            <AccountSettingsModal 
+            <AccountSettingsModal
                 isOpen={isAccountModalOpen}
                 onClose={() => setIsAccountModalOpen(false)}
                 profile={profile}
                 onSave={handleAccountSave}
             />
 
-            <CommandPalette 
+            <CommandPalette
                 isOpen={isCommandPaletteOpen}
                 onClose={() => setIsCommandPaletteOpen(false)}
                 onAction={handleCommandAction}
