@@ -420,8 +420,8 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = 
             </button>
 
             <button 
-              onClick={loginWithApple}
-              className="auth-social-btn apple-btn"
+              disabled
+              className="auth-social-btn apple-btn disabled"
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <svg viewBox="0 0 384 512" width="18" height="18" fill="currentColor">

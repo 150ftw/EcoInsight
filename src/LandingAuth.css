@@ -1435,10 +1435,17 @@ select {
     padding-right: 1.25rem !important;
 }
 
-.apple-btn:hover {
+.apple-btn:not(.disabled):hover {
     background: #080808 !important;
     border-color: #fff !important;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.05) !important;
+}
+
+.apple-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+    filter: grayscale(1);
+    pointer-events: none;
 }
 
 .in-dev-tag {
