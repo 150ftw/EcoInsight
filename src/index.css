@@ -9402,3 +9402,33 @@ select {
         z-index: 1001;
     }
 }
+
+/* --- PROVENANCE HEADER MOBILE CENTERING --- */
+@media (max-width: 640px) {
+    .source-carousel-header {
+        justify-content: center !important;
+        padding: 0 1rem !important;
+    }
+
+    .source-header-text {
+        text-align: center !important;
+        white-space: nowrap;
+    }
+
+    /* Make lines symmetric for centering */
+    .source-header-line:first-child {
+        background: linear-gradient(270deg, rgba(139, 92, 246, 0.4), transparent) !important;
+    }
+    
+    .source-header-line:last-child {
+        background: linear-gradient(90deg, rgba(139, 92, 246, 0.4), transparent) !important;
+    }
+}
+
+/* Hide second line on desktop to maintain original look if preferred, 
+   but centered looks better. Sticking to "Just for mobile" behavior requested. */
+@media (min-width: 641px) {
+    .source-carousel-header .source-header-line:last-child {
+        display: none;
+    }
+}

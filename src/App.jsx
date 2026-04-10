@@ -229,6 +229,7 @@ const SourceCarousel = ({ sources }) => {
             <div className="source-carousel-header">
                 <div className="source-header-line" />
                 <span className="source-header-text">Intelligence Provenance</span>
+                <div className="source-header-line" />
             </div>
             <div className="source-carousel">
                 {sources.map((source, idx) => (
