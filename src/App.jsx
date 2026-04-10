@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useId, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft, Headphones } from 'lucide-react'
+import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, ChevronUp, Database, CheckCircle2, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft, Headphones } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { streamMessage } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
@@ -24,6 +24,7 @@ import CreditModal from './components/CreditModal';
 import BugReportModal from './components/BugReportModal';
 import OnboardingView from './components/OnboardingView';
 import InstitutionalVoicePlayer from './components/InstitutionalVoicePlayer';
+import IntelligenceProbes from './components/IntelligenceProbes';
 import * as pdfjs from 'pdfjs-dist'
 // Set worker for pdfjs (using a static file from the public directory to bypass Vite bundler issues)
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
@@ -77,60 +78,90 @@ const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = fa
 }
 
 
-const ThinkingIndicator = () => (
-    <motion.div
-        className="message-wrapper assistant"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, transition: { duration: 0.6 } }}
-    >
-        <div className="message-icon" style={{ position: 'relative' }}>
-            <motion.div
-                animate={{ opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-                <EkoSparkle size={18} animate={true} />
-            </motion.div>
+const ThinkingIndicator = () => {
+  const [seconds, setSeconds] = useState(0);
+  const [step, setStep] = useState(0);
 
-            <motion.div
-                style={{ position: 'absolute', inset: -20, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0 }}
-                exit={{ opacity: 1 }}
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSeconds(prev => +(prev + 0.1).toFixed(1));
+    }, 100);
+    
+    // Progress through steps based on time
+    const stepTimer = setInterval(() => {
+      setStep(prev => (prev < 3 ? prev + 1 : prev));
+    }, 2800);
+
+    return () => {
+      clearInterval(timer);
+      clearInterval(stepTimer);
+    };
+  }, []);
+
+  const steps = [
+    { label: "Decoding institutional query", tool: null },
+    { label: "Scanning financial databases & documentation", tool: "Company Fundamental Data" },
+    { label: "Synthesizing market correlations", tool: null },
+    { label: "Drafting executive intelligence report", tool: null }
+  ];
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      className="thought-tracer-container"
+    >
+      <div className="thought-header">
+        <div className="thought-timer">
+          <Sparkles size={14} className="animate-pulse" />
+          <span>Thought for {seconds.toFixed(1)}s</span>
+        </div>
+        <ChevronUp size={14} style={{ opacity: 0.3 }} />
+      </div>
+
+      <div className="thought-steps">
+        <div className="thought-timeline-line" />
+        
+        {steps.map((s, idx) => {
+          const isActive = step === idx;
+          const isCompleted = step > idx;
+          
+          if (idx > step) return null;
+
+          return (
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className={`thought-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
             >
-                {Array.from({ length: 12 }).map((_, i) => {
-                    const angle = (i / 12) * 360;
-                    return (
-                        <motion.div
-                            key={i}
-                            initial={{ x: 0, y: 0, scale: 0 }}
-                            exit={{
-                                x: Math.cos(angle * Math.PI / 180) * 40,
-                                y: Math.sin(angle * Math.PI / 180) * 40,
-                                scale: [0, 1.5, 0],
-                                opacity: [1, 1, 0]
-                            }}
-                            transition={{ duration: 0.7, ease: "easeOut" }}
-                            style={{
-                                position: 'absolute',
-                                width: 3,
-                                height: 3,
-                                borderRadius: '50%',
-                                backgroundColor: '#c084fc',
-                                boxShadow: '0 0 6px #c084fc'
-                            }}
-                        />
-                    );
-                })}
+              <div className={`thought-step-dot ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`} />
+              <div className="thought-step-content">
+                <div className="thought-step-label">{s.label}</div>
+                {isActive && s.tool && (
+                   <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="tool-badge"
+                   >
+                     <Database size={10} />
+                     <span>{s.tool}</span>
+                   </motion.div>
+                )}
+              </div>
+              {isCompleted && (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} style={{ marginLeft: 'auto' }}>
+                  <CheckCircle2 size={12} className="text-green-500" />
+                </motion.div>
+              )}
             </motion.div>
-        </div>
-        <div className="message-content">
-            <motion.span className="typing-indicator" exit={{ opacity: 0 }}>Eko is thinking...</motion.span>
-        </div>
+          );
+        })}
+      </div>
     </motion.div>
-);
+  );
+};
 
 const FAST_GREETINGS = {
     'how are you': 'I am performing at peak efficiency, synchronized with Bharat\'s market shifts. Ready for your intelligence deep-dive.',
@@ -3762,7 +3793,14 @@ WEB SEARCH INTEGRATION:
 You are equipped with a live internet gateway. The "WEB SEARCH RESULTS" provided below are the ONLY source of truth.
 1. USE WEB SEARCH DATA EXCLUSIVELY for all factual, pricing, and news-related answers. 
 2. FORBIDDEN: Do not mention "training data" or "knowledge cutoff."
-3. You are an "Elite Institutional Research Engine" — your data is fresh, your analysis is current, and your authority is absolute.`;
+3. You are an "Elite Institutional Research Engine" — your data is fresh, your analysis is current, and your authority is absolute.
+
+FOLLOW-UP INTELLIGENCE (MANDATORY):
+- After every response, you MUST provide 3-5 highly relevant, high-impact follow-up questions to probe deeper into the specific topic discussed.
+- Use a strictly parseable format at the absolute END of your response (after symbols/charts).
+- FORMAT: Add exactly the string "---QUESTIONS---" followed by the questions separated by pipes (|).
+- EXAMPLE: ...this suggests a cycle-top. ---QUESTIONS--- What are the key downside risks? | How does this compare to the 2008 cycle? | Is there a technical catalyst for a reversal?
+- DO NOT use numbers or bullet points for these questions. Just the pipe character.`;
 
         // PDF Context Integration
         if (currentPdfText) {
@@ -4273,8 +4311,23 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 console.error("[App] Failed to send welcome email during onboarding:", err);
             }
         }
-        // Note: The profile sync effect will automatically save these updates to Supabase
     };
+
+// --- BEGIN RELATED QUESTIONS PARSING ---
+const parseResponseWithProbes = (content) => {
+    if (!content) return { text: '', probes: [] };
+    const parts = content.split('---QUESTIONS---');
+    const mainText = parts[0].trim();
+    let probes = [];
+    
+    if (parts.length > 1) {
+        const probeList = parts[1].split('|');
+        probes = probeList.map(p => p.trim()).filter(p => p.length > 0);
+    }
+    
+    return { text: mainText, probes };
+};
+// --- END RELATED QUESTIONS PARSING ---
 
     const MobileDashboardLock = () => (
         <div className="mobile-dashboard-lock">
@@ -4424,11 +4477,18 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                                                 </div>
                                                 <div className="message-container">
                                                     <div className="message-content">
-                                                        {parseChartBlocks(msg.content).map((block, bIdx) => (
+                                                        {parseChartBlocks(parseResponseWithProbes(msg.content).text).map((block, bIdx) => (
                                                             block.type === 'chart'
                                                                 ? <EcoChartRenderer key={bIdx} config={block.content} />
                                                                 : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
                                                         ))}
+                                                        
+                                                        {msg.role === 'assistant' && !isLoading && parseResponseWithProbes(msg.content).probes.length > 0 && (
+                                                            <IntelligenceProbes 
+                                                                questions={parseResponseWithProbes(msg.content).probes} 
+                                                                onSelect={(q) => handleSend(q)} 
+                                                            />
+                                                        )}
                                                     </div>
                                                     {msg.sources && <SourceCarousel sources={msg.sources} />}
                                                 </div>
