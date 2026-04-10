@@ -9310,3 +9310,35 @@ select {
         -webkit-line-clamp: 2 !important;
     }
 }
+
+/* --- iOS AUTO-ZOOM & LAYOUT STABILIZATION --- */
+@media (max-width: 768px) {
+    /* Force 16px font to prevent iOS Safari auto-zoom on focus */
+    .input-wrapper input,
+    .input-wrapper textarea,
+    .search-input-wrapper input,
+    .username-input-wrapper input,
+    .chat-input textarea {
+        font-size: 16px !important;
+        touch-action: manipulation;
+    }
+
+    /* Prevent text selection and unintended scaling */
+    body {
+        -webkit-text-size-adjust: 100%;
+        touch-action: manipulation;
+    }
+
+    /* Anchor the interface to dynamic viewport height to prevent "jumpy" keyboard behavior */
+    .app-container,
+    .main-content,
+    .chat-container {
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+    }
+
+    /* Ensure the input area doesn't get buried or pushed too far */
+    .input-container {
+        padding-bottom: env(safe-area-inset-bottom, 20px) !important;
+    }
+}
