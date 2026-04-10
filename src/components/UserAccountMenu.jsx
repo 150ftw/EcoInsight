@@ -15,12 +15,17 @@ const UserAccountMenu = ({
   const [isOpen, setIsOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
   const menuRef = useRef(null);
+  const portalRef = useRef(null);
   const triggerRef = useRef(null);
   const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // Check if click was outside the trigger AND outside the portalled dropdown
+      if (
+        menuRef.current && !menuRef.current.contains(event.target) &&
+        portalRef.current && !portalRef.current.contains(event.target)
+      ) {
         setIsOpen(false);
       }
     };
@@ -84,6 +89,7 @@ const UserAccountMenu = ({
       {isOpen && createPortal(
         <AnimatePresence>
           <motion.div
+            ref={portalRef}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
