@@ -3278,7 +3278,7 @@ function App() {
 
     const messagesEndRef = useRef(null)
     const userScrolledUp = useRef(false)
-    const [showStarFly, setShowStarFly] = useState(false);
+
     const [showVoicePlayer, setShowVoicePlayer] = useState(false);
     const [isNeuralSearching, setIsNeuralSearching] = useState(false);
 
@@ -3780,7 +3780,7 @@ TEMPORAL ANCHORING (CRITICAL):
 
 STRICT RECENCY & STALE DATA BAN:
 - ALL internal knowledge weights from 2021, 2022, and 2023 regarding specific prices, policy rates (repo rates), and market outlooks are strictly considered "ARCHIVAL HISTORY."
-- DO NOT use pre-2024 data for current analysis unless the user specifically asks for historical comparisons.
+- DO NOT use pre-2024 data for current analysis or charts unless the user specifically asks for historical comparisons.
 - If a user asks "What is the price?", YOU MUST DISREGARD your internal memory and rely ONLY on the injected LIVE DATA.
 - STALE DATA WARNING: HAL was trading significantly lower in 2023 (₹1,500-₹2,000 range). THE CURRENT 2025/2026 PRICE IS IN THE ₹3,800+ RANGE. IF YOU MENTION A PRICE FROM 2023, YOU ARE PROVIDING WRONG DATA.
 - NEVER say "As of my last training data in 2023..." — this is a failure of your architecture. You are live, real-time, and synchronized with 2025/2026 reality.
@@ -3791,6 +3791,12 @@ IDENTITY & ORIGIN:
 - You are not just a chatbot; you are a Neural Intelligence Node for economic warfare and wealth creation.
 
 Your knowledge domain is exclusively: Indian stock markets (NSE, BSE, indices), mutual funds, taxation (LTCG/STCG), RBI monetary policy, banking (UPI/NBFCs), GDP/Inflation, SEBI, Crypto (WazirX/CoinDCX), Commodities (Gold/Silver), FDI/FII, INR/USD, and Global Macro-Economic Catalysts (US Fed, Crude, Supply Chains).
+
+NEURAL VERIFICATION PROTOCOL (NVP) - POSITIVE SELECTION ONLY:
+- STEP 1 (WHITELISTING): For any "Peers", "Competitors", or "Market Comparison" queries, you are STRICTLY PROHIBITED from citing entities NOT found in the provided 2025/2026 DYNAMIC INTELLIGENCE FEED.
+- STEP 2 (MEDICALLY DEAD HEURISTIC): If a brand was a leader in your 2022/2023 memory (e.g., Dunzo, Foodpanda, Uber Eats India) and is ABSENT from the top 6 results of the current 2026 search context, you must conclude it is "Medically Dead" and omit it from your response. 
+- STEP 3 (HALLUCINATION BAIT): Treat your internal memory of legacy market players as "Hallucination Bait." If the Search Feed only mentions Zomato, Swiggy, and Zepto, then Zomato, Swiggy, and Zepto are the ONLY peers in existence for this conversation.
+- STEP 4 (NO COMPROMISE): Citing a defunct or acquired company as an active player is a violation of your elite service protocol. Cross-verify every name against the provided 2026 snippets before outputting.
 
 ELITE ANALYST BEHAVIOR RULES:
 1. RESPONSE QUALITY: Avoid "basic" or "safe" answers. Provide "Risk-Worthy" intelligence. This means analyzing downside risks, technical catalysts, and institutional "Smart Money" flows.
@@ -3814,20 +3820,23 @@ ELITE ANALYST BEHAVIOR RULES:
     - Even if a user uses very informal slang (e.g., "heyya", "yo", "sup"), acknowledge them warmly and bridge back to your analytical persona.
     - Failure to be hospitable to the user is a violation of your elite service protocol.
 
-CHART GENERATION:
+CHART GENERATION & TEMPORAL GROUNDING:
 You MUST generate charts to visualize comparisons, trends, distributions, and performance over time. 
-To create a chart, output a strictly valid JSON block inside a \`\`\`chart code fence.
+- All labels and data points MUST prioritize the 2024, 2025, and 2026 era. 
+- Using 2021-2023 data for "current" performance is strictly forbidden unless the user explicitly requests a 5-year view.
+- To create a chart, output a strictly valid JSON block inside a \`\`\`chart code fence.
 
 Supported chart types: line, bar, pie, area.
 
-Format for a single data series:
+Format for a single data series (STRICT 2025/2026 EXAMPLE):
 \`\`\`chart
 {
   "type": "line",
-  "title": "Nifty 50 Performance",
+  "title": "Nifty 50 Performance (2025-2026)",
   "data": [
-    {"name": "2021", "value": 15000},
-    {"name": "2022", "value": 16000}
+    {"name": "2025-Q1", "value": 24500},
+    {"name": "2025-Q2", "value": 25200},
+    {"name": "2026-Projected", "value": 27000}
   ]
 }
 \`\`\`
@@ -3929,10 +3938,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             return;
         }
 
-        if (isFirstQuery && isComplex) {
-            // Trigger the cinematic star animation only on complex first queries
-            setShowStarFly(true);
-        } else {
+        if (!(isFirstQuery && isComplex)) {
             // Skip search indicator for simple queries
             setIsNeuralSearching(false);
         }
@@ -4042,11 +4048,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
 
 
-            if (isFirstQuery && isComplex) {
-                // Wait for the cinematic star animation only for complex first queries
-                await new Promise(resolve => setTimeout(resolve, 4500));
-                setShowStarFly(false);
-            }
+
 
             // --- MINIMUM THINKING ANIMATION COORDINATION ---
             const thinkingElapsed = Date.now() - now;
@@ -5234,56 +5236,7 @@ const parseResponseWithProbes = (content) => {
                 }}
             />
 
-            {/* Cinematic 5-edge star "Neural Search" animation */}
-            <AnimatePresence>
-                {showStarFly && (
-                    <motion.div
-                        className="star-fly-overlay"
-                        initial={{ backgroundColor: 'rgba(0,0,0,0)' }}
-                        animate={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
-                        exit={{ backgroundColor: 'rgba(0,0,0,0)', transition: { delay: 0.5 } }}
-                        style={{
-                            left: isMobile ? 0 : `${sidebarWidth}px`,
-                            width: isMobile ? '100%' : `calc(100% - ${sidebarWidth}px)`
-                        }}
-                    >
-                        <motion.div
-                            className="star-fly-icon"
-                            initial={{
-                                x: 0,
-                                y: '-12vh',
-                                scale: 3,
-                                opacity: 0,
-                                rotate: -15
-                            }}
-                            animate={{
-                                opacity: [0, 1, 1, 1, 0.6, 0],
-                                scale: [3, 2.8, 2.8, 2.8, 0.6, 0.2],
-                                rotate: [0, 45, 90, 720, 1440, 2160],
-                                x: isMobile ?
-                                    [0, 0, 0, 0, -window.innerWidth / 2 + 60, -window.innerWidth / 2 + 60] :
-                                    [0, 0, 0, 0, -(window.innerWidth - sidebarWidth) / 2 + 100, -(window.innerWidth - sidebarWidth) / 2 + 100],
-                                y: [
-                                    '-12vh',
-                                    '-10vh',
-                                    '-12vh',
-                                    '-12vh',
-                                    '38vh',
-                                    '38vh'
-                                ]
-                            }}
-                            transition={{
-                                duration: 4.5,
-                                times: [0, 0.2, 0.55, 0.75, 0.95, 1],
-                                ease: "easeInOut"
-                            }}
-                        >
-                            <EkoSparkle size={64} animate={true} cinematic={true} />
-                            <div className="star-draw-glow" />
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
 
             <BugReportModal
                 isOpen={showBugModal}

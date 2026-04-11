@@ -25,14 +25,20 @@ const buildSearchQuery = (userMessage) => {
     // Add Indian context if not already present
     if (!hasIndiaContext) {
         if (isPriceQuery || isFinancialQuery) {
-            query += ' India INR';
+            query += ' India Market INR';
         } else {
             query += ' India';
         }
     }
 
-    // Refreshness boost
-    query += ' latest 2025';
+    // Refreshness boost - Focus on the current/near-future 2026 landscape
+    query += ' latest 2026 analysis';
+
+    // PEER DISCOVERY AUGMENTATION:
+    // If the query is about competitors or peers, force the search to find "Active Survivors"
+    if (/peer|competitor|rival|market share|landscape|vs|versus/i.test(userMessage)) {
+        query += ' active players 2026 landscape';
+    }
 
     return query;
 };
