@@ -8,20 +8,25 @@ EcoInsight is a high-end Economic Intelligence engine built with React and Vite.
 ## Tech Stack
 - **Frontend**: React (Vite), Framer Motion, Lucide-React.
 - **3D Graphics**: Three.js (@react-three/fiber).
-- **Authentication**: Clerk (`@clerk/clerk-react`).
+- **Authentication**: Custom JWT-based Authentication with **Supabase** backend. 
+- **Database**: Supabase (PostgreSQL).
 - **Styling**: Vanilla CSS with a heavy focus on glassmorphism and futuristic aesthetics.
 
 ## Key Architectures
 - **`App.jsx`**: contains the core logic, state management (chats, settings, appearance), and the primary routing switch (`renderView`).
-- **Authentication**: Managed via `ClerkProvider` in `main.jsx`. We use `useUser` and `useAuth` hooks.
+- **Authentication**: Managed via a custom `AuthProvider` in `src/context/AuthContext.jsx`. We use standard `useUser` and `useAuth` hooks that mimic Clerk-style behavior for compatibility.
+- **Backend API**: Serverless functions located in the `api/` directory (Vercel/Node.js).
 - **AI Integration**: AI logic is routed through `src/lib/KimiClient.js` for streaming responses.
 
 ## Current Priorities
-- Ensuring Clerk authentication flows are seamless.
+- Ensuring the custom authentication flows (Login, Signup, Google OAuth) are seamless and secure.
 - Maintaining the "Elite Analyst" aesthetic in all new components.
 - Optimizing Three.js performance for low-end devices.
+- Improving real-time market data reliability via the "Search-Sync" architecture.
 
 ## Development Patterns
 - Use functional components and hooks.
-- Maintain the state in `App.jsx` for global concerns (theme, auth, chats).
+- Maintain global state in `App.jsx` and auth state in `AuthContext.jsx`.
 - Keep CSS variables at the root of `src/index.css`.
+- All backend-related utilities should be in `api/lib/`.
+

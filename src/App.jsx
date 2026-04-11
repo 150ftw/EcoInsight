@@ -5152,17 +5152,21 @@ const parseResponseWithProbes = (content) => {
                                 {view !== 'chat' && <div className="badge">Beta</div>}
                                 <div className="header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
                                     <button 
-                                        className={`header-action-btn ${showVoicePlayer ? 'active' : ''}`} 
-                                        onClick={() => setShowVoicePlayer(prev => !prev)}
+                                        className="header-action-btn" 
                                         style={{ 
-                                            position: 'relative',
-                                            color: showVoicePlayer ? 'var(--accent-primary)' : 'inherit',
-                                            background: showVoicePlayer ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-                                            borderColor: showVoicePlayer ? 'rgba(139, 92, 246, 0.3)' : 'transparent'
+                                            opacity: 0.6,
+                                            cursor: 'not-allowed',
+                                            pointerEvents: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
                                         }}
+                                        title="Neural Briefing - In Development"
                                     >
                                         <Headphones size={16} />
-                                        <span>Neural Briefing</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            Neural Briefing <Lock size={12} color="#a78bfa" />
+                                        </span>
                                     </button>
                                     <button className="header-action-btn" onClick={downloadChatAsPDF} disabled={isExporting}>
                                         {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
