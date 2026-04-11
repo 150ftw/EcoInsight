@@ -42,6 +42,8 @@ import AIInsightBox from './components/AIInsightBox'
 import SectorHeatmap from './components/SectorHeatmap'
 import PortfolioAnalyzer from './components/PortfolioAnalyzer'
 
+const MIN_THINKING_DURATION = 8000; // 8 seconds to ensure analytical animation steps complete
+
 import neuralNode from './assets/neural_node_high_res_elite-removebg-preview.png';
 import iridescentOrb from './assets/premium_3d_iridescent_orb_1772080138013-removebg-preview.png';
 const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = false }) => {
@@ -188,6 +190,9 @@ const FAST_GREETINGS = {
     'hi': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
     'hello': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
     'hey': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
+    'heyya': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
+    'ya': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
+    'yo': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
     'who are you': 'I am Eko, your institutional-grade Economic Intelligence engine, designed to decode complex financial dynamics.',
     'what can you do': 'I can analyze market trends, simulate economic scenarios, and provide institutional-grade intelligence across equities, macro data, and sectoral shifts.',
     'good morning': 'Good morning, Analyst. The markets are waking up. Ready to decode the early signals?',
@@ -3803,6 +3808,11 @@ ELITE ANALYST BEHAVIOR RULES:
 9. BREVITY & CONCISENESS (DEFAULT BEHAVIOR): By default, be extremely concise. Provide high-impact, pithy answers. Aim for clarity and speed.
    - ONLY provide long-form, deep-dive analysis if the user explicitly asks for "details," "a long answer," "a deep dive," "elaborate," "more info," or equivalent phrases.
    - If not explicitly asked for details, favor bullet points and summary snapshots over long rambling paragraphs.
+10. POLITENESS & HOSPITALITY (UNCOMPROMISING):
+    - You must ALWAYS be polite, professional, and welcoming to the user, REGARDLESS of their tone or informal language.
+    - NEVER respond with phrases like "looks like you're here for a different type of convo" or similar dismissive or exclusionary language.
+    - Even if a user uses very informal slang (e.g., "heyya", "yo", "sup"), acknowledge them warmly and bridge back to your analytical persona.
+    - Failure to be hospitable to the user is a violation of your elite service protocol.
 
 CHART GENERATION:
 You MUST generate charts to visualize comparisons, trends, distributions, and performance over time. 
@@ -3932,7 +3942,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         // FAST PATH: Handle greetings instantly (with platform-name stripping)
         const cleanText = textToSend.toLowerCase()
             .replace(/[^\w\s]/g, '')
-            .replace(/\b(eko|ecoinsight|echo|heye|heyeko|helloeko|hi|hey)\b/g, '') // Strip fillers/platform names
+            .replace(/\b(eko|ecoinsight|echo|heye|heyeko|helloeko|hi|hello|hey|heyya|yo)\b/g, '') // Strip fillers/platform names
             .trim();
 
         // Also check raw phrases if stripped version is too short or empty
@@ -4037,6 +4047,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
                 await new Promise(resolve => setTimeout(resolve, 4500));
                 setShowStarFly(false);
             }
+
+            // --- MINIMUM THINKING ANIMATION COORDINATION ---
+            const thinkingElapsed = Date.now() - now;
+            if (thinkingElapsed < MIN_THINKING_DURATION) {
+                await new Promise(resolve => setTimeout(resolve, MIN_THINKING_DURATION - thinkingElapsed));
+            }
+
             setIsNeuralSearching(false);
 
             let assistantContent = '';
