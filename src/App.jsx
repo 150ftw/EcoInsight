@@ -4392,13 +4392,30 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 // --- BEGIN RELATED QUESTIONS PARSING ---
 const parseResponseWithProbes = (content) => {
     if (!content) return { text: '', probes: [] };
-    const parts = content.split('---QUESTIONS---');
+    
+    // Robust regex to handle bolding, varying dashes, and spaces
+    // Matches: ---QUESTIONS---, **---QUESTIONS---**, --- QUESTIONS ---, etc.
+    const delimiterRegex = /\**\s*-{3,}\s*QUESTIONS\s*-{3,}\s*\**/i;
+    
+    const parts = content.split(delimiterRegex);
     const mainText = parts[0].trim();
     let probes = [];
     
     if (parts.length > 1) {
-        const probeList = parts[1].split('|');
-        probes = probeList.map(p => p.trim()).filter(p => p.length > 0);
+        const rawProbes = parts[1];
+        let probeList = [];
+        
+        // Handle pipe separator or newline/numbered fallback
+        if (rawProbes.includes('|')) {
+            probeList = rawProbes.split('|');
+        } else {
+            // Split by newlines and strip leading numbers/bullets if AI deviates
+            probeList = rawProbes.split(/\r?\n/).map(p => p.replace(/^[\d\.\-\*]+\s*/, '').trim());
+        }
+        
+        probes = probeList
+            .map(p => p.trim())
+            .filter(p => p.length > 2 && p.length < 250);
     }
     
     return { text: mainText, probes };
