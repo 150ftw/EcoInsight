@@ -41,6 +41,7 @@ import MarketPulseDashboard from './components/MarketPulseDashboard'
 import IntelligenceInsightsReport from './components/IntelligenceInsightsReport'
 import SectorHeatmap from './components/SectorHeatmap'
 import PortfolioAnalyzer from './components/PortfolioAnalyzer'
+import IntelligenceHubNotification from './components/IntelligenceHubNotification'
 
 const MIN_THINKING_DURATION = 8000; // 8 seconds to ensure analytical animation steps complete
 
@@ -3221,6 +3222,19 @@ function App() {
     const [authType, setAuthType] = useState('login') // 'login', 'signup'
     const [supaLoaded, setSupaLoaded] = useState(false);
     const [showEnginePopup, setShowEnginePopup] = useState(false);
+    const [showIntelNotification, setShowIntelNotification] = useState(false);
+    const [hasShownIntelNotification, setHasShownIntelNotification] = useState(false);
+
+    useEffect(() => {
+        // Only show once when entering the chat section
+        if (appSection === 'chat' && !hasShownIntelNotification) {
+            const timer = setTimeout(() => {
+                setShowIntelNotification(true);
+                setHasShownIntelNotification(true);
+            }, 3000); // 3 seconds after entering chat
+            return () => clearTimeout(timer);
+        }
+    }, [appSection, hasShownIntelNotification]);
 
     // Global Command Palette Listener
     useEffect(() => {
@@ -3456,6 +3470,29 @@ function App() {
         setChats(prev => [newChat, ...prev.filter(c => c.messages.length > 1)]);
         setActiveChatId(newChat.id);
         setView('chat');
+    };
+
+    const handleDeepDive = (topic) => {
+        const deepDivePrompt = `Provide a comprehensive deep-dive analysis on: "${topic}". Focus on institutional implications, technical outlook, and potential tailwinds/headwinds for the Indian market.`;
+        
+        const newChat = {
+            id: Date.now().toString(),
+            title: `Deep Dive: ${topic.slice(0, 30)}...`,
+            messages: [
+                { role: 'assistant', content: `Initiating institutional deep-dive for: **${topic}**. Evaluating telemetry and market signals...` },
+                { role: 'user', content: deepDivePrompt }
+            ]
+        };
+        
+        setChats(prev => [newChat, ...prev]);
+        setActiveChatId(newChat.id);
+        setView('chat');
+        setAppSection('chat');
+        
+        // Trigger the stream
+        setTimeout(() => {
+            handleSend(deepDivePrompt, true); 
+        }, 500);
     };
 
     const deleteChat = (e, id) => {
@@ -4750,7 +4787,7 @@ const parseResponseWithProbes = (content) => {
             case 'insights':
                 return (
                     <div className="view-content" key={view} style={{ overflowY: 'auto' }}>
-                        <IntelligenceInsightsReport />
+                        <IntelligenceInsightsReport onDeepDive={handleDeepDive} />
                     </div>
                 );
             case 'trends':
@@ -5285,6 +5322,17 @@ const parseResponseWithProbes = (content) => {
                 />,
                 document.body
             )}
+            <AnimatePresence>
+                {showIntelNotification && (
+                    <IntelligenceHubNotification 
+                        onOpen={() => {
+                            setView('insights');
+                            setIsIntelHubExpanded(true);
+                        }}
+                        onClose={() => setShowIntelNotification(false)}
+                    />
+                )}
+            </AnimatePresence>
             <CookieConsent />
             <AuthModal
                 isOpen={isAuthModalOpen}

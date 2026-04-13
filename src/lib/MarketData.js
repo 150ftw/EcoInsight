@@ -798,15 +798,18 @@ export const fetchNewsTickerData = async () => {
                 .replace(/&nbsp;/g, ' ');
         };
 
-        const headlines = (newsData.items || [])
-            .map(item => decodeEntities(item.title))
-            .filter(title => {
-                const lowTitle = title.toLowerCase();
-                const hasIndianContext = indianKeywords.some(key => lowTitle.includes(key));
-                const isGlobalNoise = globalFilters.some(key => lowTitle.includes(key)) && !lowTitle.includes('india');
-                return title.length > 20 && hasIndianContext && !isGlobalNoise;
+        const newsItems = (newsData.items || [])
+            .filter(item => {
+                const title = decodeEntities(item.title).toLowerCase();
+                const hasIndianContext = indianKeywords.some(key => title.includes(key));
+                const isGlobalNoise = globalFilters.some(key => title.includes(key)) && !title.includes('india');
+                return item.title.length > 20 && hasIndianContext && !isGlobalNoise;
             })
-            .slice(0, 10); // Get top 10 valid headlines
+            .map(item => ({
+                title: decodeEntities(item.title),
+                link: item.link || '#'
+            }))
+            .slice(0, 10); // Get top 10 valid items
 
         // Fetch real-time prices for top Indian tickers using Google Finance (Unlimited, Free)
         const topStocks = ["RELIANCE", "HDFCBANK", "INFY", "TCS", "ICICIBANK", "SBIN"];
@@ -832,10 +835,10 @@ export const fetchNewsTickerData = async () => {
 
         return {
             trending,
-            headlines: headlines.length > 0 ? headlines : [
-                "Nifty 50 extends gains as domestic institutional buying surges.",
-                "Sensex scales new heights led by banking and IT blue-chips.",
-                "RBI governor highlights resilient Indian macroeconomic fundamentals."
+            headlines: newsItems.length > 0 ? newsItems : [
+                { title: "Nifty 50 extends gains as domestic institutional buying surges.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+                { title: "Sensex scales new heights led by banking and IT blue-chips.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+                { title: "RBI governor highlights resilient Indian macroeconomic fundamentals.", link: "https://economictimes.indiatimes.com/markets/stocks" }
             ]
         };
     } catch (e) {
@@ -843,11 +846,11 @@ export const fetchNewsTickerData = async () => {
         return {
             trending: ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK"],
             headlines: [
-                "RBI maintains repo rate at 6.5%, focus on inflation target.",
-                "Nifty 50 hits record high as FII inflows surge.",
-                "Digital Rupee adoption grows across retail segment.",
-                "India's GDP growth projected at 7% for FY25.",
-                "Sensex gains on strong global cues."
+                { title: "RBI maintains repo rate at 6.5%, focus on inflation target.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+                { title: "Nifty 50 hits record high as FII inflows surge.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+                { title: "Digital Rupee adoption grows across retail segment.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+                { title: "India's GDP growth projected at 7% for FY25.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+                { title: "Sensex gains on strong global cues.", link: "https://economictimes.indiatimes.com/markets/stocks" }
             ]
         };
     }

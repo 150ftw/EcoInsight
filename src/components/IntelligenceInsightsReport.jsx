@@ -4,7 +4,7 @@ import { Sparkles, Newspaper, TrendingUp, TrendingDown, ChevronRight, Zap, Targe
 import { fetchInsightRegistry } from '../lib/MarketData';
 import { fetchNiftySectors } from '../lib/DashboardData';
 
-const IntelligenceInsightsReport = () => {
+const IntelligenceInsightsReport = ({ onDeepDive }) => {
     const [data, setData] = useState(null);
     const [sectors, setSectors] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -85,18 +85,21 @@ const IntelligenceInsightsReport = () => {
                         {data.hero.desc}
                     </p>
                     
-                    <button style={{ 
-                        background: 'white', 
-                        color: 'black', 
-                        padding: '1rem 2rem', 
-                        borderRadius: '16px', 
-                        fontWeight: 700, 
-                        border: 'none', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '12px',
-                        cursor: 'pointer'
-                    }}>
+                    <button 
+                        onClick={() => onDeepDive && onDeepDive(data.hero.title)}
+                        style={{ 
+                            background: 'white', 
+                            color: 'black', 
+                            padding: '1rem 2rem', 
+                            borderRadius: '16px', 
+                            fontWeight: 700, 
+                            border: 'none', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '12px',
+                            cursor: 'pointer'
+                        }}
+                    >
                         Deep Dive Analysis <ChevronRight size={18} />
                     </button>
                 </div>
@@ -115,12 +118,13 @@ const IntelligenceInsightsReport = () => {
                         </div>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {data.news.map((headline, i) => (
+                            {data.news.map((item, i) => (
                                 <motion.div 
                                     key={i}
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: i * 0.1 }}
+                                    onClick={() => window.open(item.link, '_blank')}
                                     style={{ 
                                         padding: '1.5rem', 
                                         background: 'rgba(255,255,255,0.02)', 
@@ -138,9 +142,16 @@ const IntelligenceInsightsReport = () => {
                                     </div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', marginBottom: '4px', fontWeight: 600 }}>MARKET ALERT • JUST NOW</div>
-                                        <div style={{ fontSize: '1rem', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{headline}</div>
+                                        <div style={{ fontSize: '1rem', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{item.title}</div>
                                     </div>
-                                    <ChevronRight size={16} style={{ opacity: 0.2 }} />
+                                    <ChevronRight 
+                                        size={16} 
+                                        style={{ opacity: 0.2 }} 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            window.open(item.link, '_blank');
+                                        }}
+                                    />
                                 </motion.div>
                             ))}
                         </div>
