@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Activity, TrendingUp, TrendingDown, BarChart3, Info, RefreshCw, Cpu, Zap } from 'lucide-react';
 import { fetchPulseRegistry } from '../lib/MarketData';
 import SentimentGauge from './SentimentGauge';
 

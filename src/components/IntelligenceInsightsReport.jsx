@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Sparkles, Newspaper, TrendingUp, TrendingDown, ChevronRight, Zap, Target, PieChart, ShieldCheck } from 'lucide-react';
 import { fetchInsightRegistry } from '../lib/MarketData';
 import { fetchNiftySectors } from '../lib/DashboardData';
 

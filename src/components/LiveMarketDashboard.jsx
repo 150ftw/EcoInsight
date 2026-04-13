@@ -121,7 +121,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
     const loadAllData = useCallback(async (watchlistSymbols, showLoader = true) => {
         if (showLoader) setIsLoading(true);
         try {
-            const [idx, mac, cry, com, glo, cal, sec, mov, fii, tech, earn] = await Promise.all([
+            const [idx, mac, cry, com, glo, cal, sec, mov, fii, snt, tech, earn] = await Promise.all([
                 fetchDashboardIndices(),
                 fetchGlobalMacro(),
                 fetchCryptoData(),
