@@ -37,8 +37,8 @@ import Threads from './components/Threads'
 import { SUBPAGE_DATA } from './lib/SubpageContent'
 import CookieConsent from './components/CookieConsent'
 import LiveMarketDashboard from './components/LiveMarketDashboard'
-import MarketTicker from './components/MarketTicker'
-import AIInsightBox from './components/AIInsightBox'
+import MarketPulseDashboard from './components/MarketPulseDashboard'
+import IntelligenceInsightsReport from './components/IntelligenceInsightsReport'
 import SectorHeatmap from './components/SectorHeatmap'
 import PortfolioAnalyzer from './components/PortfolioAnalyzer'
 
@@ -4749,14 +4749,8 @@ const parseResponseWithProbes = (content) => {
                 );
             case 'insights':
                 return (
-                    <div className="view-content" key={view}>
-                        <div className="view-header">
-                            <h1>AI Intelligence Insights</h1>
-                            <p>Today's high-impact economic & market perspectives.</p>
-                        </div>
-                        <div style={{ maxWidth: '800px', margin: '2rem auto' }}>
-                            <AIInsightBox />
-                        </div>
+                    <div className="view-content" key={view} style={{ overflowY: 'auto' }}>
+                        <IntelligenceInsightsReport />
                     </div>
                 );
             case 'trends':
@@ -4787,14 +4781,8 @@ const parseResponseWithProbes = (content) => {
                 )
             case 'market-pulse':
                 return (
-                    <div className="view-content" key={view}>
-                        <div className="view-header">
-                            <h1>Market Pulse</h1>
-                            <p>Real-time ticker and high-density market metrics.</p>
-                        </div>
-                        <div style={{ marginTop: '2rem' }}>
-                            <MarketTicker />
-                        </div>
+                    <div className="view-content" key={view} style={{ overflowY: 'auto' }}>
+                        <MarketPulseDashboard />
                     </div>
                 );
             case 'settings':
@@ -5018,20 +5006,18 @@ const parseResponseWithProbes = (content) => {
                                     >
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
                                             <button
-                                                className="nav-item sub-nav-item"
-                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
-                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
+                                                className={`nav-item sub-nav-item ${view === 'insights' ? 'active' : ''}`}
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                                onClick={() => setView('insights')}
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={16} /> Today's Insight</div>
-                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button
-                                                className="nav-item sub-nav-item"
-                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
-                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
+                                                className={`nav-item sub-nav-item ${view === 'market-pulse' ? 'active' : ''}`}
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                                onClick={() => setView('market-pulse')}
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={16} /> Market Pulse</div>
-                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button
                                                 className="nav-item sub-nav-item"
