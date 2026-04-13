@@ -427,7 +427,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                         </div>
                     </section>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: '1.5rem', marginBottom: '1.5rem', alignItems: 'stretch' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem', alignItems: 'stretch' }}>
                         <SectorHeatmap sectors={niftySectors} />
                         
                         <section className="panel-card" style={{ marginBottom: 0 }}>
@@ -455,7 +455,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                         </section>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)', gap: '1.5rem', alignItems: 'stretch' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', alignItems: 'stretch' }}>
                         <FiiDiiAnalyzer flows={fiiDiiFlows} />
                         <EconomicCalendar events={calendar} />
                     </div>

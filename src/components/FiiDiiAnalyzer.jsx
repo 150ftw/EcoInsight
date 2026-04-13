@@ -12,7 +12,7 @@ const FiiDiiAnalyzer = ({ flows }) => {
                 <span style={{ fontSize: '0.65rem', color: 'var(--accent-primary)', opacity: 0.8 }}>DAILY SETTLEMENT</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: '0.75rem' }}>
                 {flows.map((flow, idx) => (
                     <motion.div 
                         key={idx}
@@ -26,7 +26,8 @@ const FiiDiiAnalyzer = ({ flows }) => {
                             border: '1px solid rgba(255,255,255,0.05)',
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '0.4rem'
+                            gap: '0.4rem',
+                            minWidth: 0
                         }}
                     >
                         <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontWeight: 800 }}>{flow.name.toUpperCase()}</span>
