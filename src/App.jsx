@@ -3397,11 +3397,13 @@ function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isHandheld, setIsHandheld] = useState(window.innerWidth <= 1024);
     const HUB_LOCK_THRESHOLD = 1024;
 
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
+            setIsHandheld(window.innerWidth <= 1024);
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -4749,7 +4751,7 @@ const parseResponseWithProbes = (content) => {
                     </div>
                 );
             case 'trends':
-                if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
+                if (isHandheld) {
                     return (
                         <div className="view-content" key="mobile-lock-trends">
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
@@ -4987,7 +4989,7 @@ const parseResponseWithProbes = (content) => {
                         </div>
 
 
-                        {window.innerWidth <= HUB_LOCK_THRESHOLD && (
+                        {isHandheld && (
                             <div className="sidebar-section">
                                 <span className="section-label">Real-time Data</span>
                                 <button
@@ -5017,18 +5019,18 @@ const parseResponseWithProbes = (content) => {
                             <button
                                 className={`nav-item beta-lab-toggle ${isIntelHubExpanded ? 'expanded' : ''}`}
                                 onClick={() => {
-                                    if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
+                                    if (isHandheld) {
                                         setShowEnginePopup(true);
                                     } else {
                                         setIsIntelHubExpanded(!isIntelHubExpanded);
                                     }
                                 }}
-                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: window.innerWidth <= HUB_LOCK_THRESHOLD ? 0.7 : 1 }}
+                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isHandheld ? 0.7 : 1 }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Sparkles size={18} className="text-purple-400" /> Intelligence Hub
                                 </div>
-                                {window.innerWidth <= HUB_LOCK_THRESHOLD ? (
+                                {isHandheld ? (
                                     <Lock size={12} color="#a78bfa" />
                                 ) : (
                                     <motion.div animate={{ rotate: isIntelHubExpanded ? 180 : 0 }}>
@@ -5038,7 +5040,7 @@ const parseResponseWithProbes = (content) => {
                             </button>
 
                             <AnimatePresence>
-                                {isIntelHubExpanded && window.innerWidth > HUB_LOCK_THRESHOLD && (
+                                {isIntelHubExpanded && !isHandheld && (
                                     <motion.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
