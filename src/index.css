@@ -3259,22 +3259,19 @@ input[type="range"] {
     }
 
     .suggestion-chips {
-        justify-content: flex-start !important;
-        padding-bottom: 1rem;
-        overflow-x: auto;
-        flex-wrap: nowrap !important;
-        -webkit-overflow-scrolling: touch;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.75rem !important;
         width: 100%;
-        scrollbar-width: none;
-    }
-
-    .suggestion-chips::-webkit-scrollbar {
-        display: none;
+        max-width: 100%;
+        padding: 0 1rem;
     }
 
     .suggestion-chip {
-        white-space: nowrap !important;
-        flex-shrink: 0;
+        width: 100% !important;
+        justify-content: flex-start !important;
+        white-space: normal !important;
+        padding: 1rem 1.25rem !important;
     }
 }
 
