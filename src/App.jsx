@@ -3401,9 +3401,6 @@ function App() {
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
-            if (window.innerWidth > 768) {
-                setIsMobileSidebarOpen(false);
-            }
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -3442,15 +3439,6 @@ function App() {
         }
     };
 
-    useEffect(() => {
-        const handleResize = () => {
-            const mobile = window.innerWidth <= 768;
-            setIsMobile(mobile);
-            if (!mobile) setIsSidebarOpen(false);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     const activeChat = chats.find(c => c.id === activeChatId) || chats[0] || { title: 'New Session', messages: [] };
     const messages = activeChat.messages || [];
