@@ -4906,14 +4906,18 @@ const parseResponseWithProbes = (content) => {
                             <button
                                 className="nav-item"
                                 onClick={() => {
-                                    setView('dashboard');
-                                    if (isMobile) setIsSidebarOpen(false);
+                                    if (isHandheld) {
+                                        setShowEnginePopup(true);
+                                    } else {
+                                        setView('dashboard');
+                                    }
+                                    if (isMobile && !isHandheld) setIsSidebarOpen(false);
                                 }}
                                 style={{
                                     background: 'rgba(255, 255, 255, 0.02)',
                                     marginBottom: '1rem',
                                     border: '1px solid rgba(255, 255, 255, 0.05)',
-                                    opacity: 1,
+                                    opacity: isHandheld ? 0.7 : 1,
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center'
@@ -4923,6 +4927,7 @@ const parseResponseWithProbes = (content) => {
                                     <BarChart3 size={18} className="text-purple-400" />
                                     <span>Eko Intelligence Hub</span>
                                 </div>
+                                {isHandheld && <Lock size={12} color="#a78bfa" />}
                             </button>
                         </div>
 
@@ -4989,58 +4994,23 @@ const parseResponseWithProbes = (content) => {
                         </div>
 
 
-                        {isHandheld && (
-                            <div className="sidebar-section">
-                                <span className="section-label">Real-time Data</span>
-                                <button
-                                    className={`nav-item ${view === 'insights' ? 'active' : ''}`}
-                                    onClick={() => {
-                                        setView('insights');
-                                        if (isMobile) setIsSidebarOpen(false);
-                                    }}
-                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                                >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={18} /> Today's Insight</div>
-                                </button>
-                                <button
-                                    className={`nav-item ${view === 'market-pulse' ? 'active' : ''}`}
-                                    onClick={() => {
-                                        setView('market-pulse');
-                                        if (isMobile) setIsSidebarOpen(false);
-                                    }}
-                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                                >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={18} /> Market Pulse</div>
-                                </button>
-                            </div>
-                        )}
 
                         <div className="sidebar-section">
                             <button
                                 className={`nav-item beta-lab-toggle ${isIntelHubExpanded ? 'expanded' : ''}`}
-                                onClick={() => {
-                                    if (isHandheld) {
-                                        setShowEnginePopup(true);
-                                    } else {
-                                        setIsIntelHubExpanded(!isIntelHubExpanded);
-                                    }
-                                }}
-                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isHandheld ? 0.7 : 1 }}
+                                onClick={() => setIsIntelHubExpanded(!isIntelHubExpanded)}
+                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Sparkles size={18} className="text-purple-400" /> Intelligence Hub
                                 </div>
-                                {isHandheld ? (
-                                    <Lock size={12} color="#a78bfa" />
-                                ) : (
-                                    <motion.div animate={{ rotate: isIntelHubExpanded ? 180 : 0 }}>
-                                        <ChevronDown size={14} />
-                                    </motion.div>
-                                )}
+                                <motion.div animate={{ rotate: isIntelHubExpanded ? 180 : 0 }}>
+                                    <ChevronDown size={14} />
+                                </motion.div>
                             </button>
 
                             <AnimatePresence>
-                                {isIntelHubExpanded && !isHandheld && (
+                                {isIntelHubExpanded && (
                                     <motion.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
