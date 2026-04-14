@@ -4743,20 +4743,6 @@ const parseResponseWithProbes = (content) => {
                     </div>
                 );
             case 'insights':
-                if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
-                    return (
-                        <div className="view-content" key="mobile-lock">
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
-                                <Lock size={48} color="#a78bfa" />
-                                <h2 style={{ color: 'white' }}>Laptop Required</h2>
-                                <p style={{ color: 'rgba(255,255,255,0.6)' }}>Pro Economic Reporting is optimized for large screens to maintain analytical precision.</p>
-                                <button className="btn-shine-primary" onClick={() => { setShowEnginePopup(true); setView('chat'); }} style={{ padding: '0.8rem 1.5rem' }}>
-                                    <Zap size={18} /> Upgrade to Elite Engine
-                                </button>
-                            </div>
-                        </div>
-                    );
-                }
                 return (
                     <div className="view-content dashboard-view" key={view} style={{ overflowY: 'auto' }}>
                         <IntelligenceInsightsReport onDeepDive={handleDeepDive} />
@@ -4803,20 +4789,6 @@ const parseResponseWithProbes = (content) => {
                     </div>
                 )
             case 'market-pulse':
-                if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
-                    return (
-                        <div className="view-content" key="mobile-lock-pulse">
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
-                                <Lock size={48} color="#a78bfa" />
-                                <h2 style={{ color: 'white' }}>Stationary Use Only</h2>
-                                <p style={{ color: 'rgba(255,255,255,0.6)' }}>Market Pulse Telemetry requires a wider viewport for multi-chart correlation.</p>
-                                <button className="btn-shine-primary" onClick={() => { setShowEnginePopup(true); setView('chat'); }} style={{ padding: '0.8rem 1.5rem' }}>
-                                    <Zap size={18} /> Access Pro Features
-                                </button>
-                            </div>
-                        </div>
-                    );
-                }
                 return (
                     <div className="view-content dashboard-view" key={view} style={{ overflowY: 'auto' }}>
                         <MarketPulseDashboard />
@@ -5015,21 +4987,55 @@ const parseResponseWithProbes = (content) => {
                         </div>
 
                         <div className="sidebar-section">
+                            <span className="section-label">Real-time Data</span>
+                            <button
+                                className={`nav-item ${view === 'insights' ? 'active' : ''}`}
+                                onClick={() => {
+                                    setView('insights');
+                                    if (isMobile) setIsSidebarOpen(false);
+                                }}
+                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={18} /> Today's Insight</div>
+                            </button>
+                            <button
+                                className={`nav-item ${view === 'market-pulse' ? 'active' : ''}`}
+                                onClick={() => {
+                                    setView('market-pulse');
+                                    if (isMobile) setIsSidebarOpen(false);
+                                }}
+                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={18} /> Market Pulse</div>
+                            </button>
+                        </div>
+
+                        <div className="sidebar-section">
                             <button
                                 className={`nav-item beta-lab-toggle ${isIntelHubExpanded ? 'expanded' : ''}`}
-                                onClick={() => setIsIntelHubExpanded(!isIntelHubExpanded)}
-                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                onClick={() => {
+                                    if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
+                                        setShowEnginePopup(true);
+                                    } else {
+                                        setIsIntelHubExpanded(!isIntelHubExpanded);
+                                    }
+                                }}
+                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: window.innerWidth <= HUB_LOCK_THRESHOLD ? 0.7 : 1 }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Sparkles size={18} className="text-purple-400" /> Intelligence Hub
                                 </div>
-                                <motion.div animate={{ rotate: isIntelHubExpanded ? 180 : 0 }}>
-                                    <ChevronDown size={14} />
-                                </motion.div>
+                                {window.innerWidth <= HUB_LOCK_THRESHOLD ? (
+                                    <Lock size={12} color="#a78bfa" />
+                                ) : (
+                                    <motion.div animate={{ rotate: isIntelHubExpanded ? 180 : 0 }}>
+                                        <ChevronDown size={14} />
+                                    </motion.div>
+                                )}
                             </button>
 
                             <AnimatePresence>
-                                {isIntelHubExpanded && (
+                                {isIntelHubExpanded && window.innerWidth > HUB_LOCK_THRESHOLD && (
                                     <motion.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
@@ -5037,34 +5043,6 @@ const parseResponseWithProbes = (content) => {
                                         style={{ overflow: 'hidden' }}
                                     >
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
-                                            <button
-                                                className={`nav-item sub-nav-item ${view === 'insights' ? 'active' : ''}`}
-                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: window.innerWidth <= HUB_LOCK_THRESHOLD ? 0.7 : 1 }}
-                                                onClick={() => {
-                                                    if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
-                                                        setShowEnginePopup(true);
-                                                    } else {
-                                                        setView('insights');
-                                                    }
-                                                }}
-                                            >
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={16} /> Today's Insight</div>
-                                                {window.innerWidth <= HUB_LOCK_THRESHOLD && <Lock size={12} color="#a78bfa" />}
-                                            </button>
-                                            <button
-                                                className={`nav-item sub-nav-item ${view === 'market-pulse' ? 'active' : ''}`}
-                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: window.innerWidth <= HUB_LOCK_THRESHOLD ? 0.7 : 1 }}
-                                                onClick={() => {
-                                                    if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
-                                                        setShowEnginePopup(true);
-                                                    } else {
-                                                        setView('market-pulse');
-                                                    }
-                                                }}
-                                            >
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={16} /> Market Pulse</div>
-                                                {window.innerWidth <= HUB_LOCK_THRESHOLD && <Lock size={12} color="#a78bfa" />}
-                                            </button>
                                             <button
                                                 className="nav-item sub-nav-item"
                                                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
