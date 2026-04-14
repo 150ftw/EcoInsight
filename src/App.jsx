@@ -42,6 +42,7 @@ import IntelligenceInsightsReport from './components/IntelligenceInsightsReport'
 import SectorHeatmap from './components/SectorHeatmap'
 import PortfolioAnalyzer from './components/PortfolioAnalyzer'
 import IntelligenceHubNotification from './components/IntelligenceHubNotification'
+import MobileHeader from './components/MobileHeader'
 
 const MIN_THINKING_DURATION = 8000; // 8 seconds to ensure analytical animation steps complete
 
@@ -444,7 +445,14 @@ const NewsTicker = () => {
                     {[...Array(2)].map((_, groupIdx) => (
                         <React.Fragment key={groupIdx}>
                             {data.headlines.map((h, i) => (
-                                <span key={`h-${groupIdx}-${i}`} className="ticker-item headline">{h}</span>
+                                <span 
+                                    key={`h-${groupIdx}-${i}`} 
+                                    className="ticker-item headline"
+                                    onClick={() => h.link && window.open(h.link, '_blank')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    {h.title || h}
+                                </span>
                             ))}
                             {data.trending.map((t, i) => {
                                 if (typeof t === 'string') {
@@ -3390,6 +3398,17 @@ function App() {
     const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+            if (window.innerWidth > 768) {
+                setIsMobileSidebarOpen(false);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const handleAccountSave = async (updatedData) => {
         setProfile(prev => ({ ...prev, ...updatedData }));
 
@@ -4459,57 +4478,7 @@ const parseResponseWithProbes = (content) => {
 };
 // --- END RELATED QUESTIONS PARSING ---
 
-    const MobileDashboardLock = () => (
-        <div className="mobile-dashboard-lock">
-            <motion.div
-                className="lock-card"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                style={{
-                    background: 'rgba(15, 15, 20, 0.6)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    padding: '2.5rem 1.5rem',
-                    borderRadius: '32px',
-                    textAlign: 'center',
-                    maxWidth: '320px',
-                    boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.6)'
-                }}
-            >
-                <div className="institutional-header">
-                    <Monitor size={48} className="text-accent" style={{ opacity: 0.8, marginBottom: '1rem' }} />
-                </div>
-                <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'rgba(139, 92, 246, 0.1)',
-                    color: '#c084fc',
-                    padding: '4px 12px',
-                    borderRadius: '20px',
-                    fontSize: '0.7rem',
-                    fontWeight: '600',
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
-                    marginBottom: '1.5rem',
-                    border: '1px solid rgba(139, 92, 246, 0.2)'
-                }}>
-                    <Zap size={10} /> Institutional Terminal
-                </div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#fff' }}>Desktop Hub Gateway</h2>
-                <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '2rem' }}>
-                    The high-density Eko Intelligence Hub is purpose-built for ultra-wide precision displays.
-                    Institutional access is currently restricted on mobile viewports.
-                </p>
-                <div className="lock-badges" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Laptop size={14} /> Full Access on PC
-                    </div>
-                </div>
-            </motion.div>
-        </div>
-    );
+
 
     const handlePortfolioAnalyze = (stocks) => {
         if (!stocks || stocks.length === 0) return;
@@ -4761,11 +4730,11 @@ const parseResponseWithProbes = (content) => {
             case 'dashboard':
                 return (
                     <div className="view-content dashboard-view" key={view}>
-                        {isMobile ? <MobileDashboardLock /> : <LiveMarketDashboard
+                        <LiveMarketDashboard
                             user={user}
                             watchlist={personalization.watchlist || []}
                             onWatchlistChange={handleWatchlistChange}
-                        />}
+                        />
                     </div>
                 );
             case 'heatmap':
@@ -4786,7 +4755,7 @@ const parseResponseWithProbes = (content) => {
                 );
             case 'insights':
                 return (
-                    <div className="view-content" key={view} style={{ overflowY: 'auto' }}>
+                    <div className="view-content dashboard-view" key={view} style={{ overflowY: 'auto' }}>
                         <IntelligenceInsightsReport onDeepDive={handleDeepDive} />
                     </div>
                 );
@@ -4818,7 +4787,7 @@ const parseResponseWithProbes = (content) => {
                 )
             case 'market-pulse':
                 return (
-                    <div className="view-content" key={view} style={{ overflowY: 'auto' }}>
+                    <div className="view-content dashboard-view" key={view} style={{ overflowY: 'auto' }}>
                         <MarketPulseDashboard />
                     </div>
                 );
@@ -4905,17 +4874,11 @@ const parseResponseWithProbes = (content) => {
             <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
                 {isMobile && isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
                 {isMobile && (
-                    <header className="mobile-app-header">
-                        <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-                            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-                        </button>
-                        <div className="mobile-logo">
-                            <EcoInsightLogo size={24} /> <span>Eko AI</span>
-                        </div>
-                        <button className="mobile-new-chat" onClick={createNewChat}>
-                            <EcoNewChatIcon size={18} />
-                        </button>
-                    </header>
+                    <MobileHeader 
+                        onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+                        isOpen={isSidebarOpen} 
+                        activeView={view} 
+                    />
                 )}
                 <aside
                     className={`sidebar ${isSidebarOpen ? 'open' : ''}`}

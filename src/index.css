@@ -609,6 +609,89 @@ body {
     background: rgba(239, 68, 68, 0.1);
 }
 
+/* Mobile Responsiveness Overrides */
+@media (max-width: 768px) {
+    .mobile-header-container {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+
+    .main-sidebar {
+        transform: translateX(-100%);
+        width: 85%;
+        max-width: 320px;
+        z-index: 1100;
+    }
+
+    .main-sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+    }
+
+    .app-main {
+        margin-left: 0 !important;
+        padding-top: 64px !important;
+        width: 100% !important;
+    }
+
+    .view-content {
+        padding: 1rem !important;
+    }
+
+    .view-content.dashboard-view {
+        padding: 1rem !important;
+    }
+
+    .hero-spotlight {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .hero-image-container {
+        width: 100% !important;
+        height: 200px !important;
+    }
+
+    .hero-content {
+        width: 100% !important;
+        padding: 1.5rem !important;
+    }
+
+    .insight-grid, .pulse-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
+        z-index: 1050;
+        display: block;
+    }
+    
+    /* Chat specific mobile fixes */
+    .chat-container {
+        padding: 0.5rem !important;
+    }
+    
+    .messages-container {
+        padding: 1rem 0.5rem !important;
+    }
+    
+    .input-container-wrapper {
+        padding: 0.5rem !important;
+    }
+}
+
 /* Mobile Header */
 .mobile-app-header {
     display: none;
@@ -3067,7 +3150,7 @@ input[type="range"] {
 
     /* --- MAIN AREA HEIGHT ADJUSTMENT --- */
     main.chat-area {
-        height: calc(100vh - 56px); /* Account for mobile header */
+        height: calc(100vh - 64px); /* Account for mobile header height */
         overflow: hidden;
     }
 }
@@ -4907,11 +4990,14 @@ html {
     width: 100%;
 }
 
-/* Allow the dashboard view to be wider than default 950px */
+/* Allow the dashboard view to be wider than default 950px and center its content */
 .view-content.dashboard-view {
-    max-width: 100%;
+    max-width: 100% !important;
+    width: 100% !important;
     padding: 0 !important;
-    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     flex: 1;
 }
 

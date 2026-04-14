@@ -7,6 +7,13 @@ import SentimentGauge from './SentimentGauge';
 const MarketPulseDashboard = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const loadPulseData = async () => {
         try {
@@ -43,9 +50,26 @@ const MarketPulseDashboard = () => {
 
     if (loading || !data) {
         return (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-purple-400">
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                minHeight: '80vh', 
+                width: '100%', 
+                gap: '1rem',
+                color: '#c084fc'
+            }}>
                 <RefreshCw className="animate-spin" size={32} />
-                <span className="font-mono text-sm tracking-widest uppercase">Initializing Neural Market Flux...</span>
+                <span style={{ 
+                    fontFamily: 'monospace', 
+                    fontSize: '0.875rem', 
+                    letterSpacing: '0.1em', 
+                    textTransform: 'uppercase',
+                    textAlign: 'center'
+                }}>
+                    Initializing Neural Market Flux...
+                </span>
             </div>
         );
     }
@@ -55,16 +79,31 @@ const MarketPulseDashboard = () => {
     return (
         <motion.div 
             className="market-pulse-full-dashboard"
+            style={{ 
+                padding: '2rem 1.5rem', 
+                maxWidth: '1400px', 
+                width: '100%',
+                margin: '0 auto',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}
         >
             {/* Header Status Bar */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: isMobile ? 'column' : 'row',
+                justifyContent: 'space-between', 
+                alignItems: isMobile ? 'flex-start' : 'center', 
+                marginBottom: '2.5rem',
+                gap: isMobile ? '1.5rem' : '0'
+            }}>
                 <div>
-                    <h1 style={{ fontSize: '2.5rem', fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>Market Pulse <span style={{ color: 'var(--accent-primary)' }}>Command</span></h1>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', marginTop: '0.5rem' }}>Advanced institutional telemetry for the Indian Stock Market.</p>
+                    <h1 style={{ fontSize: isMobile ? '1.8rem' : '2.5rem', fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>Market Pulse <span style={{ color: 'var(--accent-primary)' }}>Command</span></h1>
+                    <p style={{ color: 'rgba(255,255,255,0.5)', marginTop: '0.5rem', fontSize: isMobile ? '0.9rem' : '1rem' }}>Advanced institutional telemetry for the Indian Stock Market.</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(34, 197, 94, 0.1)', padding: '0.5rem 1rem', borderRadius: '12px', border: '1px solid rgba(34, 197, 94, 0.2)', marginBottom: '0.5rem' }}>
@@ -75,10 +114,15 @@ const MarketPulseDashboard = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.5rem' }}>
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(12, 1fr)', 
+                gap: '1.5rem',
+                width: '100%'
+            }}>
                 
                 {/* Sentiment Gauge Section */}
-                <motion.div variants={itemVariants} style={{ gridColumn: 'span 4' }}>
+                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? 'span 1' : 'span 4' }}>
                     <SentimentGauge 
                         score={pulse} 
                         label={pulse > 70 ? "Extreme Greed" : pulse < 30 ? "Extreme Fear" : "Neutral Stability"}
@@ -87,7 +131,12 @@ const MarketPulseDashboard = () => {
                 </motion.div>
 
                 {/* Volatility & Breadth Matrix */}
-                <motion.div variants={itemVariants} style={{ gridColumn: 'span 8', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+                <motion.div variants={itemVariants} style={{ 
+                    gridColumn: isMobile ? 'span 1' : 'span 8', 
+                    display: 'grid', 
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', 
+                    gap: '1.5rem' 
+                }}>
                     
                     {/* Volatility Widget */}
                     <div className="panel-card" style={{ background: 'rgba(15, 15, 20, 0.4)', borderRadius: '24px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.08)', position: 'relative', overflow: 'hidden' }}>
@@ -155,13 +204,17 @@ const MarketPulseDashboard = () => {
                 </motion.div>
 
                 {/* Liquidity Flux Terminal */}
-                <motion.div variants={itemVariants} style={{ gridColumn: 'span 12' }}>
+                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? 'span 1' : 'span 12' }}>
                     <div className="panel-card" style={{ background: 'rgba(0, 0, 0, 0.3)', borderRadius: '24px', padding: '1.5rem', border: '1px solid rgba(139, 92, 246, 0.15)', overflow: 'hidden' }}>
                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
                             <Cpu size={18} className="text-purple-400" />
                             <span style={{ fontSize: '0.85rem', fontWeight: 700, letterSpacing: '2px', color: 'white', textTransform: 'uppercase' }}>Liquidity & Volume Influx Matrix</span>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1.5rem' }}>
+                        <div style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: isMobile ? '1fr' : 'repeat(5, 1fr)', 
+                            gap: '1.5rem' 
+                        }}>
                             {liquidity.map((item, i) => (
                                 <div key={i} style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.03)' }}>
                                     <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', display: 'block' }}>{item.name}</span>
@@ -186,7 +239,7 @@ const MarketPulseDashboard = () => {
                 </motion.div>
 
                 {/* Critical Alerts Strip */}
-                <motion.div variants={itemVariants} style={{ gridColumn: 'span 12' }}>
+                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? 'span 1' : 'span 12' }}>
                     <div style={{ background: 'linear-gradient(90deg, rgba(139, 92, 246, 0.1), transparent)', borderLeft: '4px solid var(--accent-primary)', padding: '1rem 1.5rem', borderRadius: '0 12px 12px 0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <Zap size={18} className="text-purple-400" />
                         <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>

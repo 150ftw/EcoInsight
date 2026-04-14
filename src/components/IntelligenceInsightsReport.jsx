@@ -8,6 +8,13 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
     const [data, setData] = useState(null);
     const [sectors, setSectors] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const loadInsightData = async () => {
         try {
@@ -42,15 +49,37 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-purple-400">
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                minHeight: '80vh', 
+                width: '100%', 
+                gap: '1rem',
+                color: '#c084fc'
+            }}>
                 <Sparkles className="animate-pulse" size={32} />
-                <span className="font-mono text-sm tracking-widest uppercase">Synthesizing Market Intelligence...</span>
+                <span style={{ 
+                    fontFamily: 'monospace', 
+                    fontSize: '0.875rem', 
+                    letterSpacing: '0.1em', 
+                    textTransform: 'uppercase',
+                    textAlign: 'center'
+                }}>
+                    Synthesizing Market Intelligence...
+                </span>
             </div>
         );
     }
 
     return (
-        <div className="intelligence-report-container" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+        <div className="intelligence-report-container" style={{ 
+            padding: '2rem 1.5rem', 
+            maxWidth: '1400px', 
+            margin: '0 auto', 
+            width: '100%'
+        }}>
             
             {/* Hero Insight Spotlight */}
             <motion.div 
@@ -60,7 +89,7 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
                 style={{ 
                     background: 'linear-gradient(135deg, rgba(88, 28, 135, 0.4) 0%, rgba(15, 10, 30, 0.6) 100%)',
                     borderRadius: '32px',
-                    padding: '3rem',
+                    padding: isMobile ? '1.5rem' : '3rem',
                     border: '1px solid rgba(139, 92, 246, 0.2)',
                     marginBottom: '2.5rem',
                     position: 'relative',
@@ -77,7 +106,7 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
                         <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>ISSUE #284 • {new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
                     </div>
                     
-                    <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, maxWidth: '800px' }}>
+                    <h2 style={{ fontSize: isMobile ? '1.8rem' : '3rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, maxWidth: '800px' }}>
                         {data.hero.title.split(':').map((part, i) => i === 1 ? <span key={i} style={{ color: 'var(--accent-primary)' }}>{part}</span> : part)}
                     </h2>
                     
@@ -105,7 +134,11 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
                 </div>
             </motion.div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '2rem' }}>
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 380px', 
+                gap: '2rem' 
+            }}>
                 
                 {/* News Wire & Sectoral Split */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
