@@ -4932,40 +4932,18 @@ const parseResponseWithProbes = (content) => {
                         </div>
 
                         <div className="sidebar-section">
-                            <span className="section-label">Ongoing Chat</span>
                             <button className="nav-item new-chat" onClick={() => { createNewChat(); if (isMobile) setIsSidebarOpen(false); }}>
                                 <EcoNewChatIcon size={18} /> <span>New Chat</span>
                             </button>
-                            <div
-                                className="history-item-wrapper active-chat-item"
-                                onMouseEnter={() => {
-                                    clearTimeout(hoverTimeout.current);
-                                    hoverTimeout.current = setTimeout(() => setHoveredChatId(activeChat.id), 400);
-                                }}
-                                onMouseLeave={() => {
-                                    clearTimeout(hoverTimeout.current);
-                                    setHoveredChatId(null);
-                                }}
-                            >
-                                <button
-                                    className={`nav-item ${view === 'chat' ? 'active' : ''}`}
-                                    onClick={() => { setView('chat'); if (isMobile) setIsSidebarOpen(false); }}
-                                >
-                                    <EcoHistoryIcon size={18} /> <span className="truncate">{activeChat.title || 'New Session'}</span>
-                                </button>
-                                <button className="delete-chat-btn" onClick={(e) => deleteChat(e, activeChat.id)} title="Delete Session">
-                                    <Trash2 size={14} />
-                                </button>
-                            </div>
                         </div>
 
                         <div className="sidebar-section history-section">
                             <span className="section-label">Chat History</span>
                             <div className="history-list">
-                                {chats.filter(c => c.id !== activeChatId && c.messages.length > 1).map(chat => (
+                                {chats.filter(c => c.messages.length > 1).map(chat => (
                                     <div
                                         key={chat.id}
-                                        className="history-item-wrapper"
+                                        className={`history-item-wrapper ${chat.id === activeChatId ? 'active-chat-item' : ''}`}
                                         onMouseEnter={() => {
                                             clearTimeout(hoverTimeout.current);
                                             hoverTimeout.current = setTimeout(() => setHoveredChatId(chat.id), 400);
@@ -4976,7 +4954,7 @@ const parseResponseWithProbes = (content) => {
                                         }}
                                     >
                                         <button
-                                            className="nav-item history-item"
+                                            className={`nav-item history-item ${chat.id === activeChatId && view === 'chat' ? 'active' : ''}`}
                                             onClick={() => {
                                                 setActiveChatId(chat.id);
                                                 setView('chat');
