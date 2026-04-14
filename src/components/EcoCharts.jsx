@@ -354,7 +354,6 @@ export const parseChartBlocks = (text) => {
 };
 
 import SentimentGauge from './SentimentGauge';
-import SectorHeatmap from './SectorHeatmap';
 
 /**
  * Renders a chart or visual intelligence component based on the parsed config
@@ -382,15 +381,9 @@ export const EcoChartRenderer = ({ config }) => {
                     type={config.gaugeType || 'market'} 
                 />
             );
-        case 'risk_heatmap':
-            return (
-                <SectorHeatmap 
-                    sectors={config.sectors} 
-                    title={config.title || "Institutional Risk Heatmap"} 
-                    subtitle={config.subtitle || "AI Asymmetric Projection"}
-                    compact={true}
-                />
-            );
+        case 'portfolio_risk':
+            // Placeholder for a future risk component if needed
+            return null;
         default:
             return <EcoLineChart data={config.data} title={config.title} dataKeys={config.dataKeys} />;
     }

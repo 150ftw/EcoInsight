@@ -39,7 +39,6 @@ import CookieConsent from './components/CookieConsent'
 import LiveMarketDashboard from './components/LiveMarketDashboard'
 import MarketPulseDashboard from './components/MarketPulseDashboard'
 import IntelligenceInsightsReport from './components/IntelligenceInsightsReport'
-import SectorHeatmap from './components/SectorHeatmap'
 import PortfolioAnalyzer from './components/PortfolioAnalyzer'
 import IntelligenceHubNotification from './components/IntelligenceHubNotification'
 import MobileHeader from './components/MobileHeader'
@@ -4725,16 +4724,6 @@ const parseResponseWithProbes = (content) => {
                         />
                     </div>
                 );
-            case 'heatmap':
-                return (
-                    <div className="view-content" key={view}>
-                        <div className="view-header">
-                            <h1>Sector Heatmap</h1>
-                            <p>Real-time sector performance & market sentiment pulse.</p>
-                        </div>
-                        <SectorHeatmap />
-                    </div>
-                );
             case 'portfolio':
                 return (
                     <div className="view-content" key={view}>
@@ -4984,14 +4973,6 @@ const parseResponseWithProbes = (content) => {
                                                 onClick={() => setView('market-pulse')}
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={16} /> Market Pulse</div>
-                                            </button>
-                                            <button
-                                                className="nav-item sub-nav-item"
-                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
-                                                onClick={() => { setModalType('intelligence_hub'); setShowCreditModal(true); }}
-                                            >
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><BarChart3 size={16} /> Sector Heatmap</div>
-                                                <Lock size={12} color="#a78bfa" />
                                             </button>
                                             <button
                                                 className="nav-item sub-nav-item"

@@ -28,7 +28,6 @@ import {
     fetchFiiDiiFlows,
     fetchMarketSentiment
 } from '../lib/DashboardData';
-import SectorHeatmap from './SectorHeatmap';
 import MarketPulse from './MarketPulse';
 import FiiDiiAnalyzer from './FiiDiiAnalyzer';
 import EconomicCalendar from './EconomicCalendar';
@@ -428,7 +427,6 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                     </section>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem', alignItems: 'stretch' }}>
-                        <SectorHeatmap sectors={niftySectors} />
                         
                         <section className="panel-card" style={{ marginBottom: 0 }}>
                             <h3><ShieldCheck size={16} /> Asset Metrics</h3>
