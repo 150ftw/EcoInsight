@@ -4884,8 +4884,9 @@ const parseResponseWithProbes = (content) => {
                     className={`sidebar ${isSidebarOpen ? 'open' : ''}`}
                     style={{
                         '--sidebar-width': `${sidebarWidth}px`,
-                        flexBasis: isMobile ? '280px' : 'var(--sidebar-width)',
-                        width: isMobile ? '280px' : 'var(--sidebar-width)'
+                        flexBasis: isMobile ? '0px' : 'var(--sidebar-width)',
+                        width: isMobile ? '0px' : 'var(--sidebar-width)',
+                        minWidth: isMobile ? '0px' : '200px'
                     }}
                 >
                     <div className="sidebar-header">

@@ -75,10 +75,11 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
 
     return (
         <div className="intelligence-report-container" style={{ 
-            padding: '2rem 1.5rem', 
+            padding: isMobile ? '1.5rem 1rem' : '2rem 1.5rem', 
             maxWidth: '1400px', 
             margin: '0 auto', 
-            width: '100%'
+            width: '100%',
+            overflowX: 'hidden'
         }}>
             
             {/* Hero Insight Spotlight */}
@@ -96,7 +97,15 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
                     overflow: 'hidden'
                 }}
             >
-                <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '100%', background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ 
+                    position: 'absolute', 
+                    top: 0, 
+                    right: 0, 
+                    width: isMobile ? '100%' : '400px', 
+                    height: '100%', 
+                    background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%)', 
+                    pointerEvents: 'none' 
+                }} />
                 
                 <div style={{ position: 'relative', zIndex: 10 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
@@ -136,12 +145,13 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
 
             <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: isMobile ? '1fr' : '1fr 380px', 
-                gap: '2rem' 
+                gridTemplateColumns: isMobile ? '100%' : '1fr 380px', 
+                gap: '2rem',
+                width: '100%'
             }}>
                 
                 {/* News Wire & Sectoral Split */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '100%' }}>
                     
                     {/* Dalal Street Live Wire */}
                     <section>
@@ -192,7 +202,7 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
                 </div>
 
                 {/* Sidebar Intelligence */}
-                <aside style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <aside style={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '100%' }}>
                     
                     {/* Sectoral Sentiment Grid */}
                     <div className="panel-card" style={{ background: 'rgba(10, 10, 15, 0.6)', padding: '1.5rem', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>

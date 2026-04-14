@@ -80,13 +80,14 @@ const MarketPulseDashboard = () => {
         <motion.div 
             className="market-pulse-full-dashboard"
             style={{ 
-                padding: '2rem 1.5rem', 
+                padding: isMobile ? '1.5rem 1rem' : '2rem 1.5rem', 
                 maxWidth: '1400px', 
                 width: '100%',
                 margin: '0 auto',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center'
+                alignItems: 'center',
+                overflowX: 'hidden'
             }}
             variants={containerVariants}
             initial="hidden"
@@ -116,13 +117,14 @@ const MarketPulseDashboard = () => {
 
             <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: isMobile ? '1fr' : 'repeat(12, 1fr)', 
+                gridTemplateColumns: isMobile ? '100%' : 'repeat(12, 1fr)', 
                 gap: '1.5rem',
-                width: '100%'
+                width: '100%',
+                maxWidth: '100%'
             }}>
                 
                 {/* Sentiment Gauge Section */}
-                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? 'span 1' : 'span 4' }}>
+                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? '1 / -1' : 'span 4' }}>
                     <SentimentGauge 
                         score={pulse} 
                         label={pulse > 70 ? "Extreme Greed" : pulse < 30 ? "Extreme Fear" : "Neutral Stability"}
@@ -132,10 +134,11 @@ const MarketPulseDashboard = () => {
 
                 {/* Volatility & Breadth Matrix */}
                 <motion.div variants={itemVariants} style={{ 
-                    gridColumn: isMobile ? 'span 1' : 'span 8', 
+                    gridColumn: isMobile ? '1 / -1' : 'span 8', 
                     display: 'grid', 
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', 
-                    gap: '1.5rem' 
+                    gridTemplateColumns: isMobile ? '100%' : 'repeat(2, 1fr)', 
+                    gap: '1.5rem',
+                    width: '100%'
                 }}>
                     
                     {/* Volatility Widget */}
@@ -204,16 +207,17 @@ const MarketPulseDashboard = () => {
                 </motion.div>
 
                 {/* Liquidity Flux Terminal */}
-                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? 'span 1' : 'span 12' }}>
-                    <div className="panel-card" style={{ background: 'rgba(0, 0, 0, 0.3)', borderRadius: '24px', padding: '1.5rem', border: '1px solid rgba(139, 92, 246, 0.15)', overflow: 'hidden' }}>
+                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? '1 / -1' : 'span 12', width: '100%' }}>
+                    <div className="panel-card" style={{ background: 'rgba(0, 0, 0, 0.3)', borderRadius: '24px', padding: isMobile ? '1.25rem' : '1.5rem', border: '1px solid rgba(139, 92, 246, 0.15)', overflow: 'hidden', width: '100%' }}>
                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
                             <Cpu size={18} className="text-purple-400" />
                             <span style={{ fontSize: '0.85rem', fontWeight: 700, letterSpacing: '2px', color: 'white', textTransform: 'uppercase' }}>Liquidity & Volume Influx Matrix</span>
                         </div>
                         <div style={{ 
                             display: 'grid', 
-                            gridTemplateColumns: isMobile ? '1fr' : 'repeat(5, 1fr)', 
-                            gap: '1.5rem' 
+                            gridTemplateColumns: isMobile ? '100%' : 'repeat(5, 1fr)', 
+                            gap: '1.5rem',
+                            width: '100%'
                         }}>
                             {liquidity.map((item, i) => (
                                 <div key={i} style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.03)' }}>
@@ -239,7 +243,7 @@ const MarketPulseDashboard = () => {
                 </motion.div>
 
                 {/* Critical Alerts Strip */}
-                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? 'span 1' : 'span 12' }}>
+                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? '1 / -1' : 'span 12', width: '100%' }}>
                     <div style={{ background: 'linear-gradient(90deg, rgba(139, 92, 246, 0.1), transparent)', borderLeft: '4px solid var(--accent-primary)', padding: '1rem 1.5rem', borderRadius: '0 12px 12px 0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <Zap size={18} className="text-purple-400" />
                         <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>
