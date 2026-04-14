@@ -9584,13 +9584,13 @@ select {
 /* --- MOBILE ACCOUNT VISIBILITY STABILIZATION --- */
 @media (max-width: 768px) {
     /* Elevate sidebar above the chat input bar (1001) */
-    .chat-sidebar {
-        z-index: 1200 !important;
+    .sidebar {
+        z-index: 2000 !important;
     }
 
     /* Ensure the backdrop overlay is also correctly layered */
     .sidebar-overlay {
-        z-index: 1150 !important;
+        z-index: 1999 !important;
         background: rgba(0, 0, 0, 0.6) !important;
         backdrop-filter: blur(4px) !important;
     }
@@ -9600,7 +9600,7 @@ select {
         padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 20px)) !important;
         background: rgba(10, 10, 10, 0.95) !important;
         border-top: 1px solid rgba(139, 92, 246, 0.1) !important;
-        z-index: 1201 !important;
+        z-index: 2001 !important;
     }
 
     /* Refine touch targets in the footer */
