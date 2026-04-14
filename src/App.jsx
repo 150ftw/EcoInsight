@@ -4321,8 +4321,6 @@ IMPORTANT OVERRIDE RULES FOR PDF:
         return saved ? parseInt(saved, 10) : 280;
     });
     const [isResizing, setIsResizing] = useState(false);
-    const [hoveredChatId, setHoveredChatId] = useState(null);
-    const hoverTimeout = useRef(null);
 
     const startResizing = (e) => {
         e.preventDefault();
@@ -4944,14 +4942,6 @@ const parseResponseWithProbes = (content) => {
                                     <div
                                         key={chat.id}
                                         className={`history-item-wrapper ${chat.id === activeChatId ? 'active-chat-item' : ''}`}
-                                        onMouseEnter={() => {
-                                            clearTimeout(hoverTimeout.current);
-                                            hoverTimeout.current = setTimeout(() => setHoveredChatId(chat.id), 400);
-                                        }}
-                                        onMouseLeave={() => {
-                                            clearTimeout(hoverTimeout.current);
-                                            setHoveredChatId(null);
-                                        }}
                                     >
                                         <button
                                             className={`nav-item history-item ${chat.id === activeChatId && view === 'chat' ? 'active' : ''}`}
@@ -5117,30 +5107,6 @@ const parseResponseWithProbes = (content) => {
                         </div>
                     </nav>
                     <AnimatePresence>
-                        {hoveredChatId && (
-                            <motion.div
-                                className="chat-summary-tooltip"
-                                initial={{ opacity: 0, x: 10, scale: 0.95 }}
-                                animate={{ opacity: 1, x: 0, scale: 1 }}
-                                exit={{ opacity: 0, x: 10, scale: 0.95 }}
-                                style={{
-                                    left: isMobile ? '290px' : `calc(${sidebarWidth}px + 10px)`,
-                                    top: '50%',
-                                    transform: 'translateY(-50%)'
-                                }}
-                            >
-                                <div className="summary-header">
-                                    <Sparkles size={12} className="text-accent" />
-                                    <span>Intelligence Summary</span>
-                                </div>
-                                <div className="summary-content">
-                                    {getChatSummary(hoveredChatId)}
-                                </div>
-                                <div className="summary-footer">
-                                    {chats.find(c => c.id === hoveredChatId)?.messages.length || 0} messages • EcoInsight AI
-                                </div>
-                            </motion.div>
-                        )}
                     </AnimatePresence>
                 </aside>
                 {!isMobile && (
