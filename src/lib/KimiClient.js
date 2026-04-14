@@ -49,7 +49,11 @@ export const streamMessage = async (messages, apiKey, onChunk, options = {}) => 
                     try {
                         const json = JSON.parse(data);
                         const content = json.choices[0]?.delta?.content;
-                        if (content) onChunk(content);
+                        if (content) {
+                            onChunk(content);
+                            // Artificial delay to make the response feel more "thoughtful" and authentic
+                            await new Promise(resolve => setTimeout(resolve, 40));
+                        }
                     } catch (e) {
                         console.error('Error parsing JSON from stream:', e);
                     }
