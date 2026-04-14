@@ -80,7 +80,7 @@ const MarketPulseDashboard = () => {
         <motion.div 
             className="market-pulse-full-dashboard"
             style={{ 
-                padding: isMobile ? '1.5rem 1rem' : '2rem 1.5rem', 
+                padding: isMobile ? '0 1rem 1.5rem' : '2rem 1.5rem', 
                 maxWidth: '1400px', 
                 width: '100%',
                 margin: '0 auto',
