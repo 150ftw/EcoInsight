@@ -4986,47 +4986,18 @@ const parseResponseWithProbes = (content) => {
                             </div>
                         </div>
 
-                        <div className="sidebar-section">
-                            <span className="section-label">Real-time Data</span>
-                            <button
-                                className={`nav-item ${view === 'insights' ? 'active' : ''}`}
-                                onClick={() => {
-                                    setView('insights');
-                                    if (isMobile) setIsSidebarOpen(false);
-                                }}
-                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={18} /> Today's Insight</div>
-                            </button>
-                            <button
-                                className={`nav-item ${view === 'market-pulse' ? 'active' : ''}`}
-                                onClick={() => {
-                                    setView('market-pulse');
-                                    if (isMobile) setIsSidebarOpen(false);
-                                }}
-                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={18} /> Market Pulse</div>
-                            </button>
-                        </div>
 
                         <div className="sidebar-section">
                             <button
                                 className={`nav-item beta-lab-toggle ${isIntelHubExpanded ? 'expanded' : ''}`}
-                                onClick={() => {
-                                    if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
-                                        setShowEnginePopup(true);
-                                    } else {
-                                        setIsIntelHubExpanded(!isIntelHubExpanded);
-                                    }
-                                }}
-                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: window.innerWidth <= HUB_LOCK_THRESHOLD ? 0.7 : 1 }}
+                                onClick={() => setIsIntelHubExpanded(!isIntelHubExpanded)}
+                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Sparkles size={18} className="text-purple-400" /> Intelligence Hub
                                 </div>
                                 {window.innerWidth <= HUB_LOCK_THRESHOLD ? (
-                                    <Lock size={12} color="#a78bfa" />
+                                    <Sparkles size={14} color="#a78bfa" className="animate-pulse" />
                                 ) : (
                                     <motion.div animate={{ rotate: isIntelHubExpanded ? 180 : 0 }}>
                                         <ChevronDown size={14} />
@@ -5035,7 +5006,7 @@ const parseResponseWithProbes = (content) => {
                             </button>
 
                             <AnimatePresence>
-                                {isIntelHubExpanded && window.innerWidth > HUB_LOCK_THRESHOLD && (
+                                {isIntelHubExpanded && (
                                     <motion.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
@@ -5043,6 +5014,26 @@ const parseResponseWithProbes = (content) => {
                                         style={{ overflow: 'hidden' }}
                                     >
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
+                                            <button
+                                                className={`nav-item sub-nav-item ${view === 'insights' ? 'active' : ''}`}
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                                onClick={() => {
+                                                    setView('insights');
+                                                    if (isMobile) setIsSidebarOpen(false);
+                                                }}
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={16} /> Today's Insight</div>
+                                            </button>
+                                            <button
+                                                className={`nav-item sub-nav-item ${view === 'market-pulse' ? 'active' : ''}`}
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                                onClick={() => {
+                                                    setView('market-pulse');
+                                                    if (isMobile) setIsSidebarOpen(false);
+                                                }}
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={16} /> Market Pulse</div>
+                                            </button>
                                             <button
                                                 className="nav-item sub-nav-item"
                                                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}
