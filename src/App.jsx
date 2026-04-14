@@ -4699,12 +4699,23 @@ const parseResponseWithProbes = (content) => {
                                 >
                                     <FilePlus size={20} />
                                 </motion.button>
-                                <input
+                                <textarea
+                                    className="chat-textarea"
                                     placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "What's on your mind today?"}
                                     value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                                    onChange={(e) => {
+                                        setInput(e.target.value);
+                                        e.target.style.height = 'inherit';
+                                        e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleSend();
+                                        }
+                                    }}
                                     disabled={isLoading || isUploading}
+                                    rows="1"
                                 />
                                 <div className="input-actions">
                                     <button className={`send-button ${input.trim() ? 'active' : ''}`} onClick={() => handleSend()} disabled={isLoading || isUploading || !input.trim()}>
@@ -4749,20 +4760,6 @@ const parseResponseWithProbes = (content) => {
                     </div>
                 );
             case 'trends':
-                if (isHandheld) {
-                    return (
-                        <div className="view-content" key="mobile-lock-trends">
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
-                                <Lock size={48} color="#a78bfa" />
-                                <h2 style={{ color: 'white' }}>Laptop Required</h2>
-                                <p style={{ color: 'rgba(255,255,255,0.6)' }}>This analytical model requires workstation-grade hardware for real-time visualization.</p>
-                                <button className="btn-shine-primary" onClick={() => { setShowEnginePopup(true); setView('chat'); }} style={{ padding: '0.8rem 1.5rem' }}>
-                                    <Zap size={18} /> View Requirements
-                                </button>
-                            </div>
-                        </div>
-                    );
-                }
                 return (
                     <div className="view-content" key={view}>
                         <div className="view-header">
