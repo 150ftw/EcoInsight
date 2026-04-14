@@ -3238,29 +3238,6 @@ input[type="range"] {
         flex-direction: column;
     }
 
-    .chat-textarea {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        color: white;
-        padding: 12px 45px 12px 16px;
-        font-family: var(--font-body);
-        font-size: 1rem;
-        line-height: 1.5;
-        resize: none;
-        outline: none;
-        transition: all 0.3s ease;
-        max-height: 200px;
-        overflow-y: auto;
-    }
-
-    .chat-textarea:focus {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: var(--accent-primary);
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
-    }
-
     .dashboard-view, .subpage-view {
         padding: 1rem !important;
         overflow-x: hidden !important;
@@ -9797,4 +9774,87 @@ select {
 
 .view-content::-webkit-scrollbar-thumb:hover {
     background: rgba(255,255,255,0.1);
+}
+
+/* ==========================================================================
+   GLOBAL CHAT INPUT & TEXTAREA
+   ========================================================================== */
+
+.input-bar {
+    display: flex;
+    align-items: flex-end;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    padding: 10px 14px;
+    gap: 8px;
+    backdrop-filter: blur(20px);
+    width: 100%;
+    margin: 0 auto;
+    max-width: 1000px;
+    transition: all 0.3s ease;
+}
+
+.file-upload-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin-bottom: 2px;
+}
+
+.chat-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 8px 0;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    transition: all 0.3s ease;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.chat-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.send-button {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.send-button.active {
+    background: var(--accent-primary);
+    color: white;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+@media (max-width: 768px) {
+    .input-bar {
+        padding: 8px 10px;
+        border-radius: 14px;
+    }
+    
+    .chat-textarea {
+        font-size: 0.95rem;
+    }
 }

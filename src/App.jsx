@@ -4671,56 +4671,44 @@ const parseResponseWithProbes = (content) => {
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-                                <motion.button
-                                    type="button"
-                                    className="file-upload-btn"
-                                    title="Upload PDF Analysis"
-                                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowUploadSoon(true);
-                                        setTimeout(() => setShowUploadSoon(false), 3000);
-                                    }}
-                                    style={{
-                                        background: 'transparent',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        padding: '8px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        marginRight: '8px',
-                                        borderRadius: '10px',
-                                        position: 'relative',
-                                        zIndex: 20,
-                                        color: 'var(--text-secondary)'
-                                    }}
-                                >
-                                    <FilePlus size={20} />
-                                </motion.button>
-                                <textarea
-                                    className="chat-textarea"
-                                    placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "What's on your mind today?"}
-                                    value={input}
-                                    onChange={(e) => {
-                                        setInput(e.target.value);
-                                        e.target.style.height = 'inherit';
-                                        e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && !e.shiftKey) {
-                                            e.preventDefault();
-                                            handleSend();
-                                        }
-                                    }}
-                                    disabled={isLoading || isUploading}
-                                    rows="1"
-                                />
-                                <div className="input-actions">
-                                    <button className={`send-button ${input.trim() ? 'active' : ''}`} onClick={() => handleSend()} disabled={isLoading || isUploading || !input.trim()}>
-                                        {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
-                                    </button>
+                                <div className="input-bar">
+                                    <motion.button
+                                        type="button"
+                                        className="file-upload-btn"
+                                        title="Upload PDF Analysis"
+                                        whileHover={{ scale: 1.1, backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowUploadSoon(true);
+                                            setTimeout(() => setShowUploadSoon(false), 3000);
+                                        }}
+                                    >
+                                        <FilePlus size={20} />
+                                    </motion.button>
+                                    <textarea
+                                        className="chat-textarea"
+                                        placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "What's on your mind today?"}
+                                        value={input}
+                                        onChange={(e) => {
+                                            setInput(e.target.value);
+                                            e.target.style.height = 'auto';
+                                            e.target.style.height = `${e.target.scrollHeight}px`;
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSend();
+                                            }
+                                        }}
+                                        disabled={isLoading || isUploading}
+                                        rows="1"
+                                    />
+                                    <div className="input-actions">
+                                        <button className={`send-button ${input.trim() ? 'active' : ''}`} onClick={() => handleSend()} disabled={isLoading || isUploading || !input.trim()}>
+                                            {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
+                                        </button>
+                                    </div>
                                 </div>
                             </motion.div>
                             <p className="input-footer">Eko by EcoInsight – Professional Economic Analysis & Intelligence</p>
