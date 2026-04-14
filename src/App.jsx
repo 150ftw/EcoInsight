@@ -3397,6 +3397,7 @@ function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const HUB_LOCK_THRESHOLD = 1024;
 
     useEffect(() => {
         const handleResize = () => {
@@ -4742,12 +4743,40 @@ const parseResponseWithProbes = (content) => {
                     </div>
                 );
             case 'insights':
+                if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
+                    return (
+                        <div className="view-content" key="mobile-lock">
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
+                                <Lock size={48} color="#a78bfa" />
+                                <h2 style={{ color: 'white' }}>Laptop Required</h2>
+                                <p style={{ color: 'rgba(255,255,255,0.6)' }}>Pro Economic Reporting is optimized for large screens to maintain analytical precision.</p>
+                                <button className="btn-shine-primary" onClick={() => { setShowEnginePopup(true); setView('chat'); }} style={{ padding: '0.8rem 1.5rem' }}>
+                                    <Zap size={18} /> Upgrade to Elite Engine
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
                 return (
                     <div className="view-content dashboard-view" key={view} style={{ overflowY: 'auto' }}>
                         <IntelligenceInsightsReport onDeepDive={handleDeepDive} />
                     </div>
                 );
             case 'trends':
+                if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
+                    return (
+                        <div className="view-content" key="mobile-lock-trends">
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
+                                <Lock size={48} color="#a78bfa" />
+                                <h2 style={{ color: 'white' }}>Laptop Required</h2>
+                                <p style={{ color: 'rgba(255,255,255,0.6)' }}>This analytical model requires workstation-grade hardware for real-time visualization.</p>
+                                <button className="btn-shine-primary" onClick={() => { setShowEnginePopup(true); setView('chat'); }} style={{ padding: '0.8rem 1.5rem' }}>
+                                    <Zap size={18} /> View Requirements
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
                 return (
                     <div className="view-content" key={view}>
                         <div className="view-header">
@@ -4774,6 +4803,20 @@ const parseResponseWithProbes = (content) => {
                     </div>
                 )
             case 'market-pulse':
+                if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
+                    return (
+                        <div className="view-content" key="mobile-lock-pulse">
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
+                                <Lock size={48} color="#a78bfa" />
+                                <h2 style={{ color: 'white' }}>Stationary Use Only</h2>
+                                <p style={{ color: 'rgba(255,255,255,0.6)' }}>Market Pulse Telemetry requires a wider viewport for multi-chart correlation.</p>
+                                <button className="btn-shine-primary" onClick={() => { setShowEnginePopup(true); setView('chat'); }} style={{ padding: '0.8rem 1.5rem' }}>
+                                    <Zap size={18} /> Access Pro Features
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
                 return (
                     <div className="view-content dashboard-view" key={view} style={{ overflowY: 'auto' }}>
                         <MarketPulseDashboard />
@@ -4996,17 +5039,31 @@ const parseResponseWithProbes = (content) => {
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
                                             <button
                                                 className={`nav-item sub-nav-item ${view === 'insights' ? 'active' : ''}`}
-                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                                                onClick={() => setView('insights')}
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: window.innerWidth <= HUB_LOCK_THRESHOLD ? 0.7 : 1 }}
+                                                onClick={() => {
+                                                    if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
+                                                        setShowEnginePopup(true);
+                                                    } else {
+                                                        setView('insights');
+                                                    }
+                                                }}
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={16} /> Today's Insight</div>
+                                                {window.innerWidth <= HUB_LOCK_THRESHOLD && <Lock size={12} color="#a78bfa" />}
                                             </button>
                                             <button
                                                 className={`nav-item sub-nav-item ${view === 'market-pulse' ? 'active' : ''}`}
-                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                                                onClick={() => setView('market-pulse')}
+                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: window.innerWidth <= HUB_LOCK_THRESHOLD ? 0.7 : 1 }}
+                                                onClick={() => {
+                                                    if (window.innerWidth <= HUB_LOCK_THRESHOLD) {
+                                                        setShowEnginePopup(true);
+                                                    } else {
+                                                        setView('market-pulse');
+                                                    }
+                                                }}
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Activity size={16} /> Market Pulse</div>
+                                                {window.innerWidth <= HUB_LOCK_THRESHOLD && <Lock size={12} color="#a78bfa" />}
                                             </button>
                                             <button
                                                 className="nav-item sub-nav-item"
