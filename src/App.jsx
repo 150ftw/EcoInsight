@@ -4915,38 +4915,45 @@ const parseResponseWithProbes = (content) => {
                         <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <EcoInsightLogo size={36} className="logo-icon" /> <span>Eko AI</span>
                             
-                            {/* Neural Fidelity Control */}
-                            <div 
-                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: !prev.performanceMode }))}
-                                className="fidelity-control"
-                                style={{ 
-                                    padding: '4px 8px', 
-                                    borderRadius: '12px', 
-                                    background: chatSettings.performanceMode ? 'rgba(234, 179, 8, 0.1)' : 'rgba(139, 92, 246, 0.1)',
-                                    border: '1px solid',
-                                    borderColor: chatSettings.performanceMode ? 'rgba(234, 179, 8, 0.2)' : 'rgba(139, 92, 246, 0.2)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    cursor: 'pointer',
-                                    marginLeft: '4px',
-                                }}
-                                title={chatSettings.performanceMode ? "Eco Mode: Low-bypass rendering active" : "Elite Mode: High fidelity neural engine active"}
+                            {/* Neural Fidelity Control Container */}
+                            <motion.div 
+                                className="fidelity-container new-feature-pulse"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 1 }}
                             >
-                                {chatSettings.performanceMode ? (
-                                    <Zap size={10} className="text-yellow-400" />
-                                ) : (
-                                    <Sparkles size={10} className="text-purple-400 animate-pulse" />
-                                )}
-                                <span style={{ 
-                                    fontSize: '0.55rem', 
-                                    fontWeight: 800, 
-                                    letterSpacing: '0.05em', 
-                                    color: chatSettings.performanceMode ? '#facc15' : '#c084fc'
-                                }}>
-                                    {chatSettings.performanceMode ? 'ECO' : 'HIGH'}
-                                </span>
-                            </div>
+                                <span className="fidelity-label">Engine Fidelity</span>
+                                <div 
+                                    onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: !prev.performanceMode }))}
+                                    className="fidelity-control"
+                                    style={{ 
+                                        padding: '4px 8px', 
+                                        borderRadius: '12px', 
+                                        background: chatSettings.performanceMode ? 'rgba(234, 179, 8, 0.1)' : 'rgba(139, 92, 246, 0.1)',
+                                        border: '1px solid',
+                                        borderColor: chatSettings.performanceMode ? 'rgba(234, 179, 8, 0.2)' : 'rgba(139, 92, 246, 0.2)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        cursor: 'pointer',
+                                    }}
+                                    title={chatSettings.performanceMode ? "Eco Mode: Low-bypass rendering active" : "Elite Mode: High fidelity neural engine active"}
+                                >
+                                    {chatSettings.performanceMode ? (
+                                        <Zap size={10} className="text-yellow-400" />
+                                    ) : (
+                                        <Sparkles size={10} className="text-purple-400 animate-pulse" />
+                                    )}
+                                    <span style={{ 
+                                        fontSize: '0.55rem', 
+                                        fontWeight: 800, 
+                                        letterSpacing: '0.05em', 
+                                        color: chatSettings.performanceMode ? '#facc15' : '#c084fc'
+                                    }}>
+                                        {chatSettings.performanceMode ? 'ECO' : 'HIGH'}
+                                    </span>
+                                </div>
+                            </motion.div>
                         </motion.div>
                         {isMobile && <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}><X size={20} /></button>}
                     </div>

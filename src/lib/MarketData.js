@@ -475,13 +475,6 @@ const fetchGoogleFinancePrice = async (nseSymbol, force = false) => {
     return null;
 };
 
-    // Return stale cache from Supabase if available
-    try {
-        const stale = await getStaleCachedMarketData(cacheKey);
-        if (stale) return stale;
-    } catch (e) { }
-    return null;
-};
 
 /**
  * TRIPLE-CHECK VERIFICATION ENGINE

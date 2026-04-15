@@ -9898,3 +9898,50 @@ select {
     transform: scale(1.05);
     background: rgba(255, 255, 255, 0.05);
 }
+
+/* Neural Fidelity Discoverability Improvements */
+.fidelity-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-left: 10px;
+}
+
+.fidelity-label {
+    font-size: 0.5rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.fidelity-container:hover .fidelity-label {
+    color: var(--accent-primary);
+}
+
+.new-feature-pulse {
+    position: relative;
+}
+
+.new-feature-pulse::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 14px;
+    background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
+    opacity: 0;
+    animation: attention-pulse 3s infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes attention-pulse {
+    0% { transform: scale(0.95); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 0.15; }
+    100% { transform: scale(0.95); opacity: 0; }
+}
