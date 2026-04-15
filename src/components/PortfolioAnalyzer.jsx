@@ -69,7 +69,7 @@ const PortfolioAnalyzer = ({ onAnalyze }) => {
     return (
         <div className="portfolio-analyzer-container">
             <div className="section-header">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
                     <div>
                         <h3><Target size={18} className="text-purple-400" /> Neural Portfolio Analyzer</h3>
                         <p>Simulate risk exposure and sector optimization</p>

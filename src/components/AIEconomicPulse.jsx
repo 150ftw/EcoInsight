@@ -23,17 +23,17 @@ const AIEconomicPulse = () => {
         >
             <div style={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.05) 0%, transparent 50%)', pointerEvents: 'none' }} />
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 10 }}>
-                <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 10, flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div style={{ flex: '1', minWidth: '300px' }}>
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.4rem', margin: '0 0 0.5rem 0' }}>
                         <Activity className="text-accent" size={24} /> AI Economic Pulse
                     </h3>
-                    <p style={{ color: '#a1a1aa', fontSize: '0.9rem', margin: 0, maxWidth: '400px' }}>
+                    <p style={{ color: '#a1a1aa', fontSize: '0.9rem', margin: 0, maxWidth: '500px' }}>
                         Real-time neural synthesis of India's macroeconomic stability, aggregating Nifty, RBI, CPI, and sectoral data into actionable metrics.
                     </p>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(16, 185, 129, 0.1)', padding: '0.5rem 1rem', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(16, 185, 129, 0.1)', padding: '0.5rem 1rem', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.2)', whiteSpace: 'nowrap' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981' }} />
                         <span style={{ color: '#10b981', fontSize: '1rem', fontWeight: '700', letterSpacing: '0.05em' }}>SYS: OPTIMAL (78/100)</span>
                     </div>

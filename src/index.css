@@ -5189,8 +5189,8 @@ html {
 /* 3-Column Terminal Layout */
 .terminal-grid {
     display: grid;
-    grid-template-columns: 320px 1fr 350px;
-    gap: 1.5rem;
+    grid-template-columns: minmax(280px, 320px) 1fr minmax(300px, 350px);
+    gap: var(--container-gap, 1.5rem);
     padding: 0 1.5rem 2rem;
     align-items: start;
 }
@@ -5296,11 +5296,19 @@ html {
     border: 1px solid var(--glass-border);
 }
 
+@media (max-width: 1440px) {
+    .main-chart-section {
+        padding: 1.5rem;
+    }
+}
+
 .chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .chart-tabs {
@@ -5492,9 +5500,10 @@ html {
 .impact-Medium { background: rgba(234, 179, 8, 0.15); color: #facc15; }
 
 /* Responsive Terminal */
-@media (max-width: 1200px) {
+@media (max-width: 1380px) {
     .terminal-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
     }
     .analysis-column {
         grid-column: span 2;
