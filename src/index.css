@@ -9885,3 +9885,16 @@ select {
         font-size: 0.95rem;
     }
 }
+
+/* Neural Fidelity Control Styles */
+.text-yellow-400 { color: #facc15; }
+.text-purple-400 { color: #c084fc; }
+
+.fidelity-control {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fidelity-control:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.05);
+}
