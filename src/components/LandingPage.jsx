@@ -450,6 +450,12 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [authTimeout, setAuthTimeout] = useState(false);
 
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth <= 768 : false;
+    const threadQuality = useMemo(() => ({
+        lineCount: isMobile ? 8 : 18,
+        amplitude: isMobile ? 1.2 : 1.5
+    }), [isMobile]);
+
     useEffect(() => {
         const timer = setTimeout(() => { if (!isLoaded) setAuthTimeout(true); }, 25000);
         return () => clearTimeout(timer);
@@ -495,7 +501,13 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
 
             <main className="landing-hero" style={{ position: 'relative', overflow: 'hidden' }}>
                 <div className="hero-threads-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 1.0 }}>
-                    <Threads amplitude={1.5} distance={0.2} enableMouseInteraction={false} color={[0.4, 0.2, 0.8]} />
+                    <Threads 
+                        amplitude={threadQuality.amplitude} 
+                        distance={0.2} 
+                        enableMouseInteraction={false} 
+                        color={[0.4, 0.2, 0.8]} 
+                        lineCount={threadQuality.lineCount}
+                    />
                 </div>
                 <div className="purple-pulse-glow" aria-hidden="true" />
                 <div className="hero-content">

@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { supabase } from './lib/db.js';
 
 /**
  * Search-Sync v6: Ultra-Resilient Market Data Scraper
@@ -15,10 +16,33 @@ const HUMAN_HEADERS = {
 };
 
 export default async function handler(req, res) {
-  const { symbol, range = '1d', interval = '5m' } = req.query;
+  const { symbol, range = '1d', interval = '5m', force } = req.query;
+  const isForceMatch = force === 'true';
   
   if (!symbol) {
     return res.status(400).json({ error: 'Symbol parameter is required' });
+  }
+
+  // --- STAGE 0: SERVER-SIDE CACHE CHECK ---
+  // Bypass cache if ?force=true is provided to allow fresh scraping during volatility
+  if (supabase && !isForceMatch) {
+    try {
+      const { data: cached, error: cacheErr } = await supabase
+        .from('market_cache')
+        .select('data, expires_at')
+        .eq('cache_key', `ticker_${symbol}`)
+        .maybeSingle();
+
+      if (!cacheErr && cached && new Date(cached.expires_at) > new Date()) {
+        return res.status(200).json({
+          ...cached.data,
+          source: 'SERVER-CACHE (Supabase)',
+          cachedAt: cached.expires_at
+        });
+      }
+    } catch (e) {
+      console.warn('[Ticker API] Cache lookup failed:', e.message);
+    }
   }
 
   // Symbol Mapping for Better Search Queries
@@ -165,7 +189,7 @@ export default async function handler(req, res) {
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json');
-    res.status(200).json({
+    const responsePayload = {
       symbol: cleanSymbol,
       fullSymbol: symbol,
       name,
@@ -175,7 +199,27 @@ export default async function handler(req, res) {
       sparkline,
       source,
       timestamp: new Date().toISOString()
-    });
+    };
+
+    // --- STAGE 5: SAVE TO CACHE ---
+    if (supabase && price !== '---' && source !== 'SEARCH-SYNC v6 (SYNTHETIC)') {
+      try {
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 min TTL
+        await supabase
+          .from('market_cache')
+          .upsert({
+            cache_key: `ticker_${symbol}`,
+            data: responsePayload,
+            expires_at: expiresAt
+          }, { onConflict: 'cache_key' });
+      } catch (e) {
+        console.warn('[Ticker API] Cache save failed:', e.message);
+      }
+    }
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json(responsePayload);
 
   } catch (error) {
     console.error('Search-Sync v6 Exception:', error);

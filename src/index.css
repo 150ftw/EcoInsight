@@ -3260,18 +3260,31 @@ input[type="range"] {
 
     .suggestion-chips {
         flex-direction: column !important;
-        align-items: stretch !important;
+        align-items: center !important;
         gap: 0.75rem !important;
         width: 100%;
-        max-width: 100%;
-        padding: 0 1rem;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
     }
 
     .suggestion-chip {
         width: 100% !important;
-        justify-content: flex-start !important;
+        max-width: 340px !important;
+        justify-content: center !important;
+        text-align: center !important;
         white-space: normal !important;
-        padding: 1rem 1.25rem !important;
+        padding: 0.85rem 1.25rem !important;
+        font-size: 0.85rem !important;
+        border-radius: 14px !important;
+    }
+
+    .eli5-suggestions {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 0.75rem !important;
+        width: 100% !important;
     }
 }
 

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, ChevronUp, Database, CheckCircle2, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft, Headphones } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import { streamMessage } from './lib/KimiClient'
+import { streamMessage, groundMessageWithData } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
 import { fetchWebSearchContext } from './lib/WebSearch'
 import { loadChats, saveChats, deleteChat as supaDeleteChat, deleteAllChats, loadSettings, saveSettings } from './lib/SupabaseStorage'
@@ -2425,8 +2425,7 @@ const ELI5Economics = () => {
                 </p>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.8rem', color: '#71717a', display: 'flex', alignItems: 'center', marginRight: '0.5rem' }}>Popular:</span>
+            <div className="eli5-suggestions">
                 {suggestions.map((sug, idx) => (
                     <button
                         key={idx}
@@ -3230,6 +3229,26 @@ function App() {
     const [supaLoaded, setSupaLoaded] = useState(false);
     const [showEnginePopup, setShowEnginePopup] = useState(false);
     const [showIntelNotification, setShowIntelNotification] = useState(false);
+    const [intelNotificationProps, setIntelNotificationProps] = useState(null);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('auth_success') === 'true') {
+            // Institutional Welcome Sequence
+            setIntelNotificationProps({
+                title: "Identity Verified",
+                message: "Access secured. Your institutional analytical context has been successfully synchronized.",
+                badge: "Authentication Success",
+                icon: <ShieldCheck size={18} className="text-green-400" />,
+                actionLabel: "Launch Session"
+            });
+            setShowIntelNotification(true);
+            playSound('success');
+
+            // Clean URL for professional presentation
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, []);
     const [hasShownIntelNotification, setHasShownIntelNotification] = useState(false);
 
     useEffect(() => {
@@ -4051,10 +4070,13 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             let currentSources = [];
 
             if (isComplex) {
+                // Detect if user wants "Deep Grounding" (fresh/latest data bypass)
+                const isDeepSyncRequest = /\b(latest|fresh|live|now|refresh|realtime|real-time)\b/i.test(textToSend);
+
                 // Fetch live market data, on-demand stock data, AND web search results in parallel only for complex queries
                 const [marketData, onDemandData, webSearchData] = await Promise.allSettled([
                     fetchMarketContext(),
-                    fetchOnDemandContext(textToSend),
+                    fetchOnDemandContext(textToSend, isDeepSyncRequest),
                     fetchWebSearchContext(textToSend)
                 ]);
 
@@ -4104,8 +4126,12 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
             setIsNeuralSearching(false);
 
+            // Apply Neural Grounding (RAG-Light) if verified data blocks were retrieved
+            // This ensures the AI model's "Neural Mode" is calibrated with the v7 engine data
+            const groundedMessages = groundMessageWithData(chatMessages, []); // We pass empty array for now as context is already in chatMessages[0] system prompt via generateSystemPrompt + liveContext
+
             let assistantContent = '';
-            await streamMessage(chatMessages, API_KEY, (chunk) => {
+            await streamMessage(groundedMessages, API_KEY, (chunk) => {
                 assistantContent += chunk;
                 setChats(prev => prev.map(c => c.id === activeChatId ? {
                     ...c,
@@ -4582,6 +4608,25 @@ const parseResponseWithProbes = (content) => {
                                                     )}
                                                 </div>
                                                 <div className="message-container">
+                                                    {msg.role === 'assistant' && msg.content.includes('SEARCH-SYNC v7') && (
+                                                        <div style={{ 
+                                                            display: 'inline-flex', 
+                                                            alignItems: 'center', 
+                                                            gap: '6px', 
+                                                            background: 'rgba(16, 185, 129, 0.1)', 
+                                                            color: '#10b981', 
+                                                            padding: '4px 10px', 
+                                                            borderRadius: '6px', 
+                                                            fontSize: '0.65rem', 
+                                                            fontWeight: 'bold',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.05em',
+                                                            marginBottom: '8px',
+                                                            border: '1px solid rgba(16, 185, 129, 0.2)'
+                                                        }}>
+                                                            <Activity size={12} /> Search-Sync v7 Grounded
+                                                        </div>
+                                                    )}
                                                     <div className="message-content">
                                                         {parseChartBlocks(parseResponseWithProbes(msg.content).text).map((block, bIdx) => (
                                                             block.type === 'chart'
@@ -5211,11 +5256,17 @@ const parseResponseWithProbes = (content) => {
             <AnimatePresence>
                 {showIntelNotification && (
                     <IntelligenceHubNotification 
+                        {...(intelNotificationProps || {})}
                         onOpen={() => {
-                            setView('insights');
-                            setIsIntelHubExpanded(true);
+                            if (!intelNotificationProps) {
+                                setView('insights');
+                                setIsIntelHubExpanded(true);
+                            }
                         }}
-                        onClose={() => setShowIntelNotification(false)}
+                        onClose={() => {
+                            setShowIntelNotification(false);
+                            setIntelNotificationProps(null);
+                        }}
                     />
                 )}
             </AnimatePresence>

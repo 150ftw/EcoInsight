@@ -327,7 +327,9 @@ async function handleGoogleCallback(req, res) {
   // 4. Set JWT cookie
   const token = signToken({ id: user.id, email: user.email });
   setAuthCookie(res, token);
-  return res.redirect('/');
+  
+  // Consistently redirect with success flag for frontend synchronization
+  return res.redirect('/?auth_success=true');
 }
 
 async function handleUpdateProfile(req, res) {

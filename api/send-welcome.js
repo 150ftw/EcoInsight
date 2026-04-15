@@ -26,23 +26,75 @@ export default async function handler(req, res) {
   const resend = new Resend(apiKey);
 
   const templateHtml = `
-    <div style="font-family: sans-serif; max-width: 600px; line-height: 1.6; color: #333;">
-      <p>Hey ${name || 'Valued Analyst'},</p>
-      <p>I’m <strong>Shivam Sharma</strong> — the founder of <strong>EcoInsight</strong>.</p>
-      <p>I started EcoInsight because I believe <strong>economic knowledge shouldn’t be complicated or hidden behind complex reports</strong>. Anyone interested in markets, policy, or global trends should be able to understand what’s happening in the economy.</p>
-      <p>So we built EcoInsight to make <strong>economic insights simple, accessible, and useful</strong>.</p>
-      <p>Here are 3 things you can do to get started:</p>
-      <ol>
-        <li><strong>Explore the latest insights</strong><br/><a href="https://ecoinsight.online" style="color: #6d28d9; font-weight: bold;">https://ecoinsight.online</a></li>
-        <br/>
-        <li><strong>Check out current economic trends</strong><br/>Discover updates on markets, policies, and global developments.</li>
-        <br/>
-        <li><strong>Start learning something new today</strong><br/>Dive into data, analysis, and insights that matter.</li>
-      </ol>
-      <p>P.S. — I’m curious, what made you sign up for EcoInsight?</p>
-      <p>Just hit <strong>Reply</strong> and let me know. I personally read every email.</p>
-      <p>Best,<br/><strong>Shivam Sharma</strong><br/>Founder, EcoInsight<br/><a href="https://ecoinsight.online" style="color: #6d28d9;">https://ecoinsight.online</a></p>
-    </div>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #111827; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; }
+        .header { border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; }
+        .logo { font-size: 24px; font-weight: 800; color: #8b5cf6; text-decoration: none; letter-spacing: -0.025em; }
+        .hero { margin-bottom: 30px; }
+        .title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 15px; }
+        .text { font-size: 16px; color: #374151; margin-bottom: 20px; }
+        .feature-grid { background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 30px; }
+        .feature-title { font-weight: 700; color: #111827; margin-bottom: 5px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .cta-button { display: inline-block; background-color: #8b5cf6; color: #ffffff !important; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 20px; }
+        .footer { border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 40px; font-size: 14px; color: #6b7280; }
+        .founder-name { font-weight: 800; color: #111827; }
+        @media (prefers-color-scheme: dark) {
+          body { background-color: #030712; color: #f9fafb; }
+          .container { background-color: #030712; }
+          .title { color: #f9fafb; }
+          .text { color: #d1d5db; }
+          .feature-grid { background: #111827; }
+          .feature-title { color: #f9fafb; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <a href="https://ecoinsight.online" class="logo">ECOINSIGHT</a>
+        </div>
+        <div class="hero">
+          <p class="text">Hey ${name || 'Valued Analyst'},</p>
+          <div class="title">I’m Shivam Sharma — the founder of EcoInsight.</div>
+          <p class="text">
+            I started EcoInsight because I believe <strong>economic intelligence shouldn’t be gated behind complexity</strong>. 
+            Whether you're tracking Nifty trends or decoded RBI policy, you deserve direct access to the truth.
+          </p>
+          <p class="text">We’ve built this engine to make sophisticated economic insights <strong>simple, accessible, and actionable</strong> for everyone.</p>
+        </div>
+        
+        <div class="feature-grid">
+          <div class="feature-title">Next Steps for Your Analysis</div>
+          <p class="text" style="font-size: 15px; margin-bottom: 10px;">
+            1. <strong>Synchronize with Markets</strong>: Check the live dashboard for real-time volatility tracking.<br/>
+            2. <strong>Search the Intelligence Feed</strong>: Ask our AI about specific sectors or global macroeconomic shifts.<br/>
+            3. <strong>Define your Watchlist</strong>: Customize your alerts for the assets that matter to your portfolio.
+          </p>
+          <a href="https://ecoinsight.online" class="cta-button">Launch intelligence Engine</a>
+        </div>
+
+        <p class="text">
+          I’m curious — what specific part of the economy are you most interested in right now? 
+          Just hit <strong>Reply</strong> and let me know. I personally read every response.
+        </p>
+
+        <div class="footer">
+          <p>
+            Best Regards,<br/>
+            <span class="founder-name">Shivam Sharma</span><br/>
+            Founder, EcoInsight
+          </p>
+          <p style="font-size: 12px;">© 2026 EcoInsight Economic Intelligence. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
   `;
 
   try {

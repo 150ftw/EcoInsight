@@ -1,15 +1,22 @@
 // Dashboard data fetcher for EcoInsight
-// Corrected for V5 Search-Sync Scraper
+// Synchronized for Search-Sync v7 Architecture (Server-Side Caching)
 
 const TICKER_API = '/api/ticker?symbol=';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
 
 /**
- * Fetch market data for a symbol (Search-Sync v5 Scraper)
+ * Fetch market data for a symbol (Search-Sync v7 Engine)
  */
-export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
+export const fetchHistory = async (symbol, range = '1d', interval = '5m', force = false) => {
     try {
-        const res = await fetch(`${TICKER_API}${encodeURIComponent(symbol)}&range=${range}&interval=${interval}`);
+        const queryParams = new URLSearchParams({
+            symbol,
+            range,
+            interval
+        });
+        if (force) queryParams.append('force', 'true');
+
+        const res = await fetch(`/api/ticker?${queryParams.toString()}`);
         if (!res.ok) return null;
         const data = await res.json();
         
@@ -38,7 +45,7 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m') => {
 /**
  * Fetch Main Indices (Nifty 50, Sensex, Nifty Bank, Nifty IT)
  */
-export const fetchDashboardIndices = async () => {
+export const fetchDashboardIndices = async (force = false) => {
     const targets = [
         { symbol: '^NSEI', name: 'Nifty 50' },
         { symbol: '^BSESN', name: 'Sensex' },
@@ -46,14 +53,14 @@ export const fetchDashboardIndices = async () => {
         { symbol: '^CNXIT', name: 'Nifty IT' }
     ];
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '5m', force)));
     return results.filter(r => r !== null);
 };
 
 /**
  * Fetch Commodities (Gold, Silver, Crude Oil, Natural Gas)
  */
-export const fetchCommodities = async () => {
+export const fetchCommodities = async (force = false) => {
     const targets = [
         { symbol: 'GC=F', name: 'Gold (MCX)' },
         { symbol: 'SI=F', name: 'Silver (MCX)' },
@@ -61,14 +68,14 @@ export const fetchCommodities = async () => {
         { symbol: 'NG=F', name: 'Nat Gas' }
     ];
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '5m', force)));
     return results.filter(r => r !== null);
 };
 
 /**
  * Fetch Indian Bluechips
  */
-export const fetchIndianEquities = async () => {
+export const fetchIndianEquities = async (force = false) => {
     const targets = [
         { symbol: 'RELIANCE:NSE', name: 'Reliance' },
         { symbol: 'TCS:NSE', name: 'TCS' },
@@ -76,28 +83,28 @@ export const fetchIndianEquities = async () => {
         { symbol: 'INFY:NSE', name: 'Infosys' }
     ];
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '5m', force)));
     return results.filter(r => r !== null);
 };
 
 /**
  * Fetch Global Macro (Forex & Yields)
  */
-export const fetchGlobalMacro = async () => {
+export const fetchGlobalMacro = async (force = false) => {
     const targets = [
         { symbol: 'USDINR', name: 'USD/INR' },
         { symbol: 'EURINR', name: 'EUR/INR' },
         { symbol: 'IN10Y:INDEXINDEX', name: 'India 10Y Bond' }
     ];
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '5m', force)));
     return results.filter(r => r !== null);
 };
 
 /**
  * Fetch Crypto Prices (BTC, ETH)
  */
-export const fetchCryptoData = async () => {
+export const fetchCryptoData = async (force = false) => {
     try {
         const res = await fetch(`${COINGECKO_BASE}?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true`);
         if (!res.ok) return null;

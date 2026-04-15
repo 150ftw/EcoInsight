@@ -2,14 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, ChevronRight, Activity } from 'lucide-react';
 
-const IntelligenceHubNotification = ({ onOpen, onClose }) => {
+const IntelligenceHubNotification = ({ 
+    onOpen, 
+    onClose, 
+    title = "Intelligence Hub Upgrade", 
+    message = "Experience the new Today's Insights & Market Pulse with real-time institutional telemetry.",
+    badge = "New Features Live",
+    icon = <Sparkles size={18} className="text-purple-400" />,
+    actionLabel = "Explore Hub"
+}) => {
     const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsVisible(false);
             setTimeout(onClose, 500); // Wait for exit animation
-        }, 10000);
+        }, 8000);
 
         return () => clearTimeout(timer);
     }, [onClose]);
@@ -69,21 +77,21 @@ const IntelligenceHubNotification = ({ onOpen, onClose }) => {
                             alignItems: 'center', 
                             justifyContent: 'center' 
                         }}>
-                            <Sparkles size={18} className="text-purple-400" />
+                            {icon}
                         </div>
                         <div>
-                            <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: 'white' }}>Intelligence Hub Upgrade</h4>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>New Features Live</span>
+                            <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: 'white' }}>{title}</h4>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>{badge}</span>
                         </div>
                     </div>
 
                     <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
-                        Experience the new <strong>Today's Insights</strong> & <strong>Market Pulse</strong> with real-time institutional telemetry.
+                        {message}
                     </p>
 
                     <button
                         onClick={() => {
-                            onOpen();
+                            if (onOpen) onOpen();
                             handleClose();
                         }}
                         style={{
@@ -104,7 +112,7 @@ const IntelligenceHubNotification = ({ onOpen, onClose }) => {
                         onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139, 92, 246, 0.2)'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(139, 92, 246, 0.1)'}
                     >
-                        Explore Hub <ChevronRight size={14} />
+                        {actionLabel} <ChevronRight size={14} />
                     </button>
 
                     <div style={{ 
@@ -117,7 +125,7 @@ const IntelligenceHubNotification = ({ onOpen, onClose }) => {
                         <motion.div 
                             initial={{ width: '100%' }}
                             animate={{ width: '0%' }}
-                            transition={{ duration: 10, ease: 'linear' }}
+                            transition={{ duration: 8, ease: 'linear' }}
                             style={{ height: '100%', background: 'var(--accent-primary)' }}
                         />
                     </div>

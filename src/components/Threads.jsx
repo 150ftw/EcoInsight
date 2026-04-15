@@ -20,10 +20,11 @@ uniform vec3 uColor;
 uniform float uAmplitude;
 uniform float uDistance;
 uniform vec2 uMouse;
+uniform int uLineCount;
 
 #define PI 3.1415926538
+#define MAX_LINES 25
 
-const int u_line_count = 18;
 const float u_line_width = 5.0;
 const float u_line_blur = 8.0;
 
@@ -95,8 +96,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
 
     float line_strength = 1.0;
-    for (int i = 0; i < u_line_count; i++) {
-        float p = float(i) / float(u_line_count);
+    for (int i = 0; i < MAX_LINES; i++) {
+        if (i >= uLineCount) break;
+        float p = float(i) / float(uLineCount);
         line_strength *= (1.0 - lineFn(
             uv,
             u_line_width * pixel(1.0, iResolution.xy) * (1.0 - p),
@@ -118,7 +120,7 @@ void main() {
 }
 `;
 
-const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseInteraction = false, ...rest }) => {
+const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseInteraction = false, lineCount = 18, ...rest }) => {
   const containerRef = useRef(null);
   const animationFrameId = useRef();
 
@@ -126,7 +128,16 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     if (!containerRef.current) return;
     const container = containerRef.current;
 
-    const renderer = new Renderer({ alpha: false, antialias: false });
+    // PERFORMANCE: Use balanced dpr for lower device load
+    const isMobile = window.innerWidth <= 768;
+    const dpr = Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.5);
+    
+    const renderer = new Renderer({ 
+        alpha: false, 
+        antialias: false,
+        dpr: dpr
+    });
+    
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 1);
     gl.enable(gl.BLEND);
@@ -145,7 +156,8 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
         uColor: { value: new Color(...color) },
         uAmplitude: { value: amplitude },
         uDistance: { value: distance },
-        uMouse: { value: new Float32Array([0.5, 0.5]) }
+        uMouse: { value: new Float32Array([0.5, 0.5]) },
+        uLineCount: { value: lineCount }
       }
     });
 
@@ -154,9 +166,9 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     function resize() {
       const { clientWidth, clientHeight } = container;
       renderer.setSize(clientWidth, clientHeight);
-      program.uniforms.iResolution.value.r = clientWidth;
-      program.uniforms.iResolution.value.g = clientHeight;
-      program.uniforms.iResolution.value.b = clientWidth / clientHeight;
+      program.uniforms.iResolution.value.r = gl.canvas.width;
+      program.uniforms.iResolution.value.g = gl.canvas.height;
+      program.uniforms.iResolution.value.b = gl.canvas.width / gl.canvas.height;
     }
     window.addEventListener('resize', resize);
     resize();
@@ -165,7 +177,6 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     let targetMouse = [0.5, 0.5];
 
     function handleMouseMove(e) {
-      // Global tracking
       const x = e.clientX / window.innerWidth;
       const y = 1.0 - (e.clientY / window.innerHeight);
       targetMouse = [x, y];
@@ -186,7 +197,6 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
         program.uniforms.uMouse.value[0] = currentMouse[0];
         program.uniforms.uMouse.value[1] = currentMouse[1];
       } else {
-        // Autonomous drift when no mouse interaction
         program.uniforms.uMouse.value[0] = 0.5 + Math.sin(t * 0.0007) * 0.1;
         program.uniforms.uMouse.value[1] = 0.5 + Math.cos(t * 0.0005) * 0.1;
       }
@@ -208,7 +218,7 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
       if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [color, amplitude, distance, enableMouseInteraction]);
+  }, [color, amplitude, distance, enableMouseInteraction, lineCount]);
 
   return <div ref={containerRef} className="threads-container" {...rest} />;
 };
