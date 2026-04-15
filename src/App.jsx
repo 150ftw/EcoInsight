@@ -4914,49 +4914,51 @@ const parseResponseWithProbes = (content) => {
                     <div className="sidebar-header">
                         <motion.div className="logo" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <EcoInsightLogo size={36} className="logo-icon" /> <span>Eko AI</span>
-                            
-                            {/* Neural Fidelity Control Container */}
-                            <motion.div 
-                                className="fidelity-container new-feature-pulse"
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 1 }}
-                            >
-                                <span className="fidelity-label">Engine Fidelity</span>
-                                <div 
-                                    onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: !prev.performanceMode }))}
-                                    className="fidelity-control"
-                                    style={{ 
-                                        padding: '4px 8px', 
-                                        borderRadius: '12px', 
-                                        background: chatSettings.performanceMode ? 'rgba(234, 179, 8, 0.1)' : 'rgba(139, 92, 246, 0.1)',
-                                        border: '1px solid',
-                                        borderColor: chatSettings.performanceMode ? 'rgba(234, 179, 8, 0.2)' : 'rgba(139, 92, 246, 0.2)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        cursor: 'pointer',
-                                    }}
-                                    title={chatSettings.performanceMode ? "Eco Mode: Low-bypass rendering active" : "Elite Mode: High fidelity neural engine active"}
-                                >
-                                    {chatSettings.performanceMode ? (
-                                        <Zap size={10} className="text-yellow-400" />
-                                    ) : (
-                                        <Sparkles size={10} className="text-purple-400 animate-pulse" />
-                                    )}
-                                    <span style={{ 
-                                        fontSize: '0.55rem', 
-                                        fontWeight: 800, 
-                                        letterSpacing: '0.05em', 
-                                        color: chatSettings.performanceMode ? '#facc15' : '#c084fc'
-                                    }}>
-                                        {chatSettings.performanceMode ? 'ECO' : 'HIGH'}
-                                    </span>
-                                </div>
-                            </motion.div>
                         </motion.div>
                         {isMobile && <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}><X size={20} /></button>}
                     </div>
+
+                    {/* Tactical Fidelity Controller (v2) */}
+                    <motion.div 
+                        className="fidelity-puck"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                    >
+                        <div className="puck-header">
+                            <div className="puck-branding">
+                                <div className="puck-label">System Fidelity</div>
+                                <div className="puck-status-text" style={{ color: chatSettings.performanceMode ? '#f59e0b' : '#c084fc' }}>
+                                    {chatSettings.performanceMode ? 'HIGH-SPEED BYPASS: ACTIVE' : 'NEURAL SYNTHESIS: MAX'}
+                                </div>
+                            </div>
+                            <div className={`pill-dot ${chatSettings.performanceMode ? 'eco' : 'high'}`} style={{ 
+                                background: chatSettings.performanceMode ? '#f59e0b' : '#8b5cf6',
+                                boxShadow: chatSettings.performanceMode ? '0 0 10px #f59e0b' : '0 0 10px #8b5cf6'
+                            }} />
+                        </div>
+
+                        <div className="fidelity-selector">
+                            <motion.div 
+                                className={`selector-slider ${chatSettings.performanceMode ? 'puck-glow-eco' : 'puck-glow-high'}`}
+                                animate={{ x: chatSettings.performanceMode ? '100%' : '0%' }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                            />
+                            <div 
+                                className={`selector-option ${!chatSettings.performanceMode ? 'active' : ''}`}
+                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: false }))}
+                            >
+                                <Sparkles size={12} /> <span>HIGH</span>
+                            </div>
+                            <div 
+                                className={`selector-option ${chatSettings.performanceMode ? 'active' : ''}`}
+                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: true }))}
+                            >
+                                <Zap size={12} /> <span>ECO</span>
+                            </div>
+                        </div>
+                    </motion.div>
+
                     <nav className="sidebar-nav">
                         <div className="sidebar-section">
                             <span className="section-label">Real-time Data</span>
