@@ -3978,6 +3978,9 @@ function App() {
 
             const currentPdfContext = customPdfText !== null ? customPdfText : pdfText;
 
+            // Detect if the query is strictly English to apply a Terminal Language Lock
+            const isStrictlyEnglish = /^[a-zA-Z0-9\s?.,!%'"()\-–—]*$/.test(textToSend);
+
             const chatMessages = [
                 {
                     role: 'system',
@@ -3989,6 +3992,20 @@ function App() {
                 ...activeChat.messages.map(msg => ({ role: msg.role, content: msg.content })),
                 userMessage
             ];
+
+            // Terminal Language Guardrail [v1.8]
+            if (isStrictlyEnglish) {
+                chatMessages.push({
+                    role: 'system',
+                    content: "[TERMINAL LOCK: 100% ENGLISH] User has prompted in English. It is FORBIDDEN to use Hindi, Hinglish, or Hindi summarized headers. Provide 100% English delivery."
+                });
+            } else {
+                // For Mixed/Hindi inputs, ensure we still respect the Mirroring protocol
+                chatMessages.push({
+                    role: 'system',
+                    content: "[TERMINAL LOCK: MIRROR_MODE] Mirror the user's language fidelity (Hindi/Hinglish)."
+                });
+            }
 
 
 
