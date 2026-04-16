@@ -120,14 +120,20 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         );
 
         vec3 lineColor = uColor;
+        float alphaFactor = 1.0;
         if (iTricolor == 1) {
-            if (p < 0.33) lineColor = saffron;
-            else if (p < 0.66) lineColor = white;
-            else lineColor = green;
+            if (p < 0.33) {
+                lineColor = saffron;
+            } else if (p < 0.66) {
+                lineColor = white;
+                alphaFactor = 0.7; // Subtle transparency for white to aid readability
+            } else {
+                lineColor = green;
+            }
         }
 
-        totalColor += lineColor * strength * (1.0 - totalAlpha);
-        totalAlpha += strength * (1.0 - totalAlpha);
+        totalColor += lineColor * strength * alphaFactor * (1.0 - totalAlpha);
+        totalAlpha += strength * alphaFactor * (1.0 - totalAlpha);
     }
 
     fragColor = vec4(totalColor, 1.0);
