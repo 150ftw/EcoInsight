@@ -45,6 +45,7 @@ import IntelligenceHubNotification from './components/IntelligenceHubNotificatio
 import MobileHeader from './components/MobileHeader'
 import { getIndianMarketStatus, getTaxContext, getMarketGuardrails } from './lib/MarketOracle'
 import { generateSystemPrompt } from './lib/SystemPrompt'
+import ModelSelector from './components/ModelSelector'
 
 const MIN_THINKING_DURATION = 8000; // 8 seconds to ensure analytical animation steps complete
 
@@ -4634,22 +4635,10 @@ const FintechBadges = ({ labels }) => {
                                         rows="1"
                                     />
                                     <div className="input-actions" style={{ display: 'flex', alignItems: 'center' }}>
-                                        <div className="mini-fidelity-toggle">
-                                            <div 
-                                                className={`mini-toggle-option high ${!chatSettings.performanceMode ? 'active' : ''}`}
-                                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: false }))}
-                                                title="High Fidelity Neural Synthesis"
-                                            >
-                                                <Sparkles size={14} /> <span>HIGH</span>
-                                            </div>
-                                            <div 
-                                                className={`mini-toggle-option eco ${chatSettings.performanceMode ? 'active' : ''}`}
-                                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: true }))}
-                                                title="Eco Mode: High-Speed Bypass"
-                                            >
-                                                <Zap size={14} /> <span>ECO</span>
-                                            </div>
-                                        </div>
+                                        <ModelSelector 
+                                            performanceMode={chatSettings.performanceMode} 
+                                            setPerformanceMode={(mode) => setChatSettings(prev => ({ ...prev, performanceMode: mode }))} 
+                                        />
                                         <button className={`send-button ${input.trim() ? 'active' : ''}`} onClick={() => handleSend()} disabled={isLoading || isUploading || !input.trim()}>
                                             {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
                                         </button>
