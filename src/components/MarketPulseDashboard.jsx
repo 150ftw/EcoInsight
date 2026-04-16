@@ -169,7 +169,7 @@ const MarketPulseDashboard = () => {
                             ))}
                         </div>
                         <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
-                            India VIX is tracking below historical averages, indicating low near-term hedging demand.
+                            {data.vixSummary || "India VIX is tracking below historical averages, indicating low near-term hedging demand."}
                         </p>
                     </div>
 
@@ -247,7 +247,7 @@ const MarketPulseDashboard = () => {
                     <div style={{ background: 'linear-gradient(90deg, rgba(139, 92, 246, 0.1), transparent)', borderLeft: '4px solid var(--accent-primary)', padding: '1rem 1.5rem', borderRadius: '0 12px 12px 0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <Zap size={18} className="text-purple-400" />
                         <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>
-                            <strong style={{ color: 'white' }}>Institutional Alert:</strong> Significant block deal activity detected in Large-cap Banking sector. PCR at 1.05 suggests cautious optimism.
+                            <strong style={{ color: 'white' }}>Institutional Alert:</strong> {data.alert || "Significant block deal activity detected in Large-cap Banking sector. PCR at 1.05 suggests cautious optimism."}
                         </span>
                     </div>
                 </motion.div>

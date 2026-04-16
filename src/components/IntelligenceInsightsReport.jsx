@@ -245,18 +245,20 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
                         </div>
                     </div>
 
-                    {/* Institutional Perspective */}
+                    {/* Institutional Perspective (Dynamic) */}
                     <div style={{ background: 'rgba(139, 92, 246, 0.1)', padding: '1.5rem', borderRadius: '24px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                             <ShieldCheck size={18} className="text-purple-400" />
                             <h4 style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700 }}>INSTITUTIONAL DESK</h4>
                         </div>
                         <p style={{ margin: 0, fontSize: '0.85rem', lineHeight: 1.6, color: 'rgba(255,255,255,0.7)', fontStyle: 'italic' }}>
-                            "Equity markets are currently in a transition phase. While the headline indices are flat, the underline sectoral rotation is aggressive. We advocate for a quality-focused approach, prioritizing cash-flow resilient large caps."
+                            "{data.desk?.quote || "Evaluating structural market trends for institutional alpha."}"
                         </p>
                         <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
-                            <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Arjun Mehta, Head of Strategy</span>
+                            <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 900 }}>
+                                {data.desk?.name?.[0] || 'A'}
+                            </div>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{data.desk?.name || "Arjun Mehta"}, {data.desk?.role || "Head of Strategy"}</span>
                         </div>
                     </div>
 

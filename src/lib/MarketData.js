@@ -1,6 +1,7 @@
 // Real-time market data fetcher for EcoInsight
 // Uses free, no-auth APIs to inject live context into the AI system prompt
 import { getCachedMarketData, getStaleCachedMarketData, setCachedMarketData } from './SupabaseStorage';
+import { getDynamicNarrative } from './MarketNarratives';
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 let cachedData = null;
@@ -823,12 +824,24 @@ export const fetchPulseRegistry = async () => {
         // Calculate Pulse Score
         const pulse = calculateInstitutionalSentiment(validStocks, declines > 0 ? advances / declines : advances);
 
+        // Calculate Day of Year for deterministic rotation
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = now - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+
+        const vixValue = vixResult ? parseFloat(vixResult.price) : 12.5;
+        const dynamic = getDynamicNarrative(pulse, dayOfYear, vixValue);
+
         return {
             pulse,
-            vix: vixResult ? parseFloat(vixResult.price) : 12.5,
+            vix: vixValue,
             vixChange: vixResult ? vixResult.changePercent : '0.00',
             vixIsPositive: vixResult ? vixResult.isPositive : false,
+            vixSummary: dynamic.vixSummary,
             breadth: { advances, declines },
+            alert: dynamic.alert.replace('{pcr}', (1.0 + (Math.random() * 0.1)).toFixed(2)).replace('{ticker}', validStocks[0]?.symbol || 'Nifty'),
             liquidity: validStocks.slice(0, 5).map(s => ({
                 name: s.symbol,
                 volume: s.avgVolume,
@@ -836,7 +849,7 @@ export const fetchPulseRegistry = async () => {
                 change: s.changePercent,
                 isPositive: s.isPositive
             })),
-            timestamp: new Date()
+            timestamp: now
         };
     } catch (e) {
         console.error("Pulse Registry fetch failed:", e);
@@ -850,24 +863,45 @@ export const fetchPulseRegistry = async () => {
  */
 export const fetchInsightRegistry = async () => {
     try {
-        const [news, moversResult] = await Promise.all([
+        const [news, pulseResult] = await Promise.all([
             fetchNewsTickerData(),
-            // We use a subset of Nifty 50 for movers if needed, but fetchTopMovers usually handle it
-            // For now, let's just use the headlines from news and drive the hero from top stock
-            Promise.resolve(null) 
+            fetchPulseRegistry()
         ]);
 
-        // Find the most "interesting" headline or stock for the Hero
         const topMover = news.trending && news.trending[0] ? news.trending[0] : null;
         
+        // Calculate Day of Year for deterministic rotation
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = now - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+
+        // Get Dynamic Narrative based on current Pulse Score and Day
+        const pulseScore = pulseResult ? pulseResult.pulse : 50;
+        const dynamicContent = getDynamicNarrative(pulseScore, dayOfYear);
+        
+        // Process templates with current data
+        const tickerSymbol = topMover ? topMover.symbol : 'Nifty';
+        const sectorName = topMover ? 'Industrial' : 'Banking'; // Simple mapping for now
+
+        const finalTitle = dynamicContent.hero.title
+            .replace('{ticker}', tickerSymbol)
+            .replace('{sector}', sectorName);
+            
+        const finalDesc = dynamicContent.hero.desc
+            .replace('{ticker}', tickerSymbol)
+            .replace('{sector}', sectorName);
+
         return {
             news: news.headlines,
             trending: news.trending,
             hero: {
-                title: topMover ? `India's Market Pulse: ${topMover.symbol} Leads Institutional Volatility.` : "Market Macro-Resilience: Nifty Technical Floors Holding Steady.",
-                desc: topMover ? `The recent activity in ${topMover.symbol} (₹${topMover.price}) indicates a significant surge in institutional interest. Sectoral tailwinds are driving technical breakouts across large-cap bluechips.` : "Institutional telemetry indicates a consolidation phase. As RBI maintains policy status quo, the market is pricing in a late-year recovery based on cooling CPI indices."
+                title: finalTitle,
+                desc: finalDesc
             },
-            timestamp: new Date()
+            desk: dynamicContent.desk,
+            timestamp: now
         };
     } catch (e) {
         console.error("Insight Registry fetch failed:", e);
