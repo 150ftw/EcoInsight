@@ -94,30 +94,49 @@ const WhatIfSimulator = () => {
                 </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+            <div className="simulator-main-grid" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+                gap: '2rem' 
+            }}>
                 {/* Sliders Area */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                    <h4 style={{ margin: 0, color: 'white', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Settings size={16} /> Policy Levers</h4>
+                <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '2rem', 
+                    background: 'rgba(0,0,0,0.2)', 
+                    padding: '1.5rem', 
+                    borderRadius: '12px', 
+                    border: '1px solid rgba(255,255,255,0.03)' 
+                }}>
+                    <h4 style={{ margin: 0, color: 'white', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Settings size={16} /> Institutional Levers
+                    </h4>
                     {[
-                        { key: 'interestRate', label: 'Fed Target Rate (%)', min: 0, max: 10, step: 0.25 },
-                        { key: 'govSpending', label: 'Fiscal Deficit (Trillions)', min: 0, max: 10, step: 0.1 },
-                        { key: 'inflation', label: 'Core PCE Inflation (%)', min: -2, max: 15, step: 0.1 },
-                        { key: 'taxes', label: 'Effective Corp Tax (%)', min: 0, max: 40, step: 1 }
+                        { key: 'interestRate', label: 'RBI Repo Rate (%)', min: 0, max: 10, step: 0.25 },
+                        { key: 'govSpending', label: 'Fiscal Expenditure (Cr)', min: 0, max: 10, step: 0.1 },
+                        { key: 'inflation', label: 'Core CPI Inflation (%)', min: -2, max: 15, step: 0.1 },
+                        { key: 'taxes', label: 'Corporate Surcharge (%)', min: 0, max: 40, step: 1 }
                     ].map(slider => (
-                        <div key={slider.key} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <div key={slider.key} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#a1a1aa' }}>
-                                <span>{slider.label}</span>
-                                <span style={{ color: 'var(--accent-primary)', fontWeight: '700', fontSize: '1rem' }}>{sliders[slider.key].toFixed(1)}</span>
+                                <span style={{ fontWeight: 600 }}>{slider.label}</span>
+                                <span style={{ color: 'var(--accent-primary)', fontWeight: '800', fontSize: '1.1rem' }}>{sliders[slider.key].toFixed(1)}</span>
                             </div>
                             <input
                                 type="range"
-                                className="interactive-slider"
+                                className="interactive-slider institutional-touch-slider"
                                 min={slider.min}
                                 max={slider.max}
                                 step={slider.step}
                                 value={sliders[slider.key]}
                                 onChange={(e) => handleSliderChange(e, slider.key)}
-                                style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
+                                style={{ 
+                                    width: '100%', 
+                                    accentColor: 'var(--accent-primary)',
+                                    height: '44px', /* Larger touch target */
+                                    cursor: 'pointer'
+                                }}
                             />
                         </div>
                     ))}

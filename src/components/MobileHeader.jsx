@@ -14,14 +14,14 @@ const MobileHeader = ({ onMenuClick, isOpen, activeView }) => {
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: '64px',
+                    height: 'calc(64px + env(safe-area-inset-top))',
                     background: 'rgba(10, 10, 12, 0.85)',
                     backdropFilter: 'blur(20px)',
                     borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '0 1.25rem',
+                    padding: 'env(safe-area-inset-top) 1.25rem 0',
                     zIndex: 1000
                 }}
             >
