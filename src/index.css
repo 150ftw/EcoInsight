@@ -40,7 +40,8 @@
     --glass-saturate: 100%;
 }
 
-.performance-low * {
+/* Snappy UI for Eco Mode - Except for Tickers which must remain readable */
+.performance-low *:not(.ticker-track):not(.ticker-track *) {
     transition-duration: 0.1s !important;
     animation-duration: 0.1s !important;
 }
