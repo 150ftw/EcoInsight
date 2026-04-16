@@ -4502,7 +4502,7 @@ const FintechBadges = ({ labels }) => {
                                                         <EkoSparkle size={20} />
                                                     </div>
                                                     <div className="message-container">
-                                                        <ThinkingIndicator appearance={appearance} performanceMode={performanceMode} />
+                                                        <ThinkingIndicator appearance={appearance} performanceMode={chatSettings?.performanceMode} />
                                                     </div>
                                                 </div>
                                             );
