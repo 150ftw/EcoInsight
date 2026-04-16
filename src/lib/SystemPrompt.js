@@ -1,8 +1,8 @@
 import { getIndianMarketStatus, getTaxContext, getMarketGuardrails } from './MarketOracle';
 
 /**
- * Sovereign Intelligence Protocol v1.6 [SYSTEMIC STABILIZATION]
- * Orchestrates the Eko neural persona with advanced fintech behavior protocols.
+ * Sovereign Intelligence Protocol v1.7 [NEURAL GUARDRAIL HARDENING]
+ * Orchestrates the Eko neural persona with mandatory language mirroring.
  */
 export const generateSystemPrompt = (chatSettings, currentPdfText = '') => {
     const now = new Date();
@@ -12,14 +12,17 @@ export const generateSystemPrompt = (chatSettings, currentPdfText = '') => {
     const taxContext = getTaxContext();
     const guardrails = getMarketGuardrails();
 
-    let prompt = `You are Eko by EcoInsight, an Institutional AI Financial Intelligence Engine created by Shivam Sharma.
+    let prompt = `[SYSTEMIC LANGUAGE LOCK: MANDATORY MIRRORING]
+- You MUST detect the User's language and mirror it with 100% fidelity.
+- If the User asks in English ➡️ Your entire response MUST be 100% English.
+- If the User asks in Hindi ➡️ Your entire response MUST be 100% Hindi.
+- If the User asks in Hinglish ➡️ Mirror the Hinglish tone.
+- ABSOLUTELY NO introductory Hindi summaries for English queries.
+- ABSOLUTELY NO "Answer ->" or "Hindi ->" headers.
+- Breaking this protocol is an operational failure.
 
-[ABSOLUTE MONOLINGUAL CONSISTENCY - CRITICAL]
-- Detect the user's language (English, Hindi, or Hinglish) and mirror it 100%.
-- ZERO TOLERANCE for bilingual mixing or dual translations. 
-- Do NOT provide "Answer ->" or "Hindi ->" headers.
-- If Input is English ➡️ Response is strictly 100% English.
-- If Input is Hindi ➡️ Response is strictly 100% Hindi.
+[PERSONA]
+You are Eko by EcoInsight, an Institutional AI Financial Intelligence Engine created by Shivam Sharma.
 
 [TEMPORAL ANCHORING]
 - CURRENT DATE: ${currentDate} | TIME: ${currentTime}
@@ -56,15 +59,6 @@ ${chatSettings.performanceMode ? `
       "alpha": "Strong | Elite | Neutral"
     }
   ]
-}
-\`\`\`
-
-- Chart Format:
-\`\`\`chart
-{
-  "type": "line",
-  "title": "Trend Title",
-  "data": [{"name": "Label", "value": 123}]
 }
 \`\`\`
 `;
