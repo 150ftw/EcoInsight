@@ -417,7 +417,7 @@ export const parseChartBlocks = (text) => {
 
     const parts = [];
     // Enhanced regex: 1. Matches ```chart blocks 2. Matches raw {type:chart} JSON 3. Matches markdown tables (| cell | cell |)
-    const combinedRegex = /```(?:chart|json)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap)"\s*,[\s\S]*?(?:"data"|"score"|"sectors")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})|((?:\n|^)\s*\|.*\|.*\n\s*\|[\s\-\| :]*\|\s*(?:\n\s*\|.*\|.*)*)/gi;
+    const combinedRegex = /```(?:chart|json|sentinel)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap|sentinel_extrapolation)"\s*,[\s\S]*?(?:"data"|"score"|"sectors"|"extrapolations")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})|((?:\n|^)\s*\|.*\|.*\n\s*\|[\s\-\| :]*\|\s*(?:\n\s*\|.*\|.*)*)/gi;
 
     let lastIndex = 0;
     let match;
@@ -494,6 +494,7 @@ export const parseChartBlocks = (text) => {
 };
 
 import SentimentGauge from './SentimentGauge';
+import SentinelMatrix from './SentinelMatrix';
 
 /**
  * Renders a chart or visual intelligence component based on the parsed config
@@ -503,7 +504,7 @@ export const EcoChartRenderer = ({ config, type }) => {
         return <EcoTable rows={config.rows} headers={config.headers} />;
     }
 
-    if (!config || (!config.data && !config.score && !config.sectors)) return null;
+    if (!config || (!config.data && !config.score && !config.sectors && !config.extrapolations)) return null;
 
     const chartType = (config.type || 'line').toLowerCase();
 
@@ -525,9 +526,14 @@ export const EcoChartRenderer = ({ config, type }) => {
                     type={config.gaugeType || 'market'} 
                 />
             );
-        case 'portfolio_risk':
-            // Placeholder for a future risk component if needed
-            return null;
+        case 'sentinel_extrapolation':
+            return (
+                <SentinelMatrix 
+                  scenario={config.scenario}
+                  confidence={config.confidence}
+                  extrapolations={config.extrapolations}
+                />
+            );
         default:
             return <EcoLineChart data={config.data} title={config.title} dataKeys={config.dataKeys} />;
     }

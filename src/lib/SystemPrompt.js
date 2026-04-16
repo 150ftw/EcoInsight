@@ -61,7 +61,31 @@ Format for a single data series:
     {"name": "2025-Q2", "value": 25200}
   ]
 }
-\`\`\``;
+\`\`\`
+
+SENTINEL EXTRAPOLATION PROTOCOL (ACTIVE):
+When the user discusses high-impact economic catalysts (e.g., Repo Rates, GST, Monsoon, Crude Oil price shifts), you MUST offer a predictive extrapolation.
+Use the following block format to trigger the interactive Sentinel Matrix:
+
+\`\`\`sentinel
+{
+  "type": "sentinel_extrapolation",
+  "scenario": "Short Descriptive Title",
+  "confidence": 0.XX,
+  "extrapolations": [
+    {
+      "sector": "Sector Name",
+      "direct": "Immediate impact",
+      "secondary": "Second-order derived effect",
+      "risk": "LOW | MODERATE | HIGH | CRITICAL",
+      "alpha": "Strong | Weak | Neutral | Elite | Avoid"
+    }
+  ]
+}
+\`\`\`
+
+Note: High-alpha signals are derived from your 2025-2026 neural training. Always maintain an institutional and analytical tone.
+`;
 
     return prompt;
 };
