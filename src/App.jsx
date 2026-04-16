@@ -3824,10 +3824,16 @@ function App() {
 
     const getGenerationOptions = () => {
         const lengthMap = { 'Short': 256, 'Medium': 1024, 'Long': 2048 };
+        const baseLimit = lengthMap[aiSettings.maxLength] || 1024;
+        
+        // Eco Mode Optimization: Cap tokens and slightly lower temperature for speed/precision
+        const ecoModifier = chatSettings.performanceMode ? 0.6 : 1.0;
+        const finalMaxTokens = Math.floor(baseLimit * ecoModifier);
+
         return {
-            temperature: aiSettings.creativity,
-            max_tokens: lengthMap[aiSettings.maxLength] || 1024,
-            model: aiSettings.model === 'Custom Model' ? null : aiSettings.model // Map if necessary, else use client default
+            temperature: chatSettings.performanceMode ? Math.min(aiSettings.creativity, 0.7) : aiSettings.creativity,
+            max_tokens: finalMaxTokens,
+            model: aiSettings.model === 'Custom Model' ? null : aiSettings.model
         };
     };
 
@@ -3837,6 +3843,15 @@ function App() {
         const currentTime = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' });
 
         let prompt = `You are Eko by EcoInsight, the world's most advanced Institutional AI Financial Intelligence Engine. You are built for elite Indian investors who demand high-alpha, catalyst-driven intelligence — think of yourself as a "Hedge Fund Grade Bloomberg Terminal."
+
+PERFORMANCE PROTOCOL (ACTIVE):
+${chatSettings.performanceMode ? `
+- CURRENT MODE: HIGH-SPEED TACTICAL BYPASS (ECO)
+- OBJECTIVE: Be extremely concise, rapid, and direct. Use bullet points. Avoid all conversational filler or long-form reasoning. Prioritize speed of insight over depth of analysis.
+` : `
+- CURRENT MODE: NEURAL SYNTHESIS (HIGH)
+- OBJECTIVE: Provide exhaustive, institutional-grade analytical depth. Use sophisticated financial modeling concepts, deep catalyst analysis, and comprehensive risk assessments. Provide the "Chief Investment Officer" level of detail.
+`}
 
 TEMPORAL ANCHORING (CRITICAL):
 - CURRENT DATE: ${currentDate}
@@ -4120,7 +4135,9 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
             // --- MINIMUM THINKING ANIMATION COORDINATION ---
             const thinkingElapsed = Date.now() - now;
-            if (thinkingElapsed < MIN_THINKING_DURATION) {
+            // Eco Mode Bypass: Skip the artificial delay for instant tactical feedback
+            const shouldBypassDelay = chatSettings.performanceMode;
+            if (!shouldBypassDelay && thinkingElapsed < MIN_THINKING_DURATION) {
                 await new Promise(resolve => setTimeout(resolve, MIN_THINKING_DURATION - thinkingElapsed));
             }
 
