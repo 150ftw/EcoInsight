@@ -3240,9 +3240,11 @@ function App() {
                 message: "Access secured. Your institutional analytical context has been successfully synchronized.",
                 badge: "Authentication Success",
                 icon: <ShieldCheck size={18} className="text-green-400" />,
-                actionLabel: "Launch Session"
+                actionLabel: "Launch Session",
+                type: 'auth_success'
             });
             setShowIntelNotification(true);
+            setHasShownIntelNotification(true);
             playSound('success');
 
             // Clean URL for professional presentation
@@ -5323,8 +5325,24 @@ const parseResponseWithProbes = (content) => {
                             }
                         }}
                         onClose={() => {
+                            const wasAuthSuccess = intelNotificationProps?.type === 'auth_success';
                             setShowIntelNotification(false);
                             setIntelNotificationProps(null);
+
+                            // Chained Onboarding Sequence: Auto-trigger Insights after Identity Verification
+                            if (wasAuthSuccess) {
+                                setTimeout(() => {
+                                    setIntelNotificationProps({
+                                        title: "Intelligence Briefing",
+                                        message: "Today's Insights & Market Pulse are ready. Real-time telemetry has been synthesized.",
+                                        badge: "Market Pulse Active",
+                                        icon: <Activity size={18} className="text-orange-400" />,
+                                        actionLabel: "Explore Pulse",
+                                        type: 'insights'
+                                    });
+                                    setShowIntelNotification(true);
+                                }, 600); // Fluid transition delay
+                            }
                         }}
                     />
                 )}
