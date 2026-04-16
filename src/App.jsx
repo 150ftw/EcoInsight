@@ -3405,6 +3405,7 @@ function App() {
     const [personalization, setPersonalization] = useState({
         callMe: '',
         respondHow: '',
+        preferredLanguage: 'English', // Default
         memory: true,
         watchlist: []
     })
@@ -3846,8 +3847,11 @@ function App() {
         if (!text) return false;
         const lowText = text.toLowerCase().trim();
 
-        // Greetings and very short talk are NOT complex
-        const greetings = ['hi', 'hello', 'hey', 'yo', 'good morning', 'good afternoon', 'good evening', 'how are you', 'howdy', 'sup'];
+        // Greetings and very short talk are NOT complex (Bilingual Expansion)
+        const greetings = [
+            'hi', 'hello', 'hey', 'yo', 'good morning', 'good afternoon', 'good evening', 'how are you', 'howdy', 'sup',
+            'kya hal chal', 'kya haal chal', 'aur bhai', 'kaise ho', 'kya scene hai', 'namaste', 'ram ram', 'sat sri akal', 'adaab'
+        ];
         if (greetings.includes(lowText)) return false;
         if (lowText.length < 5 && !/\d/.test(lowText)) return false;
 
@@ -3875,6 +3879,15 @@ function App() {
             return;
         }
         setLastMessageTime(now);
+
+        // Detect language preference based on current message (Hinglish/Hindi indicators)
+        const lowerText = textToSend.toLowerCase();
+        const hindiHinglishKeys = ['kya', 'hai', 'bhai', 'mast', 'hal', 'haal', 'kaise', 'mood', 'ho', 'yaar', 'boss', 'namaste', 'batao', 'suna'];
+        const isHindiHinglish = hindiHinglishKeys.some(key => lowerText.includes(key));
+        
+        if (isHindiHinglish && personalization.preferredLanguage !== 'Hinglish') {
+            setPersonalization(prev => ({ ...prev, preferredLanguage: 'Hinglish' }));
+        }
 
         setIsLoading(true)
         setIsNeuralSearching(true)
