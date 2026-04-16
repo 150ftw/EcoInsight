@@ -148,16 +148,16 @@ const ThinkingIndicator = ({ appearance, performanceMode }) => {
       >
         <motion.div
            animate={{ 
-             scale: [1, 1.2, 1],
-             opacity: [0.5, 1, 0.5]
+             rotate: [0, 15, 0],
+             opacity: [0.6, 1, 0.6]
            }}
            transition={{ 
-             duration: 2, 
+             duration: 3, 
              repeat: Infinity,
              ease: "easeInOut"
            }}
         >
-          <EkoSparkle size={18} color="#8b5cf6" />
+          <Sparkles size={16} color="#a78bfa" />
         </motion.div>
         <motion.span 
           style={{ fontSize: '0.85rem', fontWeight: 500, letterSpacing: '0.02em' }}
