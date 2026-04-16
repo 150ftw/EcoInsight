@@ -3420,12 +3420,38 @@ function App() {
     const HUB_LOCK_THRESHOLD = 1024;
 
     useEffect(() => {
+        let resizeTimer;
         const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768);
-            setIsHandheld(window.innerWidth <= 1024);
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                setIsMobile(window.innerWidth <= 768);
+                setIsHandheld(window.innerWidth <= 1024);
+                
+                // --- UNIVERSAL FIDELITY: VISUAL VIEWPORT STABILIZATION ---
+                // Precisely anchor the app height for mobile keyboard compatibility
+                if (window.visualViewport) {
+                    const vh = window.visualViewport.height;
+                    const offset = (window.innerHeight - vh);
+                    document.documentElement.style.setProperty('--vv-height', `${vh}px`);
+                    document.documentElement.style.setProperty('--vv-offset', `${offset}px`);
+                }
+            }, 100);
         };
+        
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleResize);
+        }
+        
+        // Initial set
+        handleResize();
+        
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', handleResize);
+            }
+        };
     }, []);
 
     const handleAccountSave = async (updatedData) => {

@@ -35,6 +35,26 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+    cursor: default;
+}
+
+/* Enable hardware-accelerated smooth scrolling for high-end rendering */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- TOUCH ERGONOMICS & GESTURE STABILIZATION --- */
+@media (hover: none) {
+    /* Disable "Sticky Hover" on mobile devices to prevent glitchy UI states after tapping */
+    *:hover {
+        transform: none !important;
+        background-color: inherit !important;
+        border-color: inherit !important;
+        box-shadow: none !important;
+    }
 }
 
 body {
@@ -9628,6 +9648,13 @@ select {
     .sources-carousel {
         margin: 1rem -1rem !important; /* Bleed to edges */
         padding: 0 1rem !important;
+        -webkit-overflow-scrolling: touch !important; /* Enable momentum scrolling for iOS */
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+    }
+
+    .sources-carousel::-webkit-scrollbar {
+        display: none;
     }
 
     .source-card {
@@ -9785,7 +9812,7 @@ select {
 
     /* Ensure the footer menu items are fully visible and clickable */
     .sidebar-footer {
-        padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 20px)) !important;
+        padding: 1rem 1rem calc(1.5rem + env(safe-area-inset-bottom, 20px)) !important; /* Enhanced Safe-Area Protection */
         background: rgba(10, 10, 10, 0.95) !important;
         border-top: 1px solid rgba(139, 92, 246, 0.1) !important;
         z-index: 2001 !important;
@@ -9957,8 +9984,9 @@ select {
 
 @media (max-width: 768px) {
     .input-bar {
-        padding: 8px 10px;
-        border-radius: 14px;
+        padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 5px)); /* Protect against iPhone notch/home bar */
+        border-radius: 16px;
+        margin-bottom: 2px !important;
     }
     
     .chat-textarea {
@@ -10085,8 +10113,53 @@ select {
         height: 34px;
     }
     
-    .mini-toggle-option {
-        padding: 0 8px;
-        height: 28px;
+/* --- UNIVERSAL FIDELITY: ULTRA-WIDE & PRO SCALING --- */
+@media (min-width: 1440px) {
+    .app-container,
+    .chat-container,
+    .landing-page-container,
+    .detailed-footer {
+        max-width: 1440px !important;
+        margin: 0 auto !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
     }
+    
+    .sidebar {
+        border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+}
+
+/* Precise Snap-Scrolling for Mobile Carousels */
+@media (max-width: 768px) {
+    .sources-carousel,
+    .pricing-grid,
+    .market-ticker-container {
+        scroll-snap-type: x mandatory !important;
+        padding-bottom: 5px !important;
+    }
+
+    .source-card,
+    .pricing-card {
+        scroll-snap-align: center !important;
+    }
+}
+
+/* Premium Button Interaction Fidelity (Active States) */
+.btn-shine-primary:active,
+.btn-shine-secondary:active,
+.sidebar-menu-item:active {
+    transform: scale(0.96) !important;
+    opacity: 0.9;
+}
+
+/* Global Hardware Acceleration Hints */
+.pulse-card,
+.glass-card,
+.chat-container,
+.hero-badge {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
