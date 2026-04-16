@@ -57,10 +57,37 @@ body {
     --glass-saturate: 100%;
 }
 
-/* Snappy UI for Eco Mode */
+/* Quiet UI for Eco Mode - Performance & Stability Focused */
 .performance-low * {
-    transition-duration: 0.1s !important;
-    animation-duration: 0.1s !important;
+    transition-duration: 0.4s !important; 
+    animation-delay: 0s !important;
+}
+
+/* Strictly disable non-essential animations in Eco Mode */
+.performance-low .animate-pulse,
+.performance-low .thinking-content-stage,
+.performance-low .eko-neural-pulse,
+.performance-low .status-pulse,
+.performance-low .pulse-ring,
+.performance-low .eko-dot-pulse,
+.performance-low .hero-badge,
+.performance-low .insight-hero-spotlight {
+    animation: none !important;
+    transform: none !important;
+}
+
+/* Whitelist essential state indicators with low-performance profiles */
+.performance-low .animate-spin {
+    animation: spin 3s linear infinite !important; /* Low-CPU rotation */
+}
+
+/* Disable high-cost visuals */
+.performance-low .hero-threads-bg,
+.performance-low .purple-pulse-glow,
+.performance-low .glass-card::before,
+.performance-low .lock-card::before,
+.performance-low .footer-glow {
+    display: none !important;
 }
 
 /* Hide Tickers in Eco Mode for maximum efficiency as requested */
