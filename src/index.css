@@ -10113,21 +10113,12 @@ select {
     }
 }
 
-/* --- UNIVERSAL FIDELITY: ULTRA-WIDE & PRO SCALING --- */
+/* --- UNIVERSAL FIDELITY: PRO FULL-WIDTH SCALING --- */
 @media (min-width: 1440px) {
-    .app-container,
-    .chat-container,
     .landing-page-container,
     .detailed-footer {
         max-width: 1440px !important;
         margin: 0 auto !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.05);
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-        box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
-    }
-    
-    .sidebar {
-        border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
 }
 

@@ -76,7 +76,7 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
     return (
         <div className="intelligence-report-container" style={{ 
             padding: isMobile ? '70px 1rem 1.5rem' : '2rem 1.5rem', 
-            maxWidth: '1400px', 
+            maxWidth: '100%', 
             margin: '0 auto', 
             width: '100%',
             overflowX: 'hidden'
