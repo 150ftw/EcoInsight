@@ -3225,9 +3225,26 @@ function App() {
     const [hasShownIntelNotification, setHasShownIntelNotification] = useState(false);
 
     useEffect(() => {
-        // Only show once when entering the chat section
+        // Only show once when entering the chat section with dynamic resonance
         if (appSection === 'chat' && !hasShownIntelNotification) {
-            const timer = setTimeout(() => {
+            const timer = setTimeout(async () => {
+                try {
+                    const { fetchPulseRegistry } = await import('./lib/MarketData');
+                    const pulseData = await fetchPulseRegistry();
+                    
+                    if (pulseData) {
+                        setIntelNotificationProps({
+                            title: `Market Pulse: ${pulseData.pulse}/100`,
+                            message: pulseData.alert,
+                            badge: "Neural Analysis Live",
+                            icon: <Activity size={18} className="text-purple-400" />,
+                            actionLabel: "View Intelligence"
+                        });
+                    }
+                } catch (e) {
+                    console.warn("Dynamic notification failed:", e);
+                }
+                
                 setShowIntelNotification(true);
                 setHasShownIntelNotification(true);
             }, 3000); // 3 seconds after entering chat
