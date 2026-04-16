@@ -124,124 +124,122 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
   const containerRef = useRef(null);
   const animationFrameId = useRef();
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
+    // --- LERP TARGETS (REFS) ---
+    const targetColorRef = useRef(new Color(...color));
+    const targetAmplitudeRef = useRef(amplitude);
+    const targetDistanceRef = useRef(distance);
 
-    // PERFORMANCE: Use balanced dpr for lower device load
-    const isMobile = window.innerWidth <= 768;
-    const dpr = Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.5);
-    
-    const renderer = new Renderer({ 
-        alpha: false, 
-        antialias: false,
-        dpr: dpr
-    });
-    
-    const gl = renderer.gl;
-    gl.clearColor(0, 0, 0, 1);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    container.appendChild(gl.canvas);
+    // Update targets when props change
+    useEffect(() => {
+        targetColorRef.current.set(...color);
+        targetAmplitudeRef.current = amplitude;
+        targetDistanceRef.current = distance;
+    }, [color, amplitude, distance]);
 
-    const geometry = new Triangle(gl);
-    const program = new Program(gl, {
-      vertex: vertexShader,
-      fragment: fragmentShader,
-      uniforms: {
-        iTime: { value: 0 },
-        iResolution: {
-          value: new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
-        },
-        uColor: { value: new Color(...color) },
-        uAmplitude: { value: amplitude },
-        uDistance: { value: distance },
-        uMouse: { value: new Float32Array([0.5, 0.5]) },
-        uLineCount: { value: lineCount }
-      }
-    });
+    useEffect(() => {
+        if (!containerRef.current) return;
+        const container = containerRef.current;
 
-    const mesh = new Mesh(gl, { geometry, program });
-    
-    // Lerp targets
-    const lerpTargetColor = new Color(...color);
-    const lerpTargetAmplitude = { value: amplitude };
-    const lerpTargetDistance = { value: distance };
+        const isMobile = window.innerWidth <= 768;
+        const dpr = Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.5);
+        
+        const renderer = new Renderer({ 
+            alpha: false, 
+            antialias: false,
+            dpr: dpr
+        });
+        
+        const gl = renderer.gl;
+        gl.clearColor(0, 0, 0, 1);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        container.appendChild(gl.canvas);
 
-    function resize() {
-      const { clientWidth, clientHeight } = container;
-      renderer.setSize(clientWidth, clientHeight);
-      program.uniforms.iResolution.value.r = gl.canvas.width;
-      program.uniforms.iResolution.value.g = gl.canvas.height;
-      program.uniforms.iResolution.value.b = gl.canvas.width / gl.canvas.height;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+        const geometry = new Triangle(gl);
+        const program = new Program(gl, {
+          vertex: vertexShader,
+          fragment: fragmentShader,
+          uniforms: {
+            iTime: { value: 0 },
+            iResolution: {
+              value: new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
+            },
+            uColor: { value: new Color(...color) },
+            uAmplitude: { value: amplitude },
+            uDistance: { value: distance },
+            uMouse: { value: new Float32Array([0.5, 0.5]) },
+            uLineCount: { value: lineCount }
+          }
+        });
 
-    let currentMouse = [0.5, 0.5];
-    let targetMouse = [0.5, 0.5];
+        const mesh = new Mesh(gl, { geometry, program });
+        
+        function resize() {
+          const { clientWidth, clientHeight } = container;
+          renderer.setSize(clientWidth, clientHeight);
+          program.uniforms.iResolution.value.r = gl.canvas.width;
+          program.uniforms.iResolution.value.g = gl.canvas.height;
+          program.uniforms.iResolution.value.b = gl.canvas.width / gl.canvas.height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-    function handleMouseMove(e) {
-      const x = e.clientX / window.innerWidth;
-      const y = 1.0 - (e.clientY / window.innerHeight);
-      targetMouse = [x, y];
-    }
-    function handleMouseLeave() {
-      targetMouse = [0.5, 0.5];
-    }
-    if (enableMouseInteraction) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseleave', handleMouseLeave);
-    }
+        let currentMouse = [0.5, 0.5];
+        let targetMouse = [0.5, 0.5];
 
-    function update(t) {
-      // Smoothly lerp towards target values
-      const lerpSpeed = 0.05;
-      
-      // Color lerp
-      program.uniforms.uColor.value.r += (lerpTargetColor.r - program.uniforms.uColor.value.r) * lerpSpeed;
-      program.uniforms.uColor.value.g += (lerpTargetColor.g - program.uniforms.uColor.value.g) * lerpSpeed;
-      program.uniforms.uColor.value.b += (lerpTargetColor.b - program.uniforms.uColor.value.b) * lerpSpeed;
-      
-      // Amplitude & Distance lerp
-      program.uniforms.uAmplitude.value += (lerpTargetAmplitude.value - program.uniforms.uAmplitude.value) * lerpSpeed;
-      program.uniforms.uDistance.value += (lerpTargetDistance.value - program.uniforms.uDistance.value) * lerpSpeed;
+        function handleMouseMove(e) {
+          const x = e.clientX / window.innerWidth;
+          const y = 1.0 - (e.clientY / window.innerHeight);
+          targetMouse = [x, y];
+        }
+        function handleMouseLeave() {
+          targetMouse = [0.5, 0.5];
+        }
+        if (enableMouseInteraction) {
+          window.addEventListener('mousemove', handleMouseMove);
+          window.addEventListener('mouseleave', handleMouseLeave);
+        }
 
-      if (enableMouseInteraction) {
-        const mouseSmoothing = 0.05;
-        currentMouse[0] += mouseSmoothing * (targetMouse[0] - currentMouse[0]);
-        currentMouse[1] += mouseSmoothing * (targetMouse[1] - currentMouse[1]);
-        program.uniforms.uMouse.value[0] = currentMouse[0];
-        program.uniforms.uMouse.value[1] = currentMouse[1];
-      } else {
-        program.uniforms.uMouse.value[0] = 0.5 + Math.sin(t * 0.0007) * 0.1;
-        program.uniforms.uMouse.value[1] = 0.5 + Math.cos(t * 0.0005) * 0.1;
-      }
-      program.uniforms.iTime.value = t * 0.001;
+        function update(t) {
+          const lerpSpeed = 0.05;
+          const targetColor = targetColorRef.current;
+          
+          program.uniforms.uColor.value.r += (targetColor.r - program.uniforms.uColor.value.r) * lerpSpeed;
+          program.uniforms.uColor.value.g += (targetColor.g - program.uniforms.uColor.value.g) * lerpSpeed;
+          program.uniforms.uColor.value.b += (targetColor.b - program.uniforms.uColor.value.b) * lerpSpeed;
+          
+          program.uniforms.uAmplitude.value += (targetAmplitudeRef.current - program.uniforms.uAmplitude.value) * lerpSpeed;
+          program.uniforms.uDistance.value += (targetDistanceRef.current - program.uniforms.uDistance.value) * lerpSpeed;
 
-      renderer.render({ scene: mesh });
-      animationFrameId.current = requestAnimationFrame(update);
-    }
-    
-    // Update targets when props change without re-mounting
-    lerpTargetColor.set(...color);
-    lerpTargetAmplitude.value = amplitude;
-    lerpTargetDistance.value = distance;
+          if (enableMouseInteraction) {
+            const mouseSmoothing = 0.05;
+            currentMouse[0] += mouseSmoothing * (targetMouse[0] - currentMouse[0]);
+            currentMouse[1] += mouseSmoothing * (targetMouse[1] - currentMouse[1]);
+            program.uniforms.uMouse.value[0] = currentMouse[0];
+            program.uniforms.uMouse.value[1] = currentMouse[1];
+          } else {
+            program.uniforms.uMouse.value[0] = 0.5 + Math.sin(t * 0.0007) * 0.1;
+            program.uniforms.uMouse.value[1] = 0.5 + Math.cos(t * 0.0005) * 0.1;
+          }
+          program.uniforms.iTime.value = t * 0.001;
 
-    animationFrameId.current = requestAnimationFrame(update);
+          renderer.render({ scene: mesh });
+          animationFrameId.current = requestAnimationFrame(update);
+        }
+        
+        animationFrameId.current = requestAnimationFrame(update);
 
-    return () => {
-      if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
-      window.removeEventListener('resize', resize);
-
-      if (enableMouseInteraction) {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseleave', handleMouseLeave);
-      }
-      if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
-    };
-  }, [enableMouseInteraction, lineCount, color, amplitude, distance]);
+        return () => {
+          if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
+          window.removeEventListener('resize', resize);
+          if (enableMouseInteraction) {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseleave', handleMouseLeave);
+          }
+          if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
+          gl.getExtension('WEBGL_lose_context')?.loseContext();
+        };
+    }, [enableMouseInteraction, lineCount]);
 
   return <div ref={containerRef} className="threads-container" {...rest} />;
 };
