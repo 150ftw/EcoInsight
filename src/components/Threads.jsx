@@ -32,7 +32,7 @@ const float u_line_blur = 8.0;
 // Indian Flag Colors
 const vec3 saffron = vec3(1.0, 0.603, 0.2);
 const vec3 white = vec3(1.0, 1.0, 1.0);
-const vec3 green = vec3(0.07, 0.533, 0.031);
+const vec3 green = vec3(0.1, 0.65, 0.1); // Brightened Institutional Green
 
 float Perlin2D(vec2 P) {
     vec2 Pi = floor(P);
@@ -123,12 +123,12 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         float alphaFactor = 1.0;
         if (iTricolor == 1) {
             if (p < 0.33) {
-                lineColor = saffron;
+                lineColor = green;      // Bottom: Green (drawn first for visibility)
             } else if (p < 0.66) {
-                lineColor = white;
-                alphaFactor = 0.7; // Subtle transparency for white to aid readability
+                lineColor = white;      // Middle: White
+                alphaFactor = 0.7; 
             } else {
-                lineColor = green;
+                lineColor = saffron;    // Top: Saffron
             }
         }
 
