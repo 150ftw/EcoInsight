@@ -453,29 +453,43 @@ export const parseChartBlocks = (text) => {
                 const sanitizedContent = sanitizeChartJson(blockContent);
                 const json = JSON.parse(sanitizedContent);
 
-                // Validate it looks like our chart schema
-                if (json && json.type && json.data && Array.isArray(json.data)) {
-                    // Ensure data points are numbers or convertable strings
-                    const cleanData = json.data.map(item => {
-                        const newItem = { ...item };
-                        Object.keys(newItem).forEach(k => {
-                            if (k !== 'name' && k !== 'label') {
-                                const val = newItem[k];
-                                if (typeof val === 'string') {
-                                    // One last cleanup for strings that made it through JSON.parse
-                                    const cleanVal = val.replace(/[%,MBK₹$]/gi, '');
-                                    newItem[k] = parseFloat(cleanVal);
-                                }
-                            }
-                        });
-                        return newItem;
-                    });
+                // Validate it looks like our visual intelligence schema
+                if (json && json.type) {
+                    const type = json.type.toLowerCase();
 
-                    parts.push({ type: 'chart', content: { ...json, data: cleanData } });
+                    // Standard Charts
+                    if (['line', 'bar', 'pie', 'area'].includes(type) && json.data && Array.isArray(json.data)) {
+                        const cleanData = json.data.map(item => {
+                            const newItem = { ...item };
+                            Object.keys(newItem).forEach(k => {
+                                if (k !== 'name' && k !== 'label') {
+                                    const val = newItem[k];
+                                    if (typeof val === 'string') {
+                                        const cleanVal = val.replace(/[%,MBK₹$]/gi, '');
+                                        newItem[k] = parseFloat(cleanVal);
+                                    }
+                                }
+                            });
+                            return newItem;
+                        });
+                        parts.push({ type: 'chart', content: { ...json, data: cleanData } });
+                    } 
+                    // Sentinel Extrapolation
+                    else if (type === 'sentinel_extrapolation' && json.extrapolations && Array.isArray(json.extrapolations)) {
+                        parts.push({ type: 'chart', content: json });
+                    }
+                    // Sentiment Gauge
+                    else if (type === 'sentiment_gauge' && json.score !== undefined) {
+                      parts.push({ type: 'chart', content: json });
+                    }
+                    else {
+                        // Not a recognized visual block, fallback to text
+                        parts.push({ type: 'text', content: match[0] });
+                    }
                 } else {
-                    // Not a chart, fallback to text
                     parts.push({ type: 'text', content: match[0] });
                 }
+ Riverside: 
             } catch (e) {
                 console.warn('Chart parsing failed after sanitation:', e);
                 // Parsing failed (not valid JSON), fallback to text
