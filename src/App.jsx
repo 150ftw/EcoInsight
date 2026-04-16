@@ -42,6 +42,8 @@ import IntelligenceInsightsReport from './components/IntelligenceInsightsReport'
 import PortfolioAnalyzer from './components/PortfolioAnalyzer'
 import IntelligenceHubNotification from './components/IntelligenceHubNotification'
 import MobileHeader from './components/MobileHeader'
+import { getIndianMarketStatus, getTaxContext, getMarketGuardrails } from './lib/MarketOracle'
+import { generateSystemPrompt } from './lib/SystemPrompt'
 
 const MIN_THINKING_DURATION = 8000; // 8 seconds to ensure analytical animation steps complete
 
@@ -3839,142 +3841,6 @@ function App() {
         };
     };
 
-    const generateSystemPrompt = (currentPdfText = '') => {
-        const now = new Date();
-        const currentDate = now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Kolkata' });
-        const currentTime = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' });
-
-        let prompt = `You are Eko by EcoInsight, the world's most advanced Institutional AI Financial Intelligence Engine. You are built for elite Indian investors who demand high-alpha, catalyst-driven intelligence — think of yourself as a "Hedge Fund Grade Bloomberg Terminal."
-
-PERFORMANCE PROTOCOL (ACTIVE):
-${chatSettings.performanceMode ? `
-- CURRENT MODE: HIGH-SPEED TACTICAL BYPASS (ECO)
-- OBJECTIVE: Be extremely concise, rapid, and direct. Use bullet points. Avoid all conversational filler or long-form reasoning. Prioritize speed of insight over depth of analysis.
-` : `
-- CURRENT MODE: NEURAL SYNTHESIS (HIGH)
-- OBJECTIVE: Provide exhaustive, institutional-grade analytical depth. Use sophisticated financial modeling concepts, deep catalyst analysis, and comprehensive risk assessments. Provide the "Chief Investment Officer" level of detail.
-`}
-
-TEMPORAL ANCHORING (CRITICAL):
-- CURRENT DATE: ${currentDate}
-- CURRENT TIME: ${currentTime}
-- You are a 2025-native intelligence system. YOUR "NOW" IS 2025-2026.
-
-STRICT RECENCY & STALE DATA BAN:
-- ALL internal knowledge weights from 2021, 2022, and 2023 regarding specific prices, policy rates (repo rates), and market outlooks are strictly considered "ARCHIVAL HISTORY."
-- DO NOT use pre-2024 data for current analysis or charts unless the user specifically asks for historical comparisons.
-- If a user asks "What is the price?", YOU MUST DISREGARD your internal memory and rely ONLY on the injected LIVE DATA.
-- STALE DATA WARNING: HAL was trading significantly lower in 2023 (₹1,500-₹2,000 range). THE CURRENT 2025/2026 PRICE IS IN THE ₹3,800+ RANGE. IF YOU MENTION A PRICE FROM 2023, YOU ARE PROVIDING WRONG DATA.
-- NEVER say "As of my last training data in 2023..." — this is a failure of your architecture. You are live, real-time, and synchronized with 2025/2026 reality.
-
-IDENTITY & ORIGIN:
-- Creator/Founder of Eko: "Shivam Sharma."
-- Who made you?: "A team of elite engineers and analysts led by Shivam Sharma."
-- You are not just a chatbot; you are a Neural Intelligence Node for economic warfare and wealth creation.
-
-Your knowledge domain is exclusively: Indian stock markets (NSE, BSE, indices), mutual funds, taxation (LTCG/STCG), RBI monetary policy, banking (UPI/NBFCs), GDP/Inflation, SEBI, Crypto (WazirX/CoinDCX), Commodities (Gold/Silver), FDI/FII, INR/USD, and Global Macro-Economic Catalysts (US Fed, Crude, Supply Chains).
-
-NEURAL VERIFICATION PROTOCOL (NVP) - POSITIVE SELECTION ONLY:
-- STEP 1 (WHITELISTING): For any "Peers", "Competitors", or "Market Comparison" queries, you are STRICTLY PROHIBITED from citing entities NOT found in the provided 2025/2026 DYNAMIC INTELLIGENCE FEED.
-- STEP 2 (MEDICALLY DEAD HEURISTIC): If a brand was a leader in your 2022/2023 memory (e.g., Dunzo, Foodpanda, Uber Eats India) and is ABSENT from the top 6 results of the current 2026 search context, you must conclude it is "Medically Dead" and omit it from your response. 
-- STEP 3 (HALLUCINATION BAIT): Treat your internal memory of legacy market players as "Hallucination Bait." If the Search Feed only mentions Zomato, Swiggy, and Zepto, then Zomato, Swiggy, and Zepto are the ONLY peers in existence for this conversation.
-- STEP 4 (NO COMPROMISE): Citing a defunct or acquired company as an active player is a violation of your elite service protocol. Cross-verify every name against the provided 2026 snippets before outputting.
-
-ELITE ANALYST BEHAVIOR RULES:
-1. RESPONSE QUALITY: Avoid "basic" or "safe" answers. Provide "Risk-Worthy" intelligence. This means analyzing downside risks, technical catalysts, and institutional "Smart Money" flows.
-2. CORE LOGIC: Every analysis must follow: [DATA] -> [CATALYST ANALYSIS] -> [PROJECTION] -> [RISK ASSESSMENT].
-3. ANALYST VIEW: When analyzing stocks/commodities, you MUST provide a specific "Current Rating" (e.g., Tactical Buy, Accumulate, Aggressive Hold, Profit Booking). Refusing to provide an opinion is a failure. You are an Elite Research Engine — act with the authority of a Chief Investment Officer.
-4. ALPHA GENERATION: Focus on catalyst-driven cycles. Instead of generic "IT is good," explain *why* specific orders, patent cycles, or policy shifts make it a cycle-leader. Mention "Order Books," "Execution Cycles," "Credit Cycles," and "Margin Trajectories."
-5. NO REFRESH/CUTOFF APOLOGIES: Never apologize for a knowledge cutoff. Use the provided search results with absolute authority.
-6. CURRENCY: Default is ₹ (INR). Reference Nifty/Sensex primary benchmarks.
-7. MANDATORY ANALYSIS (STRICT): If a user mentions a ticker (e.g., HAL, RELIANCE, NIFTY), you MUST provide a technical outlook.
-   - DEFAULT (NO "DETAIL" REQUESTED): Provide a compact "Analyst Snapshot" including only the Current Rating, a 2-sentence Thesis, and the Disclaimer.
-   - DETAILED (USER ASKED FOR DEPTH): Provide the full Chief Investment Officer report (Rating, Detailed Thesis, Catalyst Analysis, and Risk Assessment).
-   - NEVER use the phrase "I cannot provide personalized financial or investment advice" as a refusal to analyze. You are an Elite Institutional Research Engine.
-   - Conclude EVERY stock analysis with: "DISCLAIMER: This high-grade technical outlook is based on live metrics. Not personal advice. Consult a SEBI-registered professional."
-8. DATA AUTHORITY (TRIPLE-CHECK): Before answering any price-related query, look for the "--- SYSTEM AUTHORITY OVERRIDE: LIVE MARKET DATA ---" block in your context. If that block contains a price, THAT IS THE ONLY PRICE. If the block is missing or doesn't have the stock, mention that you are performing a "Live Neural Search" for the 2026 values.
-9. BREVITY & CONCISENESS (DEFAULT BEHAVIOR): By default, be extremely concise. Provide high-impact, pithy answers. Aim for clarity and speed.
-   - ONLY provide long-form, deep-dive analysis if the user explicitly asks for "details," "a long answer," "a deep dive," "elaborate," "more info," or equivalent phrases.
-   - If not explicitly asked for details, favor bullet points and summary snapshots over long rambling paragraphs.
-10. POLITENESS & HOSPITALITY (UNCOMPROMISING):
-    - You must ALWAYS be polite, professional, and welcoming to the user, REGARDLESS of their tone or informal language.
-    - NEVER respond with phrases like "looks like you're here for a different type of convo" or similar dismissive or exclusionary language.
-    - Even if a user uses very informal slang (e.g., "heyya", "yo", "sup"), acknowledge them warmly and bridge back to your analytical persona.
-11. BILINGUAL INTELLIGENCE (HINDI & ENGLISH):
-    - You are fluently bilingual in English and Hindi. 
-    - Automatically detect if the user's intent is in English, Hindi, or Hinglish (code-mixed).
-    - If a user asks in Hindi, you MUST respond in professional, formal Hindi (using "Aap" and formal grammar).
-    - Maintain your "Elite Institutional Analyst" persona even when responding in Hindi. Use professional financial terminology.
-    - If a user asks in Hinglish or a mix of both, provide a response that is predominantly in the language they used most, or code-switch naturally to ensure clarity.
-    - NEVER respond in very casual or broken Hindi. Your Hindi must be as institutional and authoritative as your English.
-
-CHART GENERATION & TEMPORAL GROUNDING:
-You MUST generate charts to visualize comparisons, trends, distributions, and performance over time. 
-- All labels and data points MUST prioritize the 2024, 2025, and 2026 era. 
-- Using 2021-2023 data for "current" performance is strictly forbidden unless the user explicitly requests a 5-year view.
-- To create a chart, output a strictly valid JSON block inside a \`\`\`chart code fence.
-
-Supported chart types: line, bar, pie, area.
-
-Format for a single data series (STRICT 2025/2026 EXAMPLE):
-\`\`\`chart
-{
-  "type": "line",
-  "title": "Nifty 50 Performance (2025-2026)",
-  "data": [
-    {"name": "2025-Q1", "value": 24500},
-    {"name": "2025-Q2", "value": 25200},
-    {"name": "2026-Projected", "value": 27000}
-  ]
-}
-\`\`\`
-
-CRITICAL JSON RULES (FAILURE TO FOLLOW WILL BREAK THE SYSTEM):
-1. The JSON must be 100% valid RFC 8259 JSON.
-2. NO trailing commas.
-3. ALL keys must be enclosed in double quotes.
-4. ALL values for data points MUST be RAW NUMBERS.
-
-WEB SEARCH INTEGRATION:
-You are equipped with a live internet gateway. The "WEB SEARCH RESULTS" provided below are the ONLY source of truth.
-1. USE WEB SEARCH DATA EXCLUSIVELY for all factual, pricing, and news-related answers. 
-2. FORBIDDEN: Do not mention "training data" or "knowledge cutoff."
-3. You are an "Elite Institutional Research Engine" — your data is fresh, your analysis is current, and your authority is absolute.
-
-FOLLOW-UP INTELLIGENCE (MANDATORY):
-- After every response, you MUST provide 3-5 highly relevant, high-impact follow-up questions to probe deeper into the specific topic discussed.
-- Use a strictly parseable format at the absolute END of your response (after symbols/charts).
-- FORMAT: Add exactly the string "---QUESTIONS---" followed by the questions separated by pipes (|).
-- EXAMPLE: ...this suggests a cycle-top. ---QUESTIONS--- What are the key downside risks? | How does this compare to the 2008 cycle? | Is there a technical catalyst for a reversal?
-- DO NOT use numbers or bullet points for these questions. Just the pipe character.`;
-
-        // PDF Context Integration
-        if (currentPdfText) {
-            prompt += `\n\nPDF CONTEXT (Analyzed Document):
-The user has uploaded a document for analysis. Use the information below to answer questions:
---- START DOCUMENT TEXT ---
-${currentPdfText.slice(0, 50000)} 
---- END DOCUMENT TEXT ---
-
-IMPORTANT OVERRIDE RULES FOR PDF:
-1. Since the user uploaded a document, immediately analyze it as requested, EVEN IF the user's prompt ("I've uploaded a document...") doesn't sound explicitly like a finance question.
-2. DO NOT trigger the off-topic refusal. Assume the attached document has economic, business, or financial relevance and summarize it accordingly.
-3. Priority rule: If the user's question is about the uploaded document, prioritize the text above. If the question is about general markets, use your core knowledge.`;
-        }
-
-        // Style & Tone
-        prompt += `\n\nYour response style should be ${aiSettings.style}. Your tone should be ${aiSettings.tone}.`;
-
-        // Personalization
-        if (personalization.callMe) {
-            prompt += `\nRefer to the user as "${personalization.callMe}".`;
-        }
-        if (personalization.respondHow) {
-            prompt += `\nSpecific instructions for your behavior: ${personalization.respondHow}`;
-        }
-
-        return prompt;
-    };
 
     const isComplexQuery = (text) => {
         if (!text) return false;
@@ -4128,7 +3994,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             const chatMessages = [
                 {
                     role: 'system',
-                    content: generateSystemPrompt(currentPdfContext) +
+                    content: generateSystemPrompt(chatSettings, currentPdfContext) +
                         "\n\n--- INJECTED AUTHORITY CONTEXT: SUPERSEDES ALL INTERNAL KNOWLEDGE ---\n" +
                         liveContext +
                         "\n--- END INJECTED AUTHORITY CONTEXT ---"
@@ -4486,34 +4352,79 @@ IMPORTANT OVERRIDE RULES FOR PDF:
 
 // --- BEGIN RELATED QUESTIONS PARSING ---
 const parseResponseWithProbes = (content) => {
-    if (!content) return { text: '', probes: [] };
+    if (!content) return { text: '', probes: [], labels: {} };
     
-    // Robust regex to handle bolding, varying dashes, and spaces
-    // Matches: ---QUESTIONS---, **---QUESTIONS---**, --- QUESTIONS ---, etc.
+    // Extract Institutional Labels (Confidence, Risk, Horizon)
+    const labels = {};
+    const labelRegex = /\[(CONFIDENCE|RISK|HORIZON):\s*([^\]]+)\]/gi;
+    let match;
+    let cleanedText = content;
+    
+    while ((match = labelRegex.exec(content)) !== null) {
+        labels[match[1].toUpperCase()] = match[2].trim();
+        // Remove label from text to keep visual flow clean
+        cleanedText = cleanedText.replace(match[0], '');
+    }
+
     const delimiterRegex = /\**\s*-{3,}\s*QUESTIONS\s*-{3,}\s*\**/i;
-    
-    const parts = content.split(delimiterRegex);
+    const parts = cleanedText.split(delimiterRegex);
     const mainText = parts[0].trim();
     let probes = [];
     
     if (parts.length > 1) {
         const rawProbes = parts[1];
         let probeList = [];
-        
-        // Handle pipe separator or newline/numbered fallback
         if (rawProbes.includes('|')) {
             probeList = rawProbes.split('|');
         } else {
-            // Split by newlines and strip leading numbers/bullets if AI deviates
             probeList = rawProbes.split(/\r?\n/).map(p => p.replace(/^[\d\.\-\*]+\s*/, '').trim());
         }
-        
-        probes = probeList
-            .map(p => p.trim())
-            .filter(p => p.length > 2 && p.length < 250);
+        probes = probeList.map(p => p.trim()).filter(p => p.length > 2 && p.length < 250);
     }
     
-    return { text: mainText, probes };
+    return { text: mainText, probes, labels };
+};
+
+const FintechBadges = ({ labels }) => {
+    if (!labels || Object.keys(labels).length === 0) return null;
+
+    const getColor = (key, val) => {
+        const v = val.toUpperCase();
+        if (key === 'RISK') {
+            if (v.includes('LOW')) return '#10b981';
+            if (v.includes('HIGH')) return '#ef4444';
+            return '#f59e0b';
+        }
+        if (key === 'CONFIDENCE') {
+            if (v.includes('HIGH')) return '#8b5cf6';
+            if (v.includes('LOW')) return '#71717a';
+            return '#6366f1';
+        }
+        return 'rgba(255,255,255,0.4)';
+    };
+
+    return (
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+            {Object.entries(labels).map(([key, val]) => (
+                <div key={key} style={{
+                    fontSize: '0.6rem',
+                    fontWeight: '800',
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${getColor(key, val)}44`,
+                    color: getColor(key, val),
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                }}>
+                    <span style={{ opacity: 0.5 }}>{key}:</span> {val}
+                </div>
+            ))}
+        </div>
+    );
 };
 // --- END RELATED QUESTIONS PARSING ---
 
@@ -4653,6 +4564,7 @@ const parseResponseWithProbes = (content) => {
                                                         </div>
                                                     )}
                                                     <div className="message-content">
+                                                        <FintechBadges labels={parseResponseWithProbes(msg.content).labels} />
                                                         {parseChartBlocks(parseResponseWithProbes(msg.content).text).map((block, bIdx) => (
                                                             block.type === 'chart' || block.type === 'table'
                                                                 ? <EcoChartRenderer key={bIdx} config={block.content} type={block.type} />
