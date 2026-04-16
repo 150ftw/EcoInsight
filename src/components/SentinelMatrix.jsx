@@ -55,6 +55,15 @@ const AlphaSignal = ({ signal }) => {
 };
 
 const SentinelMatrix = ({ scenario, confidence, extrapolations }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   if (!extrapolations || !extrapolations.length) return null;
 
   return (
@@ -64,7 +73,7 @@ const SentinelMatrix = ({ scenario, confidence, extrapolations }) => {
       className="sentinel-matrix-wrapper"
       style={{
         margin: '1.5rem 0',
-        padding: '1.5rem',
+        padding: isMobile ? '1.25rem' : '1.5rem',
         borderRadius: '24px',
         background: 'rgba(0, 0, 0, 0.25)',
         border: '1px solid rgba(139, 92, 246, 0.2)',
@@ -85,67 +94,105 @@ const SentinelMatrix = ({ scenario, confidence, extrapolations }) => {
       }} />
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: isMobile ? '1rem' : '1.5rem' }}>
           <div>
             <h5 style={{ 
               color: '#8b5cf6', 
-              fontSize: '0.65rem', 
+              fontSize: '0.6rem', 
               fontWeight: 900, 
               textTransform: 'uppercase', 
               letterSpacing: '2px',
-              margin: '0 0 6px 0'
+              margin: '0 0 4px 0'
             }}>
               SENTINEL PREDICTIVE MODEL
             </h5>
-            <h3 style={{ color: '#fff', fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>
+            <h3 style={{ color: '#fff', fontSize: isMobile ? '1rem' : '1.1rem', fontWeight: 800, margin: 0 }}>
               {scenario}
             </h3>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600, marginBottom: '2px' }}>NEURAL CONFIDENCE</div>
-            <div style={{ fontSize: '1rem', color: '#fff', fontWeight: 900, fontFamily: 'monospace' }}>
+            <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600, marginBottom: '2px' }}>NEURAL CONFIDENCE</div>
+            <div style={{ fontSize: isMobile ? '0.85rem' : '1rem', color: '#fff', fontWeight: 900, fontFamily: 'monospace' }}>
               {(confidence * 100).toFixed(0)}%
             </div>
           </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                <th style={{ textAlign: 'left', padding: '12px 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase' }}>Sector Asset</th>
-                <th style={{ textAlign: 'left', padding: '12px 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase' }}>Direct Impact</th>
-                <th style={{ textAlign: 'left', padding: '12px 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase' }}>Second-Order Effects</th>
-                <th style={{ textAlign: 'right', padding: '12px 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase' }}>Risk / Signal</th>
-              </tr>
-            </thead>
-            <tbody>
-              {extrapolations.map((ext, idx) => (
-                <motion.tr 
-                  key={idx}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
-                >
-                  <td style={{ padding: '14px 10px', fontWeight: 700, color: '#fff' }}>{ext.sector}</td>
-                  <td style={{ padding: '14px 10px', color: 'rgba(255,255,255,0.8)' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 600 }}>{ext.direct}</div>
-                  </td>
-                  <td style={{ padding: '14px 10px', color: 'rgba(255,255,255,0.6)', maxWidth: '280px' }}>
-                    <div style={{ fontSize: '0.7rem', lineHeight: '1.4' }}>{ext.secondary}</div>
-                  </td>
-                  <td style={{ padding: '14px 10px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-                      <RiskBadge level={ext.risk} />
-                      <AlphaSignal signal={ext.alpha} />
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {isMobile ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {extrapolations.map((ext, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                style={{
+                  padding: '12px',
+                  borderRadius: '16px',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.05)'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 800, color: '#fff', fontSize: '0.85rem' }}>{ext.sector}</span>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <RiskBadge level={ext.risk} />
+                  </div>
+                </div>
+                <div style={{ marginBottom: '8px' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#8b5cf6', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>Direct Impact</div>
+                  <div style={{ fontSize: '0.75rem', color: '#fff', fontWeight: 600 }}>{ext.direct}</div>
+                </div>
+                <div style={{ marginBottom: '8px' }}>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>Second-Order Effects</div>
+                  <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', lineHeight: '1.4' }}>{ext.secondary}</div>
+                </div>
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>ALPHA SIGNAL</div>
+                    <AlphaSignal signal={ext.alpha} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <th style={{ textAlign: 'left', padding: '12px 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase' }}>Sector Asset</th>
+                  <th style={{ textAlign: 'left', padding: '12px 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase' }}>Direct Impact</th>
+                  <th style={{ textAlign: 'left', padding: '12px 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase' }}>Second-Order Effects</th>
+                  <th style={{ textAlign: 'right', padding: '12px 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase' }}>Risk / Signal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {extrapolations.map((ext, idx) => (
+                  <motion.tr 
+                    key={idx}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                  >
+                    <td style={{ padding: '14px 10px', fontWeight: 700, color: '#fff' }}>{ext.sector}</td>
+                    <td style={{ padding: '14px 10px', color: 'rgba(255,255,255,0.8)' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 600 }}>{ext.direct}</div>
+                    </td>
+                    <td style={{ padding: '14px 10px', color: 'rgba(255,255,255,0.6)', maxWidth: '280px' }}>
+                      <div style={{ fontSize: '0.7rem', lineHeight: '1.4' }}>{ext.secondary}</div>
+                    </td>
+                    <td style={{ padding: '14px 10px', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                        <RiskBadge level={ext.risk} />
+                        <AlphaSignal signal={ext.alpha} />
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         <div style={{ 
           marginTop: '1.5rem', 

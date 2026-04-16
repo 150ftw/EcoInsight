@@ -20,16 +20,24 @@ const ModelSelector = ({ performanceMode, setPerformanceMode }) => {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    // Use pointerdown for better mobile touch support
+    document.addEventListener('pointerdown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
   }, []);
 
   const updateCoords = () => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
+      const dropdownWidth = 260;
+      // Ensure dropdown doesn't overflow right edge on narrow screens
+      let left = rect.left;
+      if (left + dropdownWidth > window.innerWidth) {
+        left = window.innerWidth - dropdownWidth - 10;
+      }
+      
       setCoords({
         bottom: window.innerHeight - rect.top + 10,
-        left: rect.left,
+        left: Math.max(10, left),
         width: rect.width
       });
     }

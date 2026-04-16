@@ -188,20 +188,33 @@ body {
     overflow-x: hidden;
 }
 
-/* Restore native cursor */
-*:not(iframe):not(input):not(textarea):not(select) {
-    cursor: auto;
+/* --- UNIVERSAL INSTITUTIONAL SCROLLBARS (PC/WINDOWS FOCUS) --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
 
-#root {
-    min-height: 100vh;
-    min-height: 100dvh;
+::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-#root {
-    height: 100%;
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
 }
 
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.4);
+    background-clip: content-box;
+}
+
+/* Firefox Support */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.2) transparent;
+}
 
 .app-container {
     display: flex;
@@ -213,6 +226,8 @@ body {
     position: relative;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     overflow-anchor: none;
+    /* Momentum scrolling for iOS */
+    -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 768px) {
