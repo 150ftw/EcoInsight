@@ -18,6 +18,20 @@ const CHART_THEME = {
     tooltipBorder: 'rgba(139, 92, 246, 0.3)',
 };
 
+// Neural Numeric Formatter for high-magnitude economic data
+const formatInstitutionalValue = (val) => {
+    if (typeof val !== 'number') return val;
+    const absVal = Math.abs(val);
+    
+    if (absVal >= 1e12) return (val / 1e12).toFixed(2) + 'T'; // Trillion
+    if (absVal >= 1e9) return (val / 1e9).toFixed(1) + 'B';   // Billion
+    if (absVal >= 1e7) return (val / 1e7).toFixed(1) + 'Cr';  // Crore
+    if (absVal >= 1e5) return (val / 1e5).toFixed(1) + 'L';   // Lakh
+    if (absVal >= 1e3) return (val / 1e3).toFixed(1) + 'K';   // Thousand
+    
+    return val.toLocaleString('en-IN');
+};
+
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         return (
@@ -31,8 +45,9 @@ const CustomTooltip = ({ active, payload, label }) => {
             }}>
                 <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem', marginBottom: '6px' }}>{label}</p>
                 {payload.map((entry, idx) => (
-                    <p key={idx} style={{ color: entry.color, fontSize: '0.8rem', margin: '2px 0' }}>
-                        {entry.name}: {typeof entry.value === 'number' ? entry.value.toLocaleString('en-IN') : entry.value}
+                    <p key={idx} style={{ color: entry.color, fontSize: '0.8rem', margin: '2px 0', display: 'flex', justifyContent: 'space-between', gap: '15px' }}>
+                        <span style={{ fontWeight: 600 }}>{entry.name}:</span>
+                        <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{formatInstitutionalValue(entry.value)}</span>
                     </p>
                 ))}
             </div>
@@ -99,10 +114,15 @@ const EcoLineChart = ({ data, title, dataKeys }) => {
     return (
         <ChartWrapper title={title}>
             <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={processedData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                <LineChart data={processedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={CHART_THEME.gridColor} />
                     <XAxis dataKey="name" tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
-                    <YAxis tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
+                    <YAxis 
+                        tick={{ fill: CHART_THEME.textColor, fontSize: 11 }} 
+                        axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} 
+                        tickFormatter={formatInstitutionalValue}
+                        width={60}
+                    />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend wrapperStyle={{ color: CHART_THEME.textColor, fontSize: '0.8rem' }} />
                     {keys.map((key, idx) => (
@@ -147,10 +167,15 @@ const EcoBarChart = ({ data, title, dataKeys }) => {
     return (
         <ChartWrapper title={title}>
             <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={processedData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                <BarChart data={processedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={CHART_THEME.gridColor} />
                     <XAxis dataKey="name" tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
-                    <YAxis tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
+                    <YAxis 
+                        tick={{ fill: CHART_THEME.textColor, fontSize: 11 }} 
+                        axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} 
+                        tickFormatter={formatInstitutionalValue}
+                        width={60}
+                    />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend wrapperStyle={{ color: CHART_THEME.textColor, fontSize: '0.8rem' }} />
                     {keys.map((key, idx) => (
@@ -225,7 +250,7 @@ const EcoAreaChart = ({ data, title, dataKeys }) => {
     return (
         <ChartWrapper title={title}>
             <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={processedData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                <AreaChart data={processedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <defs>
                         {keys.map((key, idx) => (
                             <linearGradient key={key} id={`gradient-${key}`} x1="0" y1="0" x2="0" y2="1">
@@ -236,7 +261,12 @@ const EcoAreaChart = ({ data, title, dataKeys }) => {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke={CHART_THEME.gridColor} />
                     <XAxis dataKey="name" tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
-                    <YAxis tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
+                    <YAxis 
+                        tick={{ fill: CHART_THEME.textColor, fontSize: 11 }} 
+                        axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} 
+                        tickFormatter={formatInstitutionalValue}
+                        width={60}
+                    />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend wrapperStyle={{ color: CHART_THEME.textColor, fontSize: '0.8rem' }} />
                     {keys.map((key, idx) => (
