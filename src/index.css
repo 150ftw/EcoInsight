@@ -6053,7 +6053,7 @@ select {
 }
 
 .landing-hero {
-    padding: 220px 8% 120px;
+    padding: clamp(140px, 18vh, 200px) 8% 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -6079,11 +6079,11 @@ select {
     color: var(--text-secondary);
     font-size: 0.85rem;
     font-weight: 700;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .landing-hero h1 {
-    font-size: clamp(2.5rem, 8vw, 5.5rem);
+    font-size: clamp(2.2rem, 7vw, 5rem);
     font-weight: 800;
     letter-spacing: -2px;
     margin-bottom: 1.5rem;
@@ -6144,7 +6144,7 @@ select {
     font-size: 1.25rem;
     color: var(--text-secondary);
     line-height: 1.8;
-    margin: 0 auto 3.5rem;
+    margin: 0 auto 2.5rem;
     max-width: 800px;
     text-align: center;
 }
@@ -10162,4 +10162,37 @@ select {
     will-change: transform, opacity;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+}
+
+/* --- UNIVERSAL FIDELITY: LAPTOP & ZOOM NORMALIZATION --- */
+@media (max-height: 850px) {
+    .landing-hero {
+        padding-top: clamp(100px, 12vh, 140px) !important;
+        padding-bottom: 60px !important;
+    }
+
+    .landing-hero h1 {
+        font-size: clamp(2rem, 6vw, 3.8rem) !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .hero-content p {
+        font-size: 1.1rem !important;
+        margin-bottom: 2rem !important;
+        max-width: 700px !important;
+    }
+
+    .hero-badge {
+        margin-bottom: 1rem !important;
+        transform: scale(0.9);
+    }
+
+    .hero-actions {
+        margin-top: 0.5rem !important;
+    }
+
+    .btn-primary, .btn-secondary {
+        padding: 0.9rem 2rem !important;
+        font-size: 0.95rem !important;
+    }
 }
