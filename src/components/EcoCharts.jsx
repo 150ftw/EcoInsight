@@ -260,18 +260,27 @@ const EcoTable = ({ rows, headers }) => {
     if (!rows || !rows.length) return null;
 
     return (
-        <div style={{
-            margin: '1.5rem 0',
-            width: '100%',
-            overflowX: 'auto',
-            borderRadius: '16px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            background: 'rgba(0, 0, 0, 0.2)',
-            backdropFilter: 'blur(10px)',
-        }}>
+        <div 
+            className="institutional-table-wrapper"
+            style={{
+                margin: '1.5rem 0',
+                width: '100%',
+                overflowX: 'auto',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                background: 'rgba(0, 0, 0, 0.2)',
+                backdropFilter: 'blur(10px)',
+                position: 'relative',
+                /* Standardize scrollbar for Windows/macOS */
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent'
+            }}
+        >
             <table style={{
                 width: '100%',
-                borderCollapse: 'collapse',
+                minWidth: '550px', /* Prevent squashing on mobile */
+                borderCollapse: 'separate', /* Necessary for sticky borders */
+                borderSpacing: 0,
                 fontSize: '0.85rem',
                 color: '#d1d5db',
                 textAlign: 'left'
@@ -279,15 +288,24 @@ const EcoTable = ({ rows, headers }) => {
                 <thead>
                     <tr style={{ background: 'rgba(139, 92, 246, 0.15)' }}>
                         {headers.map((header, idx) => (
-                            <th key={idx} style={{
-                                padding: '12px 16px',
-                                fontWeight: 700,
-                                color: '#fff',
-                                textTransform: 'uppercase',
-                                fontSize: '0.75rem',
-                                letterSpacing: '0.5px',
-                                borderBottom: '1px solid rgba(255,255,255,0.1)'
-                            }}>
+                            <th 
+                                key={idx} 
+                                style={{
+                                    padding: '14px 16px',
+                                    fontWeight: 700,
+                                    color: '#fff',
+                                    textTransform: 'uppercase',
+                                    fontSize: '0.7rem',
+                                    letterSpacing: '0.8px',
+                                    borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                    position: idx === 0 ? 'sticky' : 'static',
+                                    left: 0,
+                                    zIndex: idx === 0 ? 2 : 1,
+                                    background: idx === 0 ? 'rgba(20, 20, 25, 0.95)' : 'transparent',
+                                    backdropFilter: idx === 0 ? 'blur(10px)' : 'none',
+                                    boxShadow: idx === 0 ? '4px 0 8px rgba(0,0,0,0.3)' : 'none'
+                                }}
+                            >
                                 {header}
                             </th>
                         ))}
@@ -303,12 +321,20 @@ const EcoTable = ({ rows, headers }) => {
                         onMouseLeave={(e) => e.currentTarget.style.background = rIdx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)'}
                         >
                             {row.map((cell, cIdx) => (
-                                <td key={cIdx} style={{
-                                    padding: '12px 16px',
-                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                    fontWeight: cIdx === 0 ? 600 : 400,
-                                    color: cIdx === 0 ? '#fff' : 'inherit'
-                                }}>
+                                <td 
+                                    key={cIdx} 
+                                    style={{
+                                        padding: '12px 16px',
+                                        borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                        fontWeight: cIdx === 0 ? 700 : 400,
+                                        color: cIdx === 0 ? '#fff' : 'inherit',
+                                        position: cIdx === 0 ? 'sticky' : 'static',
+                                        left: 0,
+                                        zIndex: cIdx === 0 ? 1 : 0,
+                                        background: cIdx === 0 ? (rIdx % 2 === 0 ? 'rgba(15, 15, 20, 0.98)' : 'rgba(20, 20, 25, 0.98)') : 'transparent',
+                                        boxShadow: cIdx === 0 ? '4px 0 8px rgba(0,0,0,0.3)' : 'none'
+                                    }}
+                                >
                                     {cell}
                                 </td>
                             ))}
