@@ -83,7 +83,7 @@ const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = fa
 }
 
 
-const ThinkingIndicator = () => {
+const ThinkingIndicator = ({ appearance }) => {
   const [seconds, setSeconds] = useState(0);
   const [step, setStep] = useState(0);
   const [activeSteps, setActiveSteps] = useState([]);
@@ -139,50 +139,19 @@ const ThinkingIndicator = () => {
     >
       <div className="thought-header">
         <div className="thought-timer">
-          <Sparkles size={14} className="animate-pulse" />
+          <Sparkles size={14} className="animate-pulse" style={{ color: appearance.accentColor }} />
           <span>Thought for {seconds.toFixed(1)}s</span>
         </div>
-        <ChevronUp size={14} style={{ opacity: 0.3 }} />
       </div>
 
-      <div className="thought-steps">
-        <div className="thought-timeline-line" />
-        
-        {activeSteps.map((s, idx) => {
-          const isActive = step === idx;
-          const isCompleted = step > idx;
-          
-          if (idx > step) return null;
-
-          return (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`thought-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
-            >
-              <div className={`thought-step-dot ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`} />
-              <div className="thought-step-content">
-                <div className="thought-step-label">{s.label}</div>
-                {isActive && s.tool && (
-                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="tool-badge"
-                   >
-                     <Database size={10} />
-                     <span>{s.tool}</span>
-                   </motion.div>
-                )}
-              </div>
-              {isCompleted && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} style={{ marginLeft: 'auto' }}>
-                  <CheckCircle2 size={12} className="text-green-500" />
-                </motion.div>
-              )}
-            </motion.div>
-          );
-        })}
+      <div className="thought-simple-status" style={{ 
+        paddingLeft: '24px', 
+        fontSize: '0.8rem', 
+        color: 'rgba(255,255,255,0.6)',
+        marginTop: '8px',
+        fontWeight: '500'
+      }}>
+        {activeSteps[step]?.label || "Synthesizing market intelligence..."}
       </div>
     </motion.div>
   );
@@ -4528,7 +4497,7 @@ const FintechBadges = ({ labels }) => {
                                                         <EkoSparkle size={20} />
                                                     </div>
                                                     <div className="message-container">
-                                                        <ThinkingIndicator />
+                                                        <ThinkingIndicator appearance={appearance} />
                                                     </div>
                                                 </div>
                                             );
