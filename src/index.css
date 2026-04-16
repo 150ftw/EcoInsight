@@ -10110,9 +10110,9 @@ select {
     .mini-fidelity-toggle {
         padding: 2px;
         gap: 2px;
-        height: 34px;
     }
-    
+}
+
 /* --- UNIVERSAL FIDELITY: ULTRA-WIDE & PRO SCALING --- */
 @media (min-width: 1440px) {
     .app-container,
