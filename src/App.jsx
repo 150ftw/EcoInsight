@@ -4648,8 +4648,8 @@ const parseResponseWithProbes = (content) => {
                                                     )}
                                                     <div className="message-content">
                                                         {parseChartBlocks(parseResponseWithProbes(msg.content).text).map((block, bIdx) => (
-                                                            block.type === 'chart'
-                                                                ? <EcoChartRenderer key={bIdx} config={block.content} />
+                                                            block.type === 'chart' || block.type === 'table'
+                                                                ? <EcoChartRenderer key={bIdx} config={block.content} type={block.type} />
                                                                 : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
                                                         ))}
                                                         

@@ -255,6 +255,71 @@ const EcoAreaChart = ({ data, title, dataKeys }) => {
     );
 };
 
+// Premium Institutional Table Component
+const EcoTable = ({ rows, headers }) => {
+    if (!rows || !rows.length) return null;
+
+    return (
+        <div style={{
+            margin: '1.5rem 0',
+            width: '100%',
+            overflowX: 'auto',
+            borderRadius: '16px',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'rgba(0, 0, 0, 0.2)',
+            backdropFilter: 'blur(10px)',
+        }}>
+            <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '0.85rem',
+                color: '#d1d5db',
+                textAlign: 'left'
+            }}>
+                <thead>
+                    <tr style={{ background: 'rgba(139, 92, 246, 0.15)' }}>
+                        {headers.map((header, idx) => (
+                            <th key={idx} style={{
+                                padding: '12px 16px',
+                                fontWeight: 700,
+                                color: '#fff',
+                                textTransform: 'uppercase',
+                                fontSize: '0.75rem',
+                                letterSpacing: '0.5px',
+                                borderBottom: '1px solid rgba(255,255,255,0.1)'
+                            }}>
+                                {header}
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows.map((row, rIdx) => (
+                        <tr key={rIdx} style={{ 
+                            background: rIdx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)',
+                            transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139, 92, 246, 0.05)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = rIdx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)'}
+                        >
+                            {row.map((cell, cIdx) => (
+                                <td key={cIdx} style={{
+                                    padding: '12px 16px',
+                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    fontWeight: cIdx === 0 ? 600 : 400,
+                                    color: cIdx === 0 ? '#fff' : 'inherit'
+                                }}>
+                                    {cell}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
 /**
  * Sanitizes a raw JSON string from the AI to be more parser-friendly.
  * Removes units like %, M, B, Cr, L and fixes minor syntax errors.
@@ -295,55 +360,74 @@ export const parseChartBlocks = (text) => {
     if (!text) return [{ type: 'text', content: text }];
 
     const parts = [];
-    // Extremely resilient regex:
-    // Matches ```chart { ... } ``` OR raw unformatted { "type": "line", ... }
-    const chartRegex = /```(?:chart|json)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap)"\s*,[\s\S]*?(?:"data"|"score"|"sectors")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})/gi;
+    // Enhanced regex: 1. Matches ```chart blocks 2. Matches raw {type:chart} JSON 3. Matches markdown tables (| cell | cell |)
+    const combinedRegex = /```(?:chart|json)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap)"\s*,[\s\S]*?(?:"data"|"score"|"sectors")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})|((?:\n|^)\s*\|.*\|.*\n\s*\|[\s\-\| :]*\|\s*(?:\n\s*\|.*\|.*)*)/gi;
 
     let lastIndex = 0;
     let match;
 
-    while ((match = chartRegex.exec(text)) !== null) {
+    while ((match = combinedRegex.exec(text)) !== null) {
         // Text before the chart
         if (match.index > lastIndex) {
             parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
         }
 
         // Parse the block content (match[1] is backticks, match[2] is raw json)
-        try {
-            const blockContent = (match[1] || match[2]).trim();
-            const sanitizedContent = sanitizeChartJson(blockContent);
-            const json = JSON.parse(sanitizedContent);
-
-            // Validate it looks like our chart schema
-            if (json && json.type && json.data && Array.isArray(json.data)) {
-                // Ensure data points are numbers or convertable strings
-                const cleanData = json.data.map(item => {
-                    const newItem = { ...item };
-                    Object.keys(newItem).forEach(k => {
-                        if (k !== 'name' && k !== 'label') {
-                            const val = newItem[k];
-                            if (typeof val === 'string') {
-                                // One last cleanup for strings that made it through JSON.parse
-                                const cleanVal = val.replace(/[%,MBK₹$]/gi, '');
-                                newItem[k] = parseFloat(cleanVal);
-                            }
-                        }
-                    });
-                    return newItem;
-                });
-
-                parts.push({ type: 'chart', content: { ...json, data: cleanData } });
+        if (match[3]) {
+            // Markdown Table Detected
+            const rawTable = match[3].trim();
+            const lines = rawTable.split('\n');
+            if (lines.length >= 2) {
+                const parseRow = (line) => line.trim().split('|').filter(s => s.trim() !== '' || line.indexOf('|') !== line.lastIndexOf('|')).map(s => s.trim());
+                const headers = parseRow(lines[0]);
+                const rows = lines.slice(2).map(line => parseRow(line)).filter(r => r.length > 0);
+                
+                if (headers.length > 0 && rows.length > 0) {
+                    parts.push({ type: 'table', content: { headers, rows } });
+                } else {
+                    parts.push({ type: 'text', content: match[0] });
+                }
             } else {
-                // Not a chart, fallback to text
                 parts.push({ type: 'text', content: match[0] });
             }
-        } catch (e) {
-            console.warn('Chart parsing failed after sanitation:', e);
-            // Parsing failed (not valid JSON), fallback to text
-            parts.push({ type: 'text', content: match[0] });
+        } else {
+            // Parse existing chart/JSON logic
+            try {
+                const blockContent = (match[1] || match[2]).trim();
+                const sanitizedContent = sanitizeChartJson(blockContent);
+                const json = JSON.parse(sanitizedContent);
+
+                // Validate it looks like our chart schema
+                if (json && json.type && json.data && Array.isArray(json.data)) {
+                    // Ensure data points are numbers or convertable strings
+                    const cleanData = json.data.map(item => {
+                        const newItem = { ...item };
+                        Object.keys(newItem).forEach(k => {
+                            if (k !== 'name' && k !== 'label') {
+                                const val = newItem[k];
+                                if (typeof val === 'string') {
+                                    // One last cleanup for strings that made it through JSON.parse
+                                    const cleanVal = val.replace(/[%,MBK₹$]/gi, '');
+                                    newItem[k] = parseFloat(cleanVal);
+                                }
+                            }
+                        });
+                        return newItem;
+                    });
+
+                    parts.push({ type: 'chart', content: { ...json, data: cleanData } });
+                } else {
+                    // Not a chart, fallback to text
+                    parts.push({ type: 'text', content: match[0] });
+                }
+            } catch (e) {
+                console.warn('Chart parsing failed after sanitation:', e);
+                // Parsing failed (not valid JSON), fallback to text
+                parts.push({ type: 'text', content: match[0] });
+            }
         }
 
-        lastIndex = chartRegex.lastIndex;
+        lastIndex = combinedRegex.lastIndex;
     }
 
     if (lastIndex < text.length) {
@@ -358,7 +442,11 @@ import SentimentGauge from './SentimentGauge';
 /**
  * Renders a chart or visual intelligence component based on the parsed config
  */
-export const EcoChartRenderer = ({ config }) => {
+export const EcoChartRenderer = ({ config, type }) => {
+    if (type === 'table') {
+        return <EcoTable rows={config.rows} headers={config.headers} />;
+    }
+
     if (!config || (!config.data && !config.score && !config.sectors)) return null;
 
     const chartType = (config.type || 'line').toLowerCase();
