@@ -122,9 +122,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         vec3 lineColor = uColor;
         float alphaFactor = 1.0;
         if (iTricolor == 1) {
-            if (p < 0.33) {
-                lineColor = green;      // Bottom: Green (drawn first for visibility)
-            } else if (p < 0.66) {
+            if (p < 0.18) {
+                lineColor = green;      // Bottom: Green
+            } else if (p < 0.38) {
                 lineColor = white;      // Middle: White
                 alphaFactor = 0.7; 
             } else {
