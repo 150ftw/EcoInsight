@@ -17,6 +17,14 @@
       "destination": "https://api.exchangerate-api.com/$1"
     },
     {
+      "source": "/api/auth/google-callback",
+      "destination": "/api/auth?action=google-callback"
+    },
+    {
+      "source": "/api/auth/apple-callback",
+      "destination": "/api/auth?action=apple-callback"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
