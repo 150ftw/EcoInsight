@@ -3228,13 +3228,12 @@ function App() {
     const [showVoicePlayer, setShowVoicePlayer] = useState(false);
     const [isNeuralSearching, setIsNeuralSearching] = useState(false);
 
-    // Scroll to top on view change
+    // Scroll to top on view change & Trigger Virtual Page Tracking
     useEffect(() => {
         const nukeScroll = () => {
             window.scrollTo(0, 0);
             const allElements = document.querySelectorAll('*');
             for (let i = 0; i < allElements.length; i++) {
-                // Skip the chat messages container — users must be able to scroll within it
                 if (allElements[i].classList.contains('messages-list')) continue;
                 if (allElements[i].scrollTop > 0) {
                     allElements[i].scrollTop = 0;
@@ -3243,11 +3242,19 @@ function App() {
         };
 
         nukeScroll();
-        // Fire repeatedly to defeat any asynchronous framework delays
         const t1 = setTimeout(nukeScroll, 10);
         const t2 = setTimeout(nukeScroll, 50);
         const t3 = setTimeout(nukeScroll, 150);
         const t4 = setTimeout(nukeScroll, 300);
+
+        // Institutional Tracking: Record Virtual Page View in Google Ads/Analytics
+        if (window.gtag) {
+            const virtualPath = view === 'chat' ? '/chat' : `/${view}`;
+            window.gtag('config', 'AW-18076530285', {
+                'page_path': virtualPath,
+                'page_title': view === 'chat' ? 'Eko AI Chat Interface' : `EcoInsight - ${view}`
+            });
+        }
 
         return () => {
             clearTimeout(t1);
