@@ -33,6 +33,7 @@ import FiiDiiAnalyzer from './FiiDiiAnalyzer';
 import EconomicCalendar from './EconomicCalendar';
 import TechnicalPulse from './TechnicalPulse';
 import EarningsWatch from './EarningsWatch';
+import { formatInstitutionalValue } from './EcoCharts';
 
 
 
@@ -433,6 +434,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                                         contentStyle={{ background: '#111114', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
                                         labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}
                                         itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
+                                        formatter={(value) => [formatInstitutionalValue(value), "Value"]}
                                     />
                                     <Area 
                                         type="monotone" 

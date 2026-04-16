@@ -19,7 +19,7 @@ const CHART_THEME = {
 };
 
 // Neural Numeric Formatter for high-magnitude economic data
-const formatInstitutionalValue = (val) => {
+export const formatInstitutionalValue = (val) => {
     if (typeof val !== 'number') return val;
     const absVal = Math.abs(val);
     
