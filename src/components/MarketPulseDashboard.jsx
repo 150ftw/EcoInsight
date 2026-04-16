@@ -4,7 +4,7 @@ import { Activity, TrendingUp, TrendingDown, BarChart3, Info, RefreshCw, Cpu, Za
 import { fetchPulseRegistry } from '../lib/MarketData';
 import SentimentGauge from './SentimentGauge';
 
-const MarketPulseDashboard = () => {
+const MarketPulseDashboard = ({ syncBackground }) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -124,7 +124,12 @@ const MarketPulseDashboard = () => {
             }}>
                 
                 {/* Sentiment Gauge Section */}
-                <motion.div variants={itemVariants} style={{ gridColumn: isMobile ? '1 / -1' : 'span 4' }}>
+                <motion.div 
+                    variants={itemVariants} 
+                    style={{ gridColumn: isMobile ? '1 / -1' : 'span 4' }}
+                    onMouseEnter={() => syncBackground && syncBackground({ color: '#d946ef', amplitude: 1.8, distance: 0.4 })}
+                    onMouseLeave={() => syncBackground && syncBackground({ color: '#8b5cf6', amplitude: 1.0, distance: 0.2 })}
+                >
                     <SentimentGauge 
                         score={pulse} 
                         label={pulse > 70 ? "Extreme Greed" : pulse < 30 ? "Extreme Fear" : "Neutral Stability"}

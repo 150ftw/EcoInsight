@@ -162,6 +162,11 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     });
 
     const mesh = new Mesh(gl, { geometry, program });
+    
+    // Lerp targets
+    const lerpTargetColor = new Color(...color);
+    const lerpTargetAmplitude = { value: amplitude };
+    const lerpTargetDistance = { value: distance };
 
     function resize() {
       const { clientWidth, clientHeight } = container;
@@ -190,10 +195,22 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     }
 
     function update(t) {
+      // Smoothly lerp towards target values
+      const lerpSpeed = 0.05;
+      
+      // Color lerp
+      program.uniforms.uColor.value.r += (lerpTargetColor.r - program.uniforms.uColor.value.r) * lerpSpeed;
+      program.uniforms.uColor.value.g += (lerpTargetColor.g - program.uniforms.uColor.value.g) * lerpSpeed;
+      program.uniforms.uColor.value.b += (lerpTargetColor.b - program.uniforms.uColor.value.b) * lerpSpeed;
+      
+      // Amplitude & Distance lerp
+      program.uniforms.uAmplitude.value += (lerpTargetAmplitude.value - program.uniforms.uAmplitude.value) * lerpSpeed;
+      program.uniforms.uDistance.value += (lerpTargetDistance.value - program.uniforms.uDistance.value) * lerpSpeed;
+
       if (enableMouseInteraction) {
-        const smoothing = 0.05;
-        currentMouse[0] += smoothing * (targetMouse[0] - currentMouse[0]);
-        currentMouse[1] += smoothing * (targetMouse[1] - currentMouse[1]);
+        const mouseSmoothing = 0.05;
+        currentMouse[0] += mouseSmoothing * (targetMouse[0] - currentMouse[0]);
+        currentMouse[1] += mouseSmoothing * (targetMouse[1] - currentMouse[1]);
         program.uniforms.uMouse.value[0] = currentMouse[0];
         program.uniforms.uMouse.value[1] = currentMouse[1];
       } else {
@@ -205,6 +222,12 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
       renderer.render({ scene: mesh });
       animationFrameId.current = requestAnimationFrame(update);
     }
+    
+    // Update targets when props change without re-mounting
+    lerpTargetColor.set(...color);
+    lerpTargetAmplitude.value = amplitude;
+    lerpTargetDistance.value = distance;
+
     animationFrameId.current = requestAnimationFrame(update);
 
     return () => {
@@ -218,7 +241,7 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
       if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [color, amplitude, distance, enableMouseInteraction, lineCount]);
+  }, [enableMouseInteraction, lineCount, color, amplitude, distance]);
 
   return <div ref={containerRef} className="threads-container" {...rest} />;
 };
