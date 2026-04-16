@@ -3319,32 +3319,6 @@ function App() {
         compactMode: false
     })
 
-    // --- BHARAT MACRO-WEB: NEURAL VIBE STATE ---
-    const [neuralVibe, setNeuralVibe] = useState({
-        color: [0.4, 0.2, 0.8], // Institutional Purple
-        amplitude: 1.0,
-        distance: 0.2
-    });
-
-    const syncBackground = (vibe) => {
-        // Handle hex string to RGB conversion if needed
-        let targetColor = vibe.color;
-        if (typeof targetColor === 'string' && targetColor.startsWith('#')) {
-            const r = parseInt(targetColor.slice(1, 3), 16) / 255;
-            const g = parseInt(targetColor.slice(3, 5), 16) / 255;
-            const b = parseInt(targetColor.slice(5, 7), 16) / 255;
-            targetColor = [r, g, b];
-        } else if (!targetColor) {
-            targetColor = [0.4, 0.2, 0.8]; // Reset to default
-        }
-
-        setNeuralVibe({
-            color: targetColor,
-            amplitude: vibe.amplitude || 1.0,
-            distance: vibe.distance !== undefined ? vibe.distance : 0.2
-        });
-    };
-
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -4697,16 +4671,8 @@ const FintechBadges = ({ labels }) => {
                 );
             case 'insights':
                 return (
-                    <div className="view-content dashboard-view" key={view} style={{ position: 'relative', overflowY: 'auto' }}>
-                        <div className="dashboard-neural-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 0.4 }}>
-                            <Threads 
-                                color={neuralVibe.color}
-                                amplitude={neuralVibe.amplitude}
-                                distance={neuralVibe.distance}
-                                lineCount={chatSettings.performanceMode ? 12 : 18}
-                            />
-                        </div>
-                        <IntelligenceInsightsReport onDeepDive={handleDeepDive} syncBackground={syncBackground} />
+                    <div className="view-content dashboard-view" key={view} style={{ overflowY: 'auto' }}>
+                        <IntelligenceInsightsReport onDeepDive={handleDeepDive} />
                     </div>
                 );
             case 'trends':
@@ -4737,16 +4703,8 @@ const FintechBadges = ({ labels }) => {
                 )
             case 'market-pulse':
                 return (
-                    <div className="view-content dashboard-view" key={view} style={{ position: 'relative', overflowY: 'auto' }}>
-                        <div className="dashboard-neural-bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none', opacity: 0.4 }}>
-                            <Threads 
-                                color={neuralVibe.color}
-                                amplitude={neuralVibe.amplitude}
-                                distance={neuralVibe.distance}
-                                lineCount={chatSettings.performanceMode ? 12 : 18}
-                            />
-                        </div>
-                        <MarketPulseDashboard syncBackground={syncBackground} />
+                    <div className="view-content dashboard-view" key={view} style={{ overflowY: 'auto' }}>
+                        <MarketPulseDashboard />
                     </div>
                 );
             case 'settings':

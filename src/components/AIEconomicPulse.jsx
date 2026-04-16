@@ -2,14 +2,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Activity, TrendingUp, BarChart3, Globe, Sparkles, Zap } from 'lucide-react';
 
-const AIEconomicPulse = ({ syncBackground }) => {
+const AIEconomicPulse = () => {
     return (
         <motion.div
             className="pulse-card"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            onMouseLeave={() => syncBackground && syncBackground({ color: '#8b5cf6', amplitude: 1.0, distance: 0.2 })}
             style={{
                 background: 'rgba(255, 255, 255, 0.02)',
                 border: '1px solid rgba(255, 255, 255, 0.05)',
@@ -50,8 +49,7 @@ const AIEconomicPulse = ({ syncBackground }) => {
                 ].map((stat, i) => (
                     <motion.div 
                         key={i} 
-                        style={{ padding: '1.5rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid rgba(255, 255, 255, 0.03)', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)', cursor: 'pointer' }}
-                        onMouseEnter={() => syncBackground && syncBackground({ color: stat.color, amplitude: 1.5, distance: 0.5 })}
+                        style={{ padding: '1.5rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid rgba(255, 255, 255, 0.03)', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)' }}
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>

@@ -4,7 +4,7 @@ import { Sparkles, Newspaper, TrendingUp, TrendingDown, ChevronRight, Zap, Targe
 import { fetchInsightRegistry } from '../lib/MarketData';
 import { fetchNiftySectors } from '../lib/DashboardData';
 
-const IntelligenceInsightsReport = ({ onDeepDive, syncBackground }) => {
+const IntelligenceInsightsReport = ({ onDeepDive }) => {
     const [data, setData] = useState(null);
     const [sectors, setSectors] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -110,9 +110,7 @@ const IntelligenceInsightsReport = ({ onDeepDive, syncBackground }) => {
                 <div style={{ position: 'relative', zIndex: 10 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
                         <div 
-                            onMouseEnter={() => syncBackground && syncBackground({ color: '#d946ef', amplitude: 2.0, distance: 0.4 })}
-                            onMouseLeave={() => syncBackground && syncBackground()}
-                            style={{ background: 'var(--accent-primary)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, color: 'white', letterSpacing: '1px', cursor: 'pointer' }}
+                            style={{ background: 'var(--accent-primary)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, color: 'white', letterSpacing: '1px' }}
                         >
                             ELITE INSIGHT
                         </div>
@@ -120,9 +118,7 @@ const IntelligenceInsightsReport = ({ onDeepDive, syncBackground }) => {
                     </div>
                     
                     <h2 
-                        onMouseEnter={() => syncBackground && syncBackground({ color: '#c084fc', amplitude: 1.8, distance: 0.3 })}
-                        onMouseLeave={() => syncBackground && syncBackground()}
-                        style={{ fontSize: isMobile ? '1.8rem' : '3rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, maxWidth: '800px', cursor: 'default' }}
+                        style={{ fontSize: isMobile ? '1.8rem' : '3rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, maxWidth: '800px' }}
                     >
                         {data.hero.title.split(':').map((part, i) => i === 1 ? <span key={i} style={{ color: 'var(--accent-primary)' }}>{part}</span> : part)}
                     </h2>
