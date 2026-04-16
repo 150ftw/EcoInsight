@@ -33,15 +33,7 @@ function apiServerPlugin(env) {
           }
         }
 
-        // --- DYNAMIC ROUTE SUPPORT ([action].js) ---
-        if (!foundFile && filePath.startsWith('auth/')) {
-          const action = filePath.split('/')[1];
-          const dynamicFile = 'api/auth/[action].js';
-          if (fs.existsSync(path.resolve(process.cwd(), dynamicFile))) {
-             foundFile = path.resolve(process.cwd(), dynamicFile);
-             queryParams.action = action; // Inject the dynamic segment as a query param
-          }
-        }
+        // --- END API DISCOVERY ---
 
         if (!foundFile) {
           console.warn(`[API Proxy] No file found for ${req.url}`);

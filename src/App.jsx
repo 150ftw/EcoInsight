@@ -4071,7 +4071,7 @@ IMPORTANT OVERRIDE RULES FOR PDF:
             }
             // Decrement credits on server
             try {
-                const creditRes = await axios.post('/api/auth/decrement-credits');
+                const creditRes = await axios.post('/api/auth?action=decrement-credits');
                 setProfile(prev => ({ ...prev, credits: creditRes.data.credits }));
             } catch (err) {
                 console.error("Failed to decrement credits:", err);

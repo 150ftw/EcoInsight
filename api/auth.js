@@ -24,21 +24,21 @@ const APPLE_PRIVATE_KEY = process.env.APPLE_ID_PRIVATE_KEY;
 function getCallbackUrl(req) {
   if (process.env.VITE_APP_URL) {
     const baseUrl = process.env.VITE_APP_URL.replace(/\/+$/, '');
-    return `${baseUrl}/api/auth/google-callback`;
+    return `${baseUrl}/api/auth?action=google-callback`;
   }
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const host = req.headers.host || 'localhost:5173';
-  return `${protocol}://${host}/api/auth/google-callback`;
+  return `${protocol}://${host}/api/auth?action=google-callback`;
 }
 
 function getAppleCallbackUrl(req) {
   if (process.env.VITE_APP_URL) {
     const baseUrl = process.env.VITE_APP_URL.replace(/\/+$/, '');
-    return `${baseUrl}/api/auth/apple-callback`;
+    return `${baseUrl}/api/auth?action=apple-callback`;
   }
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const host = req.headers.host || 'localhost:5173';
-  return `${protocol}://${host}/api/auth/apple-callback`;
+  return `${protocol}://${host}/api/auth?action=apple-callback`;
 }
 
 /**

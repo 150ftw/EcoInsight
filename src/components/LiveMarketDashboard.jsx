@@ -245,7 +245,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
     }
 
     return (
-        <motion.div className="dashboard-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} key={syncKey}>
+        <motion.div className="dashboard-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} key={syncState.count}>
 
 
             <header className="dashboard-header">

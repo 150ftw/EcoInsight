@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     }
     
     try {
-      const res = await axios.get('/api/auth/me');
+      const res = await axios.get('/api/auth?action=me');
       setUser(res.data.user);
     } catch (err) {
       setUser(null);
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
   const checkUser = async (email) => {
     if (IS_LOCALHOST) return { exists: true, provider: 'password' };
     
-    const res = await axios.post('/api/auth/check-user', { email });
+    const res = await axios.post('/api/auth?action=check-user', { email });
     return res.data; // { exists: boolean, provider: string }
   };
 
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
       return { user: MOCK_USER };
     }
     
-    const res = await axios.post('/api/auth/login', { email, password });
+    const res = await axios.post('/api/auth?action=login', { email, password });
     setUser(res.data.user);
     return res.data;
   };
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
       return { user: MOCK_USER };
     }
     
-    const res = await axios.post('/api/auth/signup', { firstName, lastName, email, password });
+    const res = await axios.post('/api/auth?action=signup', { firstName, lastName, email, password });
     setUser(res.data.user);
     return res.data;
   };
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     
-    await axios.post('/api/auth/logout');
+    await axios.post('/api/auth?action=logout');
     setUser(null);
     window.location.href = '/';
   };
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
       setUser(MOCK_USER);
       return;
     }
-    window.location.href = '/api/auth/google';
+    window.location.href = '/api/auth?action=google';
   };
 
   
@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }) => {
       return { user: updatedUser };
     }
     
-    const res = await axios.post('/api/auth/update-profile', profileData);
+    const res = await axios.post('/api/auth?action=update-profile', profileData);
     setUser(res.data.user);
     return res.data;
   };
@@ -114,19 +114,19 @@ export const AuthProvider = ({ children }) => {
   const updatePassword = async (newPassword) => {
     if (IS_LOCALHOST) return { success: true };
     
-    const res = await axios.post('/api/auth/update-password', { newPassword });
+    const res = await axios.post('/api/auth?action=update-password', { newPassword });
     return res.data;
   };
 
   const requestPasswordReset = async (email) => {
     if (IS_LOCALHOST) return { message: 'Reset link generated (Mock)' };
-    const res = await axios.post('/api/auth/forgot-password', { email });
+    const res = await axios.post('/api/auth?action=forgot-password', { email });
     return res.data;
   };
 
   const resetPassword = async (token, newPassword) => {
     if (IS_LOCALHOST) return { message: 'Password reset successful (Mock)' };
-    const res = await axios.post('/api/auth/reset-password', { token, newPassword });
+    const res = await axios.post('/api/auth?action=reset-password', { token, newPassword });
     return res.data;
   };
 
