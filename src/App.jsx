@@ -158,18 +158,28 @@ const ThinkingIndicator = ({ appearance }) => {
 };
 
 const FAST_GREETINGS = {
+    // English
     'how are you': 'I am performing at peak efficiency, synchronized with Bharat\'s market shifts. Ready for your intelligence deep-dive.',
     'hi': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
     'hello': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
     'hey': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
     'heyya': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
-    'ya': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
     'yo': 'Welcome back, Analyst. My neural links are active. What sector are we analyzing today?',
     'who are you': 'I am Eko, your institutional-grade Economic Intelligence engine, designed to decode complex financial dynamics.',
     'what can you do': 'I can analyze market trends, simulate economic scenarios, and provide institutional-grade intelligence across equities, macro data, and sectoral shifts.',
     'good morning': 'Good morning, Analyst. The markets are waking up. Ready to decode the early signals?',
     'good afternoon': 'Good afternoon, Analyst. Intelligence feeds are live. What deep-dive shall we initiate?',
-    'good evening': 'Good evening, Analyst. Markets may be closed, but the intelligence flow never stops. Reviewing today\'s shifts?'
+    'good evening': 'Good evening, Analyst. Markets may be closed, but the intelligence flow never stops. Reviewing today\'s shifts?',
+    
+    // Hindi / Hinglish Mirrored
+    'namaste': 'Namaste! Bharat ke markets live hain. Aaj kis sector ka mood check karein?',
+    'kaise ho': 'Ekdam mast! Sab systems active hain. Nifty ka haal dekhein ya portfolio discuss karein?',
+    'kya hal chal': 'Sab badhiya hai! Intelligence engine full speed par hai. Batao, aaj market mein kya chal raha hai?',
+    'kya haal chal': 'Sab badhiya hai! Intelligence engine full speed par hai. Batao, aaj market mein kya chal raha hai?',
+    'aur bhai': 'Mast bhai! 😎 Tu bata, market ka kya scene hai? Kuch deep-dive karein aaj?',
+    'kya scene hai': 'Market ka scene kaafi interesting hai! Data synchronization complete hai. Batao, kya analyze karein?',
+    'ram ram': 'Ram Ram! Markets active hain aur data ingest ho raha hai. Kya help chahiye aaj?',
+    'sat sri akal': 'Sat Sri Akal! System synchronized hai. Market analysis shuru karein?'
 };
 
 const SourceCard = ({ source }) => {
