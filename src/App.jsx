@@ -4767,7 +4767,23 @@ const parseResponseWithProbes = (content) => {
                                         disabled={isLoading || isUploading}
                                         rows="1"
                                     />
-                                    <div className="input-actions">
+                                    <div className="input-actions" style={{ display: 'flex', alignItems: 'center' }}>
+                                        <div className="mini-fidelity-toggle">
+                                            <div 
+                                                className={`mini-toggle-option high ${!chatSettings.performanceMode ? 'active' : ''}`}
+                                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: false }))}
+                                                title="High Fidelity Neural Synthesis"
+                                            >
+                                                <Sparkles size={14} /> <span>HIGH</span>
+                                            </div>
+                                            <div 
+                                                className={`mini-toggle-option eco ${chatSettings.performanceMode ? 'active' : ''}`}
+                                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: true }))}
+                                                title="Eco Mode: High-Speed Bypass"
+                                            >
+                                                <Zap size={14} /> <span>ECO</span>
+                                            </div>
+                                        </div>
                                         <button className={`send-button ${input.trim() ? 'active' : ''}`} onClick={() => handleSend()} disabled={isLoading || isUploading || !input.trim()}>
                                             {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
                                         </button>
@@ -4937,46 +4953,6 @@ const parseResponseWithProbes = (content) => {
                         {isMobile && <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}><X size={20} /></button>}
                     </div>
 
-                    {/* Tactical Fidelity Controller (v2) */}
-                    <motion.div 
-                        className="fidelity-puck"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                    >
-                        <div className="puck-header">
-                            <div className="puck-branding">
-                                <div className="puck-label">System Fidelity</div>
-                                <div className="puck-status-text" style={{ color: chatSettings.performanceMode ? '#f59e0b' : '#c084fc' }}>
-                                    {chatSettings.performanceMode ? 'HIGH-SPEED BYPASS: ACTIVE' : 'NEURAL SYNTHESIS: MAX'}
-                                </div>
-                            </div>
-                            <div className={`pill-dot ${chatSettings.performanceMode ? 'eco' : 'high'}`} style={{ 
-                                background: chatSettings.performanceMode ? '#f59e0b' : '#8b5cf6',
-                                boxShadow: chatSettings.performanceMode ? '0 0 10px #f59e0b' : '0 0 10px #8b5cf6'
-                            }} />
-                        </div>
-
-                        <div className="fidelity-selector">
-                            <motion.div 
-                                className={`selector-slider ${chatSettings.performanceMode ? 'puck-glow-eco' : 'puck-glow-high'}`}
-                                animate={{ x: chatSettings.performanceMode ? '100%' : '0%' }}
-                                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            />
-                            <div 
-                                className={`selector-option ${!chatSettings.performanceMode ? 'active' : ''}`}
-                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: false }))}
-                            >
-                                <Sparkles size={12} /> <span>HIGH</span>
-                            </div>
-                            <div 
-                                className={`selector-option ${chatSettings.performanceMode ? 'active' : ''}`}
-                                onClick={() => setChatSettings(prev => ({ ...prev, performanceMode: true }))}
-                            >
-                                <Zap size={12} /> <span>ECO</span>
-                            </div>
-                        </div>
-                    </motion.div>
 
                     <nav className="sidebar-nav">
                         <div className="sidebar-section">
