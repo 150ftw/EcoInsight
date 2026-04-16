@@ -40,10 +40,16 @@
     --glass-saturate: 100%;
 }
 
-/* Snappy UI for Eco Mode - Except for Tickers which must remain readable */
-.performance-low *:not(.ticker-track):not(.ticker-track *) {
+/* Snappy UI for Eco Mode */
+.performance-low * {
     transition-duration: 0.1s !important;
     animation-duration: 0.1s !important;
+}
+
+/* Hide Tickers in Eco Mode for maximum efficiency as requested */
+.performance-low .bloomberg-ticker,
+.performance-low .market-ticker-container {
+    display: none !important;
 }
 
 /* Light Theme Overrides */
