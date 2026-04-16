@@ -3,14 +3,14 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { Resend } from 'resend';
-import { supabase } from '../lib/db.js';
+import { supabase } from './lib/db.js';
 import { 
   signToken, 
   verifyToken, 
   setAuthCookie, 
   clearAuthCookie, 
   getAuthToken 
-} from '../lib/auth-util.js';
+} from './lib/auth-util.js';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || process.env.VITE_GOOGLE_CLIENT_SECRET;
