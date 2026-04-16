@@ -85,7 +85,7 @@ const EkoSparkle = ({ size = 24, className = "", animate = false, cinematic = fa
 }
 
 
-const ThinkingIndicator = ({ appearance }) => {
+const ThinkingIndicator = ({ appearance, performanceMode }) => {
   const [seconds, setSeconds] = useState(0);
   const [step, setStep] = useState(0);
   const [activeSteps, setActiveSteps] = useState([]);
@@ -131,6 +131,44 @@ const ThinkingIndicator = ({ appearance }) => {
   }, []);
 
   if (activeSteps.length === 0) return null;
+
+  if (performanceMode) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '8px 4px',
+          color: 'var(--text-secondary)'
+        }}
+      >
+        <motion.div
+           animate={{ 
+             scale: [1, 1.2, 1],
+             opacity: [0.5, 1, 0.5]
+           }}
+           transition={{ 
+             duration: 2, 
+             repeat: Infinity,
+             ease: "easeInOut"
+           }}
+        >
+          <EkoSparkle size={18} color="#8b5cf6" />
+        </motion.div>
+        <motion.span 
+          style={{ fontSize: '0.85rem', fontWeight: 500, letterSpacing: '0.02em' }}
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          Eko is thinking...
+        </motion.span>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div 
@@ -4464,7 +4502,7 @@ const FintechBadges = ({ labels }) => {
                                                         <EkoSparkle size={20} />
                                                     </div>
                                                     <div className="message-container">
-                                                        <ThinkingIndicator appearance={appearance} />
+                                                        <ThinkingIndicator appearance={appearance} performanceMode={performanceMode} />
                                                     </div>
                                                 </div>
                                             );
