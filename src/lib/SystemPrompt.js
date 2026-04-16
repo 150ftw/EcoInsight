@@ -32,10 +32,11 @@ export const generateSystemPrompt = (chatSettings, currentPdfText = '') => {
 ${chatSettings.performanceMode ? `
 - MODE: ECO (Tactical Bypass)
 - OBJECTIVE: Extreme conciseness. Use crisp bullet points. 
-- SENTINEL QUALITY: Even if brief, provide high-alpha, non-obvious second-order effects.
+- RESTRICTION: NEVER generate charts or sentinel matrices. Provide text-only intelligence.
 ` : `
 - MODE: HIGH (Neural Synthesis)
 - OBJECTIVE: Institutional-grade analytical depth. CIO-level reporting.
+- REQUIREMENT: Use charts and sentinel matrices for catalyst-driven scenario modeling.
 `}
 
 [OUTPUT ARCHITECTURE]
