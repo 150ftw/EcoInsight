@@ -489,7 +489,6 @@ export const parseChartBlocks = (text) => {
                 } else {
                     parts.push({ type: 'text', content: match[0] });
                 }
- Riverside: 
             } catch (e) {
                 console.warn('Chart parsing failed after sanitation:', e);
                 // Parsing failed (not valid JSON), fallback to text
