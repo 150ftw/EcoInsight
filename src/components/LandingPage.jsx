@@ -505,7 +505,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                         amplitude={threadQuality.amplitude} 
                         distance={0.2} 
                         enableMouseInteraction={false} 
-                        color={[0.4, 0.2, 0.8]} 
+                        isTricolor={true}
                         lineCount={threadQuality.lineCount}
                     />
                 </div>

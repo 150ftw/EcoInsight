@@ -21,12 +21,18 @@ uniform float uAmplitude;
 uniform float uDistance;
 uniform vec2 uMouse;
 uniform int uLineCount;
+uniform int iTricolor;
 
 #define PI 3.1415926538
 #define MAX_LINES 25
 
 const float u_line_width = 5.0;
 const float u_line_blur = 8.0;
+
+// Indian Flag Colors
+const vec3 saffron = vec3(1.0, 0.603, 0.2);
+const vec3 white = vec3(1.0, 1.0, 1.0);
+const vec3 green = vec3(0.07, 0.533, 0.031);
 
 float Perlin2D(vec2 P) {
     vec2 Pi = floor(P);
@@ -95,11 +101,14 @@ float lineFn(vec2 st, float width, float perc, float offset, vec2 mouse, float t
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
 
-    float line_strength = 1.0;
+    vec3 totalColor = vec3(0.0);
+    float totalAlpha = 0.0;
+    
     for (int i = 0; i < MAX_LINES; i++) {
         if (i >= uLineCount) break;
         float p = float(i) / float(uLineCount);
-        line_strength *= (1.0 - lineFn(
+        
+        float strength = lineFn(
             uv,
             u_line_width * pixel(1.0, iResolution.xy) * (1.0 - p),
             p,
@@ -108,11 +117,20 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
             iTime,
             uAmplitude,
             uDistance
-        ));
+        );
+
+        vec3 lineColor = uColor;
+        if (iTricolor == 1) {
+            if (p < 0.33) lineColor = saffron;
+            else if (p < 0.66) lineColor = white;
+            else lineColor = green;
+        }
+
+        totalColor += lineColor * strength * (1.0 - totalAlpha);
+        totalAlpha += strength * (1.0 - totalAlpha);
     }
 
-    float colorVal = 1.0 - line_strength;
-    fragColor = vec4(uColor * colorVal, 1.0);
+    fragColor = vec4(totalColor, 1.0);
 }
 
 void main() {
@@ -120,7 +138,7 @@ void main() {
 }
 `;
 
-const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseInteraction = false, lineCount = 18, ...rest }) => {
+const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseInteraction = false, lineCount = 18, isTricolor = false, ...rest }) => {
   const containerRef = useRef(null);
   const animationFrameId = useRef();
 
@@ -128,13 +146,15 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
     const targetColorRef = useRef(new Color(...color));
     const targetAmplitudeRef = useRef(amplitude);
     const targetDistanceRef = useRef(distance);
+    const tricolorRef = useRef(isTricolor ? 1 : 0);
 
     // Update targets when props change
     useEffect(() => {
         targetColorRef.current.set(...color);
         targetAmplitudeRef.current = amplitude;
         targetDistanceRef.current = distance;
-    }, [color, amplitude, distance]);
+        tricolorRef.current = isTricolor ? 1 : 0;
+    }, [color, amplitude, distance, isTricolor]);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -168,7 +188,8 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
             uAmplitude: { value: amplitude },
             uDistance: { value: distance },
             uMouse: { value: new Float32Array([0.5, 0.5]) },
-            uLineCount: { value: lineCount }
+            uLineCount: { value: lineCount },
+            iTricolor: { value: isTricolor ? 1 : 0 }
           }
         });
 
@@ -210,6 +231,7 @@ const Threads = ({ color = [1, 1, 1], amplitude = 1, distance = 0, enableMouseIn
           
           program.uniforms.uAmplitude.value += (targetAmplitudeRef.current - program.uniforms.uAmplitude.value) * lerpSpeed;
           program.uniforms.uDistance.value += (targetDistanceRef.current - program.uniforms.uDistance.value) * lerpSpeed;
+          program.uniforms.iTricolor.value = tricolorRef.current;
 
           if (enableMouseInteraction) {
             const mouseSmoothing = 0.05;
