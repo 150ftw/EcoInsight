@@ -562,44 +562,48 @@ body {
 }
 
 .user-menu-trigger {
-    display: flex !important;
+    display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 6px 12px 6px 8px;
+    gap: 0.7rem;
+    padding: 4px 12px 4px 5px;
     border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 44px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     z-index: 1101;
-    white-space: nowrap !important;
+    white-space: nowrap;
+    /* Remove rigid height to allow natural centering */
+    min-height: 40px;
 }
 
 .user-menu-trigger.compact {
-    padding: 6px !important;
-    width: 44px !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 .user-menu-trigger.active {
-    background: rgba(255, 255, 255, 0.12) !important;
-    border-color: var(--accent-primary) !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.1);
 }
 
 .user-menu-trigger:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
 }
 
 .user-menu-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50% !important;
-    overflow: hidden !important;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -608,16 +612,17 @@ body {
 }
 
 .user-menu-avatar img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .user-menu-name {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-primary);
-    opacity: 0.9;
+    opacity: 0.95;
+    letter-spacing: -0.1px;
 }
 
 .user-menu-chevron {
