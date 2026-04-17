@@ -4279,12 +4279,14 @@ html {
 }
 
 .avatar-url-input input {
-    background: transparent;
-    border: none;
-    color: white;
+    background: transparent !important;
+    border: none !important;
+    color: white !important;
     font-size: 0.85rem;
     width: 100%;
     outline: none;
+    padding: 0 !important;
+    box-shadow: none !important;
 }
 
 .avatar-url-input svg {
