@@ -157,7 +157,16 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
             if (watchlistSymbols.length > 0) {
                 const { range, interval } = getTimeframeParams(chartTimeframe);
                 const watchData = await Promise.all(watchlistSymbols.map(s => fetchHistory(s, range, interval, force)));
-                setUserWatchlist(watchData.filter(d => d !== null));
+                const validWatchData = watchData.filter(d => d !== null);
+                setUserWatchlist(validWatchData);
+                
+                // Auto-select first watchlist item if nothing is selected
+                if (validWatchData.length > 0 && !selectedAsset) {
+                    handleAssetChange(validWatchData[0]);
+                }
+            } else if (glo && glo.length > 0 && !selectedAsset) {
+                // Fallback to first Indian Bluechip if no watchlist
+                handleAssetChange(glo[0]);
             }
 
             setLastUpdated(new Date());
