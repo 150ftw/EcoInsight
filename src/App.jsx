@@ -4628,61 +4628,25 @@ const FintechBadges = ({ labels }) => {
                                     {rateLimitActive && (
                                         <motion.div
                                             key="rate-limit"
-                                            className="rate-limit-warning"
-                                            initial={{ opacity: 0, y: 10 }}
+                                            className="rate-limit-capsule"
+                                            initial={{ opacity: 0, y: 15 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 10 }}
-                                            style={{
-                                                position: 'absolute',
-                                                top: '-45px',
-                                                left: '50%',
-                                                transform: 'translateX(-50%)',
-                                                background: 'rgba(239, 68, 68, 0.2)',
-                                                color: '#ef4444',
-                                                padding: '4px 12px',
-                                                borderRadius: '20px',
-                                                fontSize: '0.75rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '6px',
-                                                border: '1px solid rgba(239, 68, 68, 0.3)',
-                                                backdropFilter: 'blur(8px)',
-                                                zIndex: 100,
-                                                whiteSpace: 'nowrap'
-                                            }}
                                         >
-                                            <AlertCircle size={12} /> Please wait 5 seconds between messages.
+                                            <AlertCircle size={isMobile ? 12 : 14} /> 
+                                            <span>Please wait 5s</span>
                                         </motion.div>
                                     )}
                                     {showUploadSoon && (
                                         <motion.div
                                             key="upload-soon"
-                                            className="rate-limit-warning"
+                                            className="rate-limit-capsule"
                                             initial={{ opacity: 0, y: 15 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 10 }}
-                                            style={{
-                                                position: 'absolute',
-                                                top: '-55px',
-                                                left: '50%',
-                                                transform: 'translateX(-50%)',
-                                                background: 'rgba(139, 92, 246, 0.3)',
-                                                color: '#c084fc',
-                                                padding: '8px 16px',
-                                                borderRadius: '24px',
-                                                fontSize: '0.8rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '8px',
-                                                border: '1px solid rgba(139, 92, 246, 0.4)',
-                                                backdropFilter: 'blur(16px)',
-                                                zIndex: 105,
-                                                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                                                whiteSpace: 'nowrap'
-                                            }}
                                         >
-                                            <Zap size={14} className="text-purple-400" />
-                                            <span>Pro Feature: File Analysis coming in next update</span>
+                                            <Zap size={isMobile ? 12 : 14} className="text-purple-400" />
+                                            <span>{isMobile ? 'Pro: File Analysis' : 'Pro Feature: File Analysis coming soon'}</span>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
