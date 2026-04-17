@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useId, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, ChevronUp, Database, CheckCircle2, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft, Headphones } from 'lucide-react'
+import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, ChevronUp, Database, CheckCircle2, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft, Headphones, Plus, Mic } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { streamMessage, groundMessageWithData } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
@@ -4464,45 +4464,26 @@ const FintechBadges = ({ labels }) => {
                             <div style={{ flex: 1 }} />
                             {messages.length === 1 ? (
                                 <motion.div
-                                    className="empty-chat-hero"
-                                    initial="hidden"
-                                    animate="visible"
-                                    variants={{
-                                        hidden: { opacity: 0 },
-                                        visible: {
-                                            opacity: 1,
-                                            transition: { staggerChildren: 0.1, delayChildren: 0.05 }
-                                        }
-                                    }}
+                                    className="claude-empty-state"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                                 >
-                                    <motion.div
-                                        className="empty-chat-greeting"
-                                        variants={{
-                                            hidden: { opacity: 0, y: 40, scale: 0.95 },
-                                            visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-                                        }}
-                                    >
-                                        <EkoSparkle size={36} />
-                                        <span className="greeting-name">Hi {(profile?.name || user?.first_name || 'There').split(' ')[0]}</span>
-                                    </motion.div>
-                                    <motion.div
-                                        className="empty-chat-headline"
-                                        variants={{
-                                            hidden: { opacity: 0, y: 40, scale: 0.95 },
-                                            visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-                                        }}
-                                    >
-                                        Where should we start?
-                                    </motion.div>
-
+                                    <div className="claude-hero-icon">
+                                        <EkoSparkle size={48} color="#8b5cf6" animate={true} />
+                                    </div>
+                                    <h2 className="claude-hero-greeting">
+                                        How can I help you, {(profile?.name || user?.first_name || 'Analyst').split(' ')[0]}?
+                                    </h2>
+                                    
                                     <motion.div
                                         className="suggestion-chips"
-                                        variants={{
-                                            hidden: { opacity: 0, y: 40, scale: 0.95 },
-                                            visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-                                        }}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                        style={{ marginTop: '1rem' }}
                                     >
-                                        {FAQS.map((faq, idx) => (
+                                        {FAQS.slice(0, 3).map((faq, idx) => (
                                             <button key={idx} className="suggestion-chip" onClick={() => handleSend(faq.text)} disabled={isLoading}>
                                                 {faq.icon} <span>{faq.text}</span>
                                             </button>
@@ -4669,11 +4650,11 @@ const FintechBadges = ({ labels }) => {
                                             setTimeout(() => setShowUploadSoon(false), 3000);
                                         }}
                                     >
-                                        <FilePlus size={20} />
+                                        {isMobile ? <Plus size={22} color="rgba(255,255,255,0.5)" /> : <FilePlus size={20} />}
                                     </motion.button>
                                     <textarea
                                         className="chat-textarea"
-                                        placeholder={pdfText ? "Document analyzed. Ask anything about it..." : "What's on your mind today?"}
+                                        placeholder={isMobile ? "Message Eko..." : (pdfText ? "Document analyzed. Ask anything about it..." : "What's on your mind today?")}
                                         value={input}
                                         onChange={(e) => {
                                             setInput(e.target.value);
@@ -4689,18 +4670,30 @@ const FintechBadges = ({ labels }) => {
                                         disabled={isLoading || isUploading}
                                         rows="1"
                                     />
-                                    <div className="input-actions" style={{ display: 'flex', alignItems: 'center' }}>
-                                        <ModelSelector 
-                                            performanceMode={chatSettings.performanceMode} 
-                                            setPerformanceMode={(mode) => setChatSettings(prev => ({ ...prev, performanceMode: mode }))} 
-                                        />
+                                    <div className="input-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        {isMobile && !input.trim() && (
+                                            <motion.button
+                                                whileTap={{ scale: 0.9 }}
+                                                style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', padding: '4px' }}
+                                            >
+                                                <Mic size={20} />
+                                            </motion.button>
+                                        )}
+                                        
+                                        {!isMobile && (
+                                            <ModelSelector 
+                                                performanceMode={chatSettings.performanceMode} 
+                                                setPerformanceMode={(mode) => setChatSettings(prev => ({ ...prev, performanceMode: mode }))} 
+                                            />
+                                        )}
+                                        
                                         <button className={`send-button ${input.trim() ? 'active' : ''}`} onClick={() => handleSend()} disabled={isLoading || isUploading || !input.trim()}>
                                             {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
                                         </button>
                                     </div>
                                 </div>
                             </motion.div>
-                            <p className="input-footer">Eko by EcoInsight – Professional Economic Analysis & Intelligence</p>
+                            {!isMobile && <p className="input-footer">Eko by EcoInsight – Professional Economic Analysis & Intelligence</p>}
                         </div>
                     </div>
                 );
@@ -4844,7 +4837,10 @@ const FintechBadges = ({ labels }) => {
                     <MobileHeader 
                         onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
                         isOpen={isSidebarOpen} 
-                        activeView={view} 
+                        activeView={view}
+                        user={user}
+                        performanceMode={chatSettings.performanceMode}
+                        setPerformanceMode={(mode) => setChatSettings(prev => ({ ...prev, performanceMode: mode }))}
                     />
                 )}
                 <aside
