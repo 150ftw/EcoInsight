@@ -4463,6 +4463,7 @@ const FintechBadges = ({ labels }) => {
                         >
                             <div style={{ flex: 1 }} />
                             {messages.length === 1 ? (
+                                 isMobile ? (
                                 <motion.div
                                     className="claude-empty-state"
                                     initial={{ opacity: 0, y: 20 }}
@@ -4490,6 +4491,54 @@ const FintechBadges = ({ labels }) => {
                                         ))}
                                     </motion.div>
                                 </motion.div>
+                                 ) : (
+                                     <motion.div
+                                         className="empty-chat-hero"
+                                         initial="hidden"
+                                         animate="visible"
+                                         variants={{
+                                             hidden: { opacity: 0 },
+                                             visible: {
+                                                 opacity: 1,
+                                                 transition: { staggerChildren: 0.1, delayChildren: 0.05 }
+                                             }
+                                         }}
+                                     >
+                                         <motion.div
+                                             className="empty-chat-greeting"
+                                             variants={{
+                                                 hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                                 visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                             }}
+                                         >
+                                             <EkoSparkle size={36} />
+                                             <span className="greeting-name">Hi {(profile?.name || user?.first_name || "There").split(" ")[0]}</span>
+                                         </motion.div>
+                                         <motion.div
+                                             className="empty-chat-headline"
+                                             variants={{
+                                                 hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                                 visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                             }}
+                                         >
+                                             Where should we start?
+                                         </motion.div>
+                                         <motion.div
+                                             className="suggestion-chips"
+                                             variants={{
+                                                 hidden: { opacity: 0, y: 40, scale: 0.95 },
+                                                 visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                             }}
+                                         >
+                                             {FAQS.map((faq, idx) => (
+                                                 <button key={idx} className="suggestion-chip" onClick={() => handleSend(faq.text)} disabled={isLoading}>
+                                                     {faq.icon} <span>{faq.text}</span>
+                                                 </button>
+                                             ))}
+                                         </motion.div>
+                                     </motion.div>
+                                 )
+
                             ) : (
                                 <AnimatePresence initial={false}>
                                     {messages.map((msg, i) => {
