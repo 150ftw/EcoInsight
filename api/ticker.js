@@ -24,13 +24,15 @@ export default async function handler(req, res) {
   }
 
   // --- STAGE 0: SERVER-SIDE CACHE CHECK ---
-  // Bypass cache if ?force=true is provided to allow fresh scraping during volatility
+  // Bypass cache if ?force=true is provided
+  const cacheKey = `ticker_${symbol}_${range}_${interval}`;
+  
   if (supabase && !isForceMatch) {
     try {
       const { data: cached, error: cacheErr } = await supabase
         .from('market_cache')
         .select('data, expires_at')
-        .eq('cache_key', `ticker_${symbol}`)
+        .eq('cache_key', cacheKey)
         .maybeSingle();
 
       if (!cacheErr && cached && new Date(cached.expires_at) > new Date()) {
@@ -70,51 +72,53 @@ export default async function handler(req, res) {
 
   try {
     // --- STAGE 1: GOOGLE SEARCH TITLE/SNIPPET SCRAPER ---
-    try {
-      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery + ' google finance')}`;
-      const googleRes = await fetch(googleUrl, { 
-        headers: HUMAN_HEADERS,
-        timeout: 5000 // 5s timeout to prevent hanging
-      });
-      
-      if (googleRes.ok) {
-        const html = await googleRes.text();
-        const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
-        if (titleMatch) {
-          const titleText = titleMatch[1];
-          const pMatch = titleText.match(/([\d,]+\.\d{2})/);
-          if (pMatch) {
-            const scrapedPrice = parseFloat(pMatch[1].replace(/,/g, ''));
-            
-            const basePrices = {
-              'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
-              'USDINR': 83.35, 'EURINR': 90.15,
-              'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 'INFY:NSE': 1480
-            };
-            const base = basePrices[symbol] || basePrices[cleanSymbol];
-            
-            if (base && Math.abs(scrapedPrice - base) / base > 0.8) {
-              console.log(`Plausibility check failed for ${symbol}: Scraped ${scrapedPrice} vs Base ${base}. Falling back.`);
-            } else {
-              price = pMatch[1].replace(/,/g, '');
-              source = 'SEARCH-SYNC v6 (GOOGLE)';
+    // Skip Google Scraper for historical ranges (>1d) to save latency
+    if (range === '1d') {
+      try {
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery + ' google finance')}`;
+        const googleRes = await fetch(googleUrl, { 
+          headers: HUMAN_HEADERS,
+          timeout: 4000 // Tighten timeout to 4s
+        });
+        
+        if (googleRes.ok) {
+          const html = await googleRes.text();
+          const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+          if (titleMatch) {
+            const titleText = titleMatch[1];
+            const pMatch = titleText.match(/([\d,]+\.\d{2})/);
+            if (pMatch) {
+              const scrapedPrice = parseFloat(pMatch[1].replace(/,/g, ''));
               
-              const cMatch = html.match(/([-+]?[\d.]+)%/);
-              if (cMatch) {
-                changePercent = cMatch[1];
+              const basePrices = {
+                'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
+                'USDINR': 83.35, 'EURINR': 90.15,
+                'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 'INFY:NSE': 1480
+              };
+              const base = basePrices[symbol] || basePrices[cleanSymbol];
+              
+              if (base && Math.abs(scrapedPrice - base) / base > 0.8) {
+                console.log(`Plausibility check failed for ${symbol}: Scraped ${scrapedPrice} vs Base ${base}. Falling back.`);
+              } else {
+                price = pMatch[1].replace(/,/g, '');
+                source = 'SEARCH-SYNC v6 (GOOGLE)';
+                
+                const cMatch = html.match(/([-+]?[\d.]+)%/);
+                if (cMatch) {
+                  changePercent = cMatch[1];
+                }
               }
             }
           }
         }
+      } catch (gError) {
+        console.warn(`Search-Sync v6 Stage 1 (Google) Error for ${symbol}:`, gError.message);
       }
-    } catch (gError) {
-      console.warn(`Search-Sync v6 Stage 1 (Google) Error for ${symbol}:`, gError.message);
     }
 
     // --- STAGE 2: YAHOO CHART API FALLBACK & HISTORICAL DATA ---
     let historyData = null;
-    // Always run Stage 2 if we need historical data or a specific range
-    if (price === '---' || range !== '1d' || historyData === null) {
+    if (price === '---' || range !== '1d') {
       try {
         let yahooSymbol = symbol.includes(':') ? symbol.split(':')[0] : symbol;
         if (symbol.endsWith(':NSE') || symbol.endsWith(':NS')) {
@@ -146,7 +150,6 @@ export default async function handler(req, res) {
               source = 'SEARCH-SYNC v6 (YAHOO)';
             }
 
-            // Extract real history for sparkline
             const indicators = result?.indicators?.quote?.[0];
             const timestamps = result?.timestamp;
             if (indicators && (indicators.close || indicators.open) && timestamps) {
@@ -163,9 +166,8 @@ export default async function handler(req, res) {
       }
     }
 
-    // --- STAGE 3: CLOUD FALLBACK (Synthetic Drift) ---
+    // --- STAGE 3: CLOUD FALLBACK ---
     if (price === '---') {
-      // Mock data based on last known stable points for UI continuity
       const basePrices = {
         'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
         'USDINR': 83.35, 'EURINR': 90.15,
@@ -181,14 +183,11 @@ export default async function handler(req, res) {
     const numericPrice = parseFloat(price) || 0;
     const isPositive = parseFloat(changePercent) >= 0;
 
-    // Sparkline Generation for UI
     const sparkline = (historyData && historyData.length > 0) ? historyData : Array.from({ length: 20 }, (_, i) => ({
       time: `${i}:00`,
       price: numericPrice > 0 ? numericPrice - (Math.random() * (numericPrice * 0.002)) + (i * (numericPrice * 0.0001) * (isPositive ? 1 : -1)) : 0
     }));
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Content-Type', 'application/json');
     const responsePayload = {
       symbol: cleanSymbol,
       fullSymbol: symbol,
@@ -198,17 +197,24 @@ export default async function handler(req, res) {
       isPositive,
       sparkline,
       source,
+      range,
+      interval,
       timestamp: new Date().toISOString()
     };
 
-    // --- STAGE 5: SAVE TO CACHE ---
+    // --- STAGE 5: SAVE TO CACHE (Tiered TTL) ---
     if (supabase && price !== '---' && source !== 'SEARCH-SYNC v6 (SYNTHETIC)') {
       try {
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 min TTL
+        // TIERED TTL Logic
+        let ttlMs = 5 * 60 * 1000; // Default 5 mins for 1d
+        if (range === '1w' || range === '1mo') ttlMs = 60 * 60 * 1000; // 1 hour
+        if (range === '1y') ttlMs = 24 * 60 * 60 * 1000; // 24 hours
+        
+        const expiresAt = new Date(Date.now() + ttlMs).toISOString();
         await supabase
           .from('market_cache')
           .upsert({
-            cache_key: `ticker_${symbol}`,
+            cache_key: cacheKey,
             data: responsePayload,
             expires_at: expiresAt
           }, { onConflict: 'cache_key' });

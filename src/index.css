@@ -10379,7 +10379,63 @@ select {
     -webkit-backface-visibility: hidden;
 }
 
-/* --- UNIVERSAL FIDELITY: LAPTOP & ZOOM NORMALIZATION --- */
+/* --- CHART VELOCITY & HUD FIDELITY --- */
+.main-chart-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    pointer-events: none;
+    border-radius: 12px;
+}
+
+.neural-pulse-container {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.neural-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    animation: neural-pulse 1.5s infinite ease-in-out;
+}
+
+.neural-dot:nth-child(2) { animation-delay: 0.2s; }
+.neural-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes neural-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; box-shadow: none; }
+    50% { transform: scale(1.5); opacity: 1; box-shadow: 0 0 10px var(--accent-primary); }
+}
+
+.loading-text {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--accent-primary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px rgba(139, 92, 246, 0.5);
+}
+
+.chart-blur-active {
+    filter: blur(10px) grayscale(0.5);
+    transition: filter 0.4s ease;
+}
+
 @media (max-height: 850px) {
     .landing-hero {
         padding-top: clamp(100px, 12vh, 140px) !important;

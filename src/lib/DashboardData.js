@@ -4,10 +4,20 @@
 const TICKER_API = '/api/ticker?symbol=';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
 
+// In-memory Session Cache for High-Speed Timeframe Switching
+const sessionCache = new Map();
+
 /**
  * Fetch market data for a symbol (Search-Sync v7 Engine)
  */
 export const fetchHistory = async (symbol, range = '1d', interval = '5m', force = false) => {
+    // 1. Session Cache Check (Instant Hit)
+    const cacheKey = `${symbol}_${range}_${interval}`;
+    if (!force && sessionCache.has(cacheKey)) {
+        console.log(`[Cache] Instant Session Hit: ${cacheKey}`);
+        return sessionCache.get(cacheKey);
+    }
+
     try {
         const queryParams = new URLSearchParams({
             symbol,
@@ -29,17 +39,41 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m', force 
             ? (data.price && data.price !== '0' ? data.price : '---')
             : numericPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        return {
+        const result = {
             ...data,
             price: formattedPrice || '---',
             rawPrice: numericPrice || 0,
             changePercent: parseFloat(data.changePercent || 0).toFixed(2),
             isPositive: parseFloat(data.changePercent || 0) >= 0
         };
+
+        // 2. Save to Session Cache
+        if (result && !force) {
+            sessionCache.set(cacheKey, result);
+        }
+
+        return result;
     } catch (e) {
         console.warn(`Ticker fetch failed for ${symbol}:`, e);
         return null;
     }
+};
+
+/**
+ * Background Prefetching for Anticipatory Hydration
+ * Loads secondary timeframes while the user is analyzing the primary chart
+ */
+export const prefetchAssetTimeframes = (symbol) => {
+    const timeframes = [
+        { range: '1w', interval: '15m' },
+        { range: '1mo', interval: '1d' }
+    ];
+    
+    console.log(`[Hydration] Initiating Background Prefetch for ${symbol}`);
+    timeframes.forEach(tf => {
+        // We don't await this, let it run in the background
+        fetchHistory(symbol, tf.range, tf.interval).catch(() => {});
+    });
 };
 
 /**

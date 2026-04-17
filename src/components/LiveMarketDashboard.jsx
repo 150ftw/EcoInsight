@@ -99,6 +99,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
     const [earningsWatch, setEarningsWatch] = useState([]);
     const [marketSentiment, setMarketSentiment] = useState({ score: 50, label: 'NEUTRAL', reason: 'Initializing...' });
     const [isLoading, setIsLoading] = useState(true);
+    const [isChartLoading, setIsChartLoading] = useState(false);
     const [lastUpdated, setLastUpdated] = useState(new Date());
     const [selectedAsset, setSelectedAsset] = useState(null);
     const [chartTimeframe, setChartTimeframe] = useState('1D');
@@ -183,15 +184,17 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
         loadAllData(watchlist, true, syncState.force);
     }, [syncState, watchlist]);
 
-    // Handle timeframe changes
+    // Handle timeframe changes (Optimistic Loading)
     useEffect(() => {
         if (selectedAsset) {
             const fetchAssetHistory = async () => {
+                setIsChartLoading(true);
                 const { range, interval } = getTimeframeParams(chartTimeframe);
                 const updated = await fetchHistory(selectedAsset.fullSymbol, range, interval, syncState.force);
                 if (updated) {
                     setSelectedAsset(updated);
                 }
+                setIsChartLoading(false);
             };
             fetchAssetHistory();
         }
@@ -232,6 +235,10 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
 
     const handleAssetChange = async (asset) => {
         setSelectedAsset(asset);
+        // Neural Prefetching: Hydrate secondary timeframes in the background
+        const { prefetchAssetTimeframes } = await import('../lib/DashboardData');
+        prefetchAssetTimeframes(asset.fullSymbol);
+
         if (asset.name) {
             const newsData = await fetchMarketNews(asset.name);
             setNews(newsData || []);
@@ -409,7 +416,9 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                     <section className="main-chart-section">
                         <header className="chart-header">
                             <div>
-                                <h2 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700 }}>{selectedAsset?.name || 'SYNCING...'}</h2>
+                                <h2 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700 }}>
+                                    {selectedAsset?.name || 'SYNCING...'}
+                                </h2>
                                 <span className="terminal-num" style={{ fontSize: '3rem', fontWeight: 800, color: selectedAsset?.isPositive ? '#22c55e' : '#ef4444' }}>
                                     {selectedAsset?.price || '---'}
                                 </span>
@@ -420,6 +429,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                                         key={tf}
                                         className={`chart-tab ${chartTimeframe === tf ? 'active' : ''}`}
                                         onClick={() => setChartTimeframe(tf)}
+                                        disabled={isChartLoading}
                                     >
                                         {tf}
                                     </button>
@@ -427,35 +437,55 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                             </div>
                         </header>
                         
-                        <div style={{ height: 500 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={selectedAsset?.sparkline || []}>
-                                    <defs>
-                                        <linearGradient id="chartG" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} stopOpacity={0.2}/>
-                                            <stop offset="95%" stopColor={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} stopOpacity={0}/>
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                                    <XAxis dataKey="time" hide />
-                                    <YAxis hide domain={['auto', 'auto']} />
-                                    <Tooltip 
-                                        contentStyle={{ background: '#111114', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                                        labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}
-                                        itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
-                                        formatter={(value) => [formatInstitutionalValue(value), "Value"]}
-                                    />
-                                    <Area 
-                                        type="monotone" 
-                                        dataKey="price" 
-                                        stroke={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} 
-                                        fill="url(#chartG)" 
-                                        strokeWidth={3}
-                                        animationDuration={1000}
-                                        isAnimationActive={true}
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                        <div style={{ height: 500, position: 'relative' }}>
+                            <AnimatePresence>
+                                {isChartLoading && (
+                                    <motion.div 
+                                        className="chart-loading-overlay"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                    >
+                                        <div className="neural-pulse-container">
+                                            <div className="neural-dot" />
+                                            <div className="neural-dot" />
+                                            <div className="neural-dot" />
+                                        </div>
+                                        <div className="loading-text">Synchronizing Neural Intelligence...</div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <div className={`chart-container-inner ${isChartLoading ? 'chart-blur-active' : ''}`} style={{ height: '100%' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={selectedAsset?.sparkline || []}>
+                                        <defs>
+                                            <linearGradient id="chartG" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} stopOpacity={0.2}/>
+                                                <stop offset="95%" stopColor={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                        <XAxis dataKey="time" hide />
+                                        <YAxis hide domain={['auto', 'auto']} />
+                                        <Tooltip 
+                                            contentStyle={{ background: '#111114', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
+                                            labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}
+                                            itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
+                                            formatter={(value) => [formatInstitutionalValue(value), "Value"]}
+                                        />
+                                        <Area 
+                                            type="monotone" 
+                                            dataKey="price" 
+                                            stroke={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} 
+                                            fill="url(#chartG)" 
+                                            strokeWidth={3}
+                                            animationDuration={1000}
+                                            isAnimationActive={!isChartLoading}
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
                     </section>
 
