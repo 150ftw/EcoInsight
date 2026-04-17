@@ -27,7 +27,6 @@ export const formatInstitutionalValue = (val) => {
     if (absVal >= 1e9) return (val / 1e9).toFixed(1) + 'B';   // Billion
     if (absVal >= 1e7) return (val / 1e7).toFixed(1) + 'Cr';  // Crore
     if (absVal >= 1e5) return (val / 1e5).toFixed(1) + 'L';   // Lakh
-    if (absVal >= 1e3) return (val / 1e3).toFixed(1) + 'K';   // Thousand
     
     return val.toLocaleString('en-IN');
 };
