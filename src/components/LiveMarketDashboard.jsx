@@ -235,6 +235,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
 
     const handleAssetChange = async (asset) => {
         setSelectedAsset(asset);
+        setChartTimeframe('1D');
         // Neural Prefetching: Hydrate secondary timeframes in the background
         const { prefetchAssetTimeframes } = await import('../lib/DashboardData');
         prefetchAssetTimeframes(asset.fullSymbol);
