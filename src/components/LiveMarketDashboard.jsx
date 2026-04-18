@@ -80,7 +80,7 @@ const WatchlistCard = ({ data, onClick, onRemove, active, isUserAdded }) => (
     </motion.div>
 );
 
-const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange, omniSymbol }) => {
+const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
     // State for Data
     const [indices, setIndices] = useState([]);
     const [macro, setMacro] = useState([]);
@@ -199,21 +199,6 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange, omniSymbol })
             fetchAssetHistory();
         }
     }, [chartTimeframe]);
-
-    // OmniSearch Selection Handshake
-    useEffect(() => {
-        if (omniSymbol) {
-            const pivotToOmniAsset = async () => {
-                setIsChartLoading(true);
-                const asset = await fetchHistory(omniSymbol);
-                if (asset) {
-                    handleAssetChange(asset);
-                }
-                setIsChartLoading(false);
-            };
-            pivotToOmniAsset();
-        }
-    }, [omniSymbol]);
 
     const handleSearch = async (e) => {
         const val = e.target.value;

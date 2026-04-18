@@ -52,19 +52,12 @@ export default async function handler(req, res) {
     '^NSEI': 'Nifty 50 index price',
     '^BSESN': 'Sensex index price',
     'NIFTYBANK': 'Nifty Bank index price',
-    'NIFTYIT': 'Nifty IT index price',
-    'NIFTYAUTO': 'Nifty Auto index price',
-    'NIFTYPHARMA': 'Nifty Pharma index price',
     'USDINR': 'USD/INR exchange rate',
     'EURINR': 'EUR/INR exchange rate',
     'RELIANCE:NSE': 'NSE:RELIANCE stock price',
     'TCS:NSE': 'NSE:TCS stock price',
     'HDFCBANK:NSE': 'NSE:HDFCBANK stock price',
-    'ICICIBANK:NSE': 'NSE:ICICIBANK stock price',
-    'SBIN:NSE': 'NSE:SBIN stock price',
     'INFY:NSE': 'NSE:INFY stock price',
-    'BHARTIARTL:NSE': 'NSE:BHARTIARTL stock price',
-    'ADANIENT:NSE': 'NSE:ADANIENT stock price',
     'GC=F': 'Gold price in USD',
     'SI=F': 'Silver price in USD'
   };
@@ -98,11 +91,9 @@ export default async function handler(req, res) {
               const scrapedPrice = parseFloat(pMatch[1].replace(/,/g, ''));
               
               const basePrices = {
-                'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 'NIFTYIT': 35000,
+                'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
                 'USDINR': 83.35, 'EURINR': 90.15,
-                'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 
-                'ICICIBANK:NSE': 1100, 'SBIN:NSE': 750, 'INFY:NSE': 1480,
-                'BHARTIARTL:NSE': 1300, 'ADANIENT:NSE': 3200
+                'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 'INFY:NSE': 1480
               };
               const base = basePrices[symbol] || basePrices[cleanSymbol];
               
@@ -178,11 +169,9 @@ export default async function handler(req, res) {
     // --- STAGE 3: CLOUD FALLBACK ---
     if (price === '---') {
       const basePrices = {
-        'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 'NIFTYIT': 35000,
+        'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
         'USDINR': 83.35, 'EURINR': 90.15,
-        'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 
-        'ICICIBANK:NSE': 1100, 'SBIN:NSE': 750, 'INFY:NSE': 1480,
-        'BHARTIARTL:NSE': 1300, 'ADANIENT:NSE': 3200,
+        'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 'INFY:NSE': 1480,
         'IN10Y:INDEXINDEX': 7.12
       };
       const base = basePrices[symbol] || basePrices[cleanSymbol] || 100;
