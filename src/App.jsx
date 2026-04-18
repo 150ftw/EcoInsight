@@ -3061,13 +3061,115 @@ const EventImpactPredictor = () => {
 };
 
 function App() {
+    // --- 1. CORE CONTEXT & NAVIGATION ---
     const { logout, loginWithGoogle, loading: authLoading, updateProfile, updatePassword } = useAuth();
     const { user, isLoaded, isSignedIn } = useUser();
+    
+    // NAVIGATION & VIEW STATE
+    const [appSection, setAppSection] = useState('landing');
+    const [view, setView] = useState('chat');
+    const [omniSymbol, setOmniSymbol] = useState(null);
+    const [globalSentiment, setGlobalSentiment] = useState(50);
 
-    // Auth Modal State
+    // --- 2. AUTHENTICATION & IDENTITY UI ---
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [authModalView, setAuthModalView] = useState('login-email');
+    const [authModalSubtitle, setAuthModalSubtitle] = useState(null);
+    const [hasAutoOpenedAuth, setHasAutoOpenedAuth] = useState(false);
+    const [authType, setAuthType] = useState('login'); // 'login', 'signup'
+    const [supaLoaded, setSupaLoaded] = useState(false);
+    const [authLoadingTimeout, setAuthLoadingTimeout] = useState(false);
+    const [hasShownIntelNotification, setHasShownIntelNotification] = useState(false);
 
+    // --- 3. PLATFORM INTELLIGENCE & DATA ---
+    const [chats, setChats] = useState([
+        { id: 'default', title: 'New Session', messages: [{ role: 'assistant', content: 'Welcome to Eko by EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }] }
+    ]);
+    const [activeChatId, setActiveChatId] = useState('default');
+    const [input, setInput] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [saveStatus, setSaveStatus] = useState('idle');
+    const [lastMessageTime, setLastMessageTime] = useState(0);
+    const [rateLimitActive, setRateLimitActive] = useState(false);
+
+    // --- 4. USER PROFILE & SETTINGS ---
+    const [profile, setProfile] = useState({
+        name: '',
+        username: '',
+        email: '',
+        avatar: null,
+        tier: 'Free',
+        credits: 10,
+        lastRechargeDate: new Date().toISOString(),
+        onboarded: false,
+        welcome_email_sent: false,
+        goal: 'Trading'
+    });
+
+    const [aiSettings, setAiSettings] = useState({
+        model: 'meta/llama-3.1-8b-instruct',
+        style: 'Balanced',
+        tone: 'Professional',
+        creativity: 0.5,
+        maxLength: 'Medium',
+        language: 'English'
+    });
+
+    const [chatSettings, setChatSettings] = useState({
+        autoTitles: true,
+        showTimestamps: false,
+        performanceMode: false,
+        history: true,
+        autoSave: true
+    });
+
+    const [personalization, setPersonalization] = useState({
+        callMe: '',
+        respondHow: '',
+        preferredLanguage: 'English',
+        memory: true,
+        watchlist: []
+    });
+
+    const [appearance, setAppearance] = useState({
+        theme: 'dark',
+        accentColor: '#8b5cf6',
+        fontSize: 'Medium',
+        compactMode: false
+    });
+
+    // --- 5. UI COMPONENTS & OVERLAYS ---
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
+    const [isHandheld, setIsHandheld] = useState(typeof window !== 'undefined' ? window.innerWidth <= 1024 : false);
+    const HUB_LOCK_THRESHOLD = 1024;
+    
+    const [showInitialization, setShowInitialization] = useState(false);
+    const [initializingModule, setInitializingModule] = useState(null);
+    const [showEnginePopup, setShowEnginePopup] = useState(false);
+    const [showCreditModal, setShowCreditModal] = useState(false);
+    const [showBugModal, setShowBugModal] = useState(false);
+    const [modalType, setModalType] = useState('credits');
+    const [pendingScrollToPricing, setPendingScrollToPricing] = useState(false);
+    const [showIntelNotification, setShowIntelNotification] = useState(false);
+    const [intelNotificationProps, setIntelNotificationProps] = useState(null);
+    const [showVoicePlayer, setShowVoicePlayer] = useState(false);
+    const [isVoiceBriefingActive, setIsVoiceBriefingActive] = useState(false);
+    const [isNeuralSearching, setIsNeuralSearching] = useState(false);
+    const [isBetaExpanded, setIsBetaExpanded] = useState(false);
+    const [isIntelHubExpanded, setIsIntelHubExpanded] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
+    const [showUploadSoon, setShowUploadSoon] = useState(false);
+    const [forceEntry, setForceEntry] = useState(false);
+
+    // --- 6. REFS ---
+    const messagesEndRef = useRef(null);
+    const userScrolledUp = useRef(false);
+
+    // --- 7. ANALYTICAL SERVICE HELPERS ---
+    
     const openLogin = (customSubtitle = null) => {
         setAuthModalView('login-email');
         setAuthModalSubtitle(customSubtitle);
@@ -3080,11 +3182,8 @@ function App() {
         setIsAuthModalOpen(true);
     };
 
-    // --- Institutional UX State ---
-    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-    const [isSoundEnabled, setIsSoundEnabled] = useState(true);
-
     const playSound = (type = 'click') => {
+        const isSoundEnabled = true; // Local override or check from settings
         if (!isSoundEnabled) return;
         try {
             const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -3129,7 +3228,7 @@ function App() {
 
         switch (action) {
             case 'dashboard':
-                setOmniSymbol(null); // Reset to default
+                setOmniSymbol(null); 
                 setAppSection('chat');
                 setView('dashboard');
                 break;
@@ -3156,25 +3255,25 @@ function App() {
         }
     };
 
-    // --- State Declarations (Must be at the top) ---
-    const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
-    const [omniSymbol, setOmniSymbol] = useState(null);
-    const [globalSentiment, setGlobalSentiment] = useState(50);
-    const [showInitialization, setShowInitialization] = useState(false);
-    const [initializingModule, setInitializingModule] = useState(null);
-    const [isVoiceBriefingActive, setIsVoiceBriefingActive] = useState(false);
-    const [authModalSubtitle, setAuthModalSubtitle] = useState(null);
-    const [hasAutoOpenedAuth, setHasAutoOpenedAuth] = useState(false);
-    const [authType, setAuthType] = useState('login') // 'login', 'signup'
-    const [supaLoaded, setSupaLoaded] = useState(false);
-    const [showEnginePopup, setShowEnginePopup] = useState(false);
-    const [showIntelNotification, setShowIntelNotification] = useState(false);
-    const [intelNotificationProps, setIntelNotificationProps] = useState(null);
+    // --- 8. GLOBAL SYNCHRONIZATION EFFECTS ---
 
+    // Market Sentiment Sync (Global Background)
+    useEffect(() => {
+        if (appSection === 'chat' || appSection === 'dashboard') {
+            const syncSentiment = async () => {
+                const snt = await fetchMarketSentiment();
+                if (snt) setGlobalSentiment(snt.score);
+            };
+            syncSentiment();
+            const interval = setInterval(syncSentiment, 60000); 
+            return () => clearInterval(interval);
+        }
+    }, [appSection]);
+
+    // Auth Event & Virtual Tracking
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         if (params.get('auth_success') === 'true') {
-            // Institutional Welcome Sequence
             setIntelNotificationProps({
                 title: "Identity Verified",
                 message: "Access secured. Your institutional analytical context has been successfully synchronized.",
@@ -3186,21 +3285,16 @@ function App() {
             setShowIntelNotification(true);
             setHasShownIntelNotification(true);
             playSound('success');
-
-            // Clean URL for professional presentation
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     }, []);
-    const [hasShownIntelNotification, setHasShownIntelNotification] = useState(false);
 
     useEffect(() => {
-        // Only show once when entering the chat section with dynamic resonance
         if (appSection === 'chat' && !hasShownIntelNotification) {
             const timer = setTimeout(async () => {
                 try {
                     const { fetchPulseRegistry } = await import('./lib/MarketData');
                     const pulseData = await fetchPulseRegistry();
-                    
                     if (pulseData) {
                         setIntelNotificationProps({
                             title: `Market Pulse: ${pulseData.pulse}/100`,
@@ -3209,19 +3303,15 @@ function App() {
                             icon: <Activity size={18} className="text-purple-400" />,
                             actionLabel: "View Intelligence"
                         });
+                        setShowIntelNotification(true);
+                        setHasShownIntelNotification(true);
                     }
-                } catch (e) {
-                    console.warn("Dynamic notification failed:", e);
-                }
-                
-                setShowIntelNotification(true);
-                setHasShownIntelNotification(true);
-            }, 3000); // 3 seconds after entering chat
+                } catch (e) { console.warn(e); }
+            }, 3000);
             return () => clearTimeout(timer);
         }
     }, [appSection, hasShownIntelNotification]);
 
-    // Global Command Palette Listener
     useEffect(() => {
         const handleKeyDown = (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -3234,73 +3324,19 @@ function App() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
     
-    // --- Global Engine Invite Popup Trigger ---
     useEffect(() => {
         if (!isSignedIn && isLoaded) {
-            const timer = setTimeout(() => {
-                setShowEnginePopup(true);
-            }, 5000); // 5 seconds
+            const timer = setTimeout(() => setShowEnginePopup(true), 5000);
             return () => clearTimeout(timer);
         }
     }, [isSignedIn, isLoaded]);
 
     useEffect(() => {
-        if (isSignedIn && showEnginePopup) {
-            setShowEnginePopup(false);
-        }
+        if (isSignedIn && showEnginePopup) setShowEnginePopup(false);
     }, [isSignedIn, showEnginePopup]);
 
-    const [forceEntry, setForceEntry] = useState(false);
-
-    const [chats, setChats] = useState([
-        { id: 'default', title: 'New Session', messages: [{ role: 'assistant', content: 'Welcome to Eko by EcoInsight — your AI-powered Indian market intelligence engine. Ask me about Nifty, Sensex, RBI policy, mutual funds, crypto, or any financial topic.' }] }
-    ]);
-    const [activeChatId, setActiveChatId] = useState('default');
-    const [view, setView] = useState('chat')
-    const [saveStatus, setSaveStatus] = useState('idle') // 'idle', 'saving', 'saved', 'error'
-    const [input, setInput] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
-    const [authLoadingTimeout, setAuthLoadingTimeout] = useState(false)
-    const [showCreditModal, setShowCreditModal] = useState(false);
-    const [showBugModal, setShowBugModal] = useState(false);
-    const [modalType, setModalType] = useState('credits');
-    const [pendingScrollToPricing, setPendingScrollToPricing] = useState(false);
-
-
-    // Premium Feature State
-    const [pdfText, setPdfText] = useState('');
-    const [isBetaExpanded, setIsBetaExpanded] = useState(false);
-    const [isIntelHubExpanded, setIsIntelHubExpanded] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
-    const [isExporting, setIsExporting] = useState(false);
-    const [showUploadSoon, setShowUploadSoon] = useState(false);
-
-    const messagesEndRef = useRef(null)
-    const userScrolledUp = useRef(false)
-
-    const [showVoicePlayer, setShowVoicePlayer] = useState(false);
-    const [isNeuralSearching, setIsNeuralSearching] = useState(false);
-
-    // Scroll to top on view change & Trigger Virtual Page Tracking
     useEffect(() => {
-        const nukeScroll = () => {
-            window.scrollTo(0, 0);
-            const allElements = document.querySelectorAll('*');
-            for (let i = 0; i < allElements.length; i++) {
-                if (allElements[i].classList.contains('messages-list')) continue;
-                if (allElements[i].scrollTop > 0) {
-                    allElements[i].scrollTop = 0;
-                }
-            }
-        };
-
-        nukeScroll();
-        const t1 = setTimeout(nukeScroll, 10);
-        const t2 = setTimeout(nukeScroll, 50);
-        const t3 = setTimeout(nukeScroll, 150);
-        const t4 = setTimeout(nukeScroll, 300);
-
-        // Institutional Tracking: Record Virtual Page View in Google Ads/Analytics
+        window.scrollTo(0, 0);
         if (window.gtag) {
             const virtualPath = view === 'chat' ? '/chat' : `/${view}`;
             window.gtag('config', 'AW-18076530285', {
@@ -3308,102 +3344,30 @@ function App() {
                 'page_title': view === 'chat' ? 'Eko AI Chat Interface' : `EcoInsight - ${view}`
             });
         }
-
-        return () => {
-            clearTimeout(t1);
-            clearTimeout(t2);
-            clearTimeout(t3);
-            clearTimeout(t4);
-        };
     }, [view, appSection]);
 
-    // Auth Timeout Fallback
     useEffect(() => {
-        console.log("Starting Global Auth Timeout Timer (25s)...");
         const timer = setTimeout(() => {
-            if (!isLoaded) {
-                console.log("Global Auth Timeout Reached!");
-                setAuthLoadingTimeout(true);
-            }
+            if (!isLoaded) setAuthLoadingTimeout(true);
         }, 25000);
         return () => clearTimeout(timer);
     }, [isLoaded]);
 
-
-
-    const [profile, setProfile] = useState({
-        name: '',
-        username: '',
-        email: '',
-        avatar: null,
-        tier: 'Free',
-        credits: 10,
-        lastRechargeDate: new Date().toISOString(),
-        onboarded: false,
-        welcome_email_sent: false,
-        goal: 'Trading'
-    })
-
-    const [aiSettings, setAiSettings] = useState({
-        model: 'meta/llama-3.1-8b-instruct',
-        style: 'Balanced',
-        tone: 'Professional',
-        creativity: 0.5,
-        maxLength: 'Medium',
-        language: 'English'
-    })
-
-    const [chatSettings, setChatSettings] = useState({
-        autoTitles: true,
-        showTimestamps: false,
-        performanceMode: false,
-        history: true,
-        autoSave: true
-    })
-
-    const [lastMessageTime, setLastMessageTime] = useState(0);
-    const [rateLimitActive, setRateLimitActive] = useState(false);
-
-    const [personalization, setPersonalization] = useState({
-        callMe: '',
-        respondHow: '',
-        preferredLanguage: 'English', // Default
-        memory: true,
-        watchlist: []
-    })
-
-    const [appearance, setAppearance] = useState({
-        theme: 'dark',
-        accentColor: '#8b5cf6',
-        fontSize: 'Medium',
-        compactMode: false
-    })
-
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-    const [isHandheld, setIsHandheld] = useState(window.innerWidth <= 1024);
-    const HUB_LOCK_THRESHOLD = 1024;
-
     useEffect(() => {
-        let resizeTimer;
         const handleResize = () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                setIsMobile(window.innerWidth <= 768);
-                setIsHandheld(window.innerWidth <= 1024);
-                
-                // --- UNIVERSAL FIDELITY: VISUAL VIEWPORT STABILIZATION ---
-                // Precisely anchor the app height for mobile keyboard compatibility
-                if (window.visualViewport) {
-                    const vh = window.visualViewport.height;
-                    const offset = (window.innerHeight - vh);
-                    document.documentElement.style.setProperty('--vv-height', `${vh}px`);
-                    document.documentElement.style.setProperty('--vv-offset', `${offset}px`);
-                }
-            }, 100);
+            setIsMobile(window.innerWidth <= 768);
+            setIsHandheld(window.innerWidth <= 1024);
+            
+            // --- UNIVERSAL FIDELITY: VISUAL VIEWPORT STABILIZATION ---
+            // Precisely anchor the app height for mobile keyboard compatibility
+            if (window.visualViewport) {
+                const vh = window.visualViewport.height;
+                const offset = (window.innerHeight - vh);
+                document.documentElement.style.setProperty('--vv-height', `${vh}px`);
+                document.documentElement.style.setProperty('--vv-offset', `${offset}px`);
+            }
         };
-        
+
         window.addEventListener('resize', handleResize);
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', handleResize);
