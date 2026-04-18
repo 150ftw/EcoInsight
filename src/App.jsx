@@ -46,6 +46,8 @@ import MobileHeader from './components/MobileHeader'
 import { getIndianMarketStatus, getTaxContext, getMarketGuardrails } from './lib/MarketOracle'
 import { generateSystemPrompt } from './lib/SystemPrompt'
 import ModelSelector from './components/ModelSelector'
+import KineticFlowField from './components/KineticFlowField'
+import { fetchMarketSentiment } from './lib/DashboardData'
 
 const MIN_THINKING_DURATION = 8000; // 8 seconds to ensure analytical animation steps complete
 
@@ -3157,6 +3159,7 @@ function App() {
     // --- State Declarations (Must be at the top) ---
     const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
     const [omniSymbol, setOmniSymbol] = useState(null);
+    const [globalSentiment, setGlobalSentiment] = useState(50);
     const [showInitialization, setShowInitialization] = useState(false);
     const [initializingModule, setInitializingModule] = useState(null);
     const [isVoiceBriefingActive, setIsVoiceBriefingActive] = useState(false);
@@ -5152,6 +5155,11 @@ const FintechBadges = ({ labels }) => {
 
     return (
         <>
+            <KineticFlowField 
+                sentiment={globalSentiment} 
+                active={appSection !== 'landing'} 
+                performanceMode={appearance.performanceMode.toLowerCase()}
+            />
             <div className="neural-bottom-light" />
             {renderActiveSection()}
             <AnimatePresence>
