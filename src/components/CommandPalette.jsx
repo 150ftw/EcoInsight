@@ -7,7 +7,11 @@ import {
   BarChart3, Newspaper, Activity, Globe,
   Briefcase, Star, Sparkles, Loader2, ArrowRight
 } from 'lucide-react';
-import { searchTickers } from '../lib/DashboardData';
+import { 
+  AreaChart, Area, 
+  ResponsiveContainer 
+} from 'recharts';
+import { searchTickers, fetchHistory } from '../lib/DashboardData';
 
 const CommandPalette = ({ 
   isOpen, 
@@ -42,6 +46,8 @@ const CommandPalette = ({
         id: `ticker_${s.symbol}`, 
         label: s.name, 
         symbol: s.symbol,
+        sparkline: s.sparkline || [],
+        isPositive: s.isPositive,
         icon: <TrendingUp size={18} />, 
         category: `Market: ${s.exch || 'Global'}`, 
         type: 'ticker' 
@@ -67,7 +73,23 @@ const CommandPalette = ({
     const timer = setTimeout(async () => {
         setIsSearching(true);
         const results = await searchTickers(query);
-        setSearchResults(results || []);
+        
+        // Hydrate top 3 results with basic history for sparklines
+        if (results && results.length > 0) {
+            const hydrationTargets = results.slice(0, 3);
+            const hydrated = await Promise.all(hydrationTargets.map(async (res) => {
+                const history = await fetchHistory(res.symbol, '1d', '15m');
+                return { ...res, sparkline: history?.sparkline || [], isPositive: history?.isPositive };
+            }));
+            
+            const merged = results.map(r => {
+                const h = hydrated.find(item => item.symbol === r.symbol);
+                return h || r;
+            });
+            setSearchResults(merged);
+        } else {
+            setSearchResults([]);
+        }
         setIsSearching(false);
     }, 300);
 
@@ -156,6 +178,24 @@ const CommandPalette = ({
                         </div>
                         <span className="item-category">{item.category}</span>
                       </div>
+                      
+                      {item.type === 'ticker' && item.sparkline?.length > 0 && (
+                        <div className="palette-sparkline">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={item.sparkline}>
+                                    <Area 
+                                        type="monotone" 
+                                        dataKey="price" 
+                                        stroke={item.isPositive ? '#22c55e' : '#ef4444'} 
+                                        fill={item.isPositive ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'}
+                                        strokeWidth={1.5}
+                                        isAnimationActive={false}
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                      )}
+
                       {item.shortcut ? (
                         <div className="item-shortcut">{item.shortcut}</div>
                       ) : (
@@ -251,6 +291,7 @@ const CommandPalette = ({
               cursor: pointer;
               transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
               margin-bottom: 4px;
+              position: relative;
             }
             .palette-item.selected {
               background: rgba(139, 92, 246, 0.15);
@@ -300,6 +341,15 @@ const CommandPalette = ({
               color: rgba(139, 92, 246, 0.6);
               font-weight: 500;
               margin-top: 2px;
+            }
+            .palette-sparkline {
+                width: 70px;
+                height: 28px;
+                opacity: 0.5;
+                margin-right: 8px;
+            }
+            .palette-item.selected .palette-sparkline {
+                opacity: 1;
             }
             .item-shortcut {
               font-size: 0.75rem;
