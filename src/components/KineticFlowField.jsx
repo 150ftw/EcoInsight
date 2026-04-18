@@ -2,7 +2,7 @@ import React, { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const ParticleField = ({ sentiment = 50, flowSpeed = 1, colorMode = 'market' }) => {
+const ParticleField = ({ sentiment = 50, flowSpeed = 1, colorMode = 'market', performanceMode = 'high' }) => {
   const pointsRef = useRef();
   const { viewport } = useThree();
   
