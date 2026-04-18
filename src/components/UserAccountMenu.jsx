@@ -55,7 +55,12 @@ const UserAccountMenu = ({
       window.removeEventListener('resize', updateCoords);
       window.removeEventListener('scroll', updateCoords, true);
     };
-  }, [isOpen]);
+  const toggleMenu = () => {
+    if (!isOpen) {
+      updateCoords();
+    }
+    setIsOpen(!isOpen);
+  };
 
   if (!user) return null;
 
@@ -63,7 +68,7 @@ const UserAccountMenu = ({
     <div className="user-menu-container" ref={menuRef}>
       <button 
         ref={triggerRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleMenu}
         className={`user-menu-trigger ${isOpen ? 'active' : ''} ${hideName ? 'compact' : ''} group`}
         aria-expanded={isOpen}
       >
@@ -86,13 +91,13 @@ const UserAccountMenu = ({
         )}
       </button>
 
-      {isOpen && createPortal(
-        <AnimatePresence>
+      <AnimatePresence>
+        {isOpen && createPortal(
           <motion.div
             ref={portalRef}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
             transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="user-menu-dropdown portal-menu"
             style={{ 
@@ -137,10 +142,10 @@ const UserAccountMenu = ({
                 <span>Sign Out</span>
               </button>
             </div>
-          </motion.div>
-        </AnimatePresence>,
-        document.body
-      )}
+          </motion.div>,
+          document.body
+        )}
+      </AnimatePresence>
     </div>
   );
 };

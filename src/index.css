@@ -813,10 +813,8 @@ body {
     box-shadow: 
         0 10px 50px rgba(0, 0, 0, 0.8),
         0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
-    z-index: 1102 !important;
     display: flex !important;
     flex-direction: column !important;
-    position: absolute;
 }
 
 .user-menu-header {
