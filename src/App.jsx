@@ -5122,7 +5122,7 @@ const FintechBadges = ({ labels }) => {
             <KineticFlowField 
                 sentiment={globalSentiment} 
                 active={appSection !== 'landing'} 
-                performanceMode={appearance.performanceMode.toLowerCase()}
+                performanceMode={appearance.performanceMode ? 'low' : 'high'}
             />
             <div className="neural-bottom-light" />
             {renderActiveSection()}
