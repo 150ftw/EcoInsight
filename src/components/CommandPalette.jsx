@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Command, LayoutDashboard, MessageCircle, 
   Settings, LogOut, Moon, Sun, Terminal, 
-  Zap, Compass, ShieldCheck 
+  Zap, Compass, ShieldCheck, TrendingUp,
+  BarChart3, Newspaper, Activity, Globe,
+  Briefcase, Star, Sparkles, Loader2, ArrowRight
 } from 'lucide-react';
+import { searchTickers } from '../lib/DashboardData';
 
 const CommandPalette = ({ 
   isOpen, 
@@ -14,26 +17,62 @@ const CommandPalette = ({
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
 
-  const commands = [
+  const staticCommands = [
     { id: 'dashboard', label: 'Go to Dashboard', icon: <LayoutDashboard size={18} />, category: 'Navigation', shortcut: 'G D' },
-    { id: 'chat', label: 'Direct Chat', icon: <MessageCircle size={18} />, category: 'Navigation', shortcut: 'G C' },
+    { id: 'chat', label: 'Direct AI Chat', icon: <MessageCircle size={18} />, category: 'Intelligence', shortcut: 'G C' },
     { id: 'insights', label: 'Intelligence Hub', icon: <Compass size={18} />, category: 'Navigation', shortcut: 'G I' },
-    { id: 'settings', label: 'Account Settings', icon: <Settings size={18} />, category: 'System', shortcut: 'S' },
-    { id: 'terminal', label: 'Open Analysis Terminal', icon: <Terminal size={18} />, category: 'Tools', shortcut: 'T' },
-    { id: 'theme', label: 'Toggle Visual Mode', icon: <Sun size={18} />, category: 'System', shortcut: 'M' },
+    { id: 'settings', label: 'Account Settings', icon: <Settings size={18} />, category: 'Elite Identity', shortcut: 'S' },
+    { id: 'terminal', label: 'Open Analysis Terminal', icon: <Terminal size={18} />, category: 'Advanced Tools', shortcut: 'T' },
     { id: 'signout', label: 'Sign Out', icon: <LogOut size={18} />, category: 'System', shortcut: 'Q' },
-  ].filter(c => c.label.toLowerCase().includes(query.toLowerCase()));
+  ];
+
+  // Derive final results list
+  const filteredCommands = query.startsWith('/') 
+    ? staticCommands.filter(c => c.label.toLowerCase().includes(query.slice(1).toLowerCase()))
+    : staticCommands.filter(c => c.label.toLowerCase().includes(query.toLowerCase()));
+
+  const finalResults = [
+    ...filteredCommands.map(c => ({ ...c, type: 'command' })),
+    ...searchResults.map(s => ({ 
+        id: `ticker_${s.symbol}`, 
+        label: s.name, 
+        symbol: s.symbol,
+        icon: <TrendingUp size={18} />, 
+        category: `Market: ${s.exch || 'Global'}`, 
+        type: 'ticker' 
+    }))
+  ];
 
   useEffect(() => {
     if (isOpen) {
       setQuery('');
+      setSearchResults([]);
       setSelectedIndex(0);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [isOpen]);
+
+  // Debounced Ticker Search
+  useEffect(() => {
+    if (query.length < 2 || query.startsWith('/')) {
+        setSearchResults([]);
+        return;
+    }
+
+    const timer = setTimeout(async () => {
+        setIsSearching(true);
+        const results = await searchTickers(query);
+        setSearchResults(results || []);
+        setIsSearching(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -41,14 +80,14 @@ const CommandPalette = ({
 
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedIndex(prev => (prev + 1) % commands.length);
+        setSelectedIndex(prev => (prev + 1) % finalResults.length);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setSelectedIndex(prev => (prev - 1 + commands.length) % commands.length);
+        setSelectedIndex(prev => (prev - 1 + finalResults.length) % finalResults.length);
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        if (commands[selectedIndex]) {
-            handleSelect(commands[selectedIndex]);
+        if (finalResults[selectedIndex]) {
+            handleSelect(finalResults[selectedIndex]);
         }
       } else if (e.key === 'Escape') {
         onClose();
@@ -57,10 +96,14 @@ const CommandPalette = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, commands, selectedIndex]);
+  }, [isOpen, finalResults, selectedIndex]);
 
-  const handleSelect = (cmd) => {
-    onAction(cmd.id);
+  const handleSelect = (item) => {
+    if (item.type === 'ticker') {
+        onAction({ type: 'SELECT_TICKER', symbol: item.symbol });
+    } else {
+        onAction(item.id);
+    }
     onClose();
   };
 
@@ -77,11 +120,11 @@ const CommandPalette = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="palette-search-container">
-              <Search className="search-icon" size={20} />
+              {isSearching ? <Loader2 className="animate-spin text-purple-400" size={20} /> : <Search className="search-icon" size={20} />}
               <input 
                 ref={inputRef}
                 type="text" 
-                placeholder="Type a command or search..."
+                placeholder="Search tickers (e.g. RELIANCE) or type / for commands..."
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -94,22 +137,29 @@ const CommandPalette = ({
             </div>
 
             <div className="palette-results" ref={scrollRef}>
-              {commands.length > 0 ? (
+              {finalResults.length > 0 ? (
                 <div className="palette-list">
-                  {commands.map((cmd, idx) => (
+                  {finalResults.map((item, idx) => (
                     <div 
-                      key={cmd.id}
+                      key={item.id}
                       className={`palette-item ${idx === selectedIndex ? 'selected' : ''}`}
                       onMouseEnter={() => setSelectedIndex(idx)}
-                      onClick={() => handleSelect(cmd)}
+                      onClick={() => handleSelect(item)}
                     >
-                      <div className="item-icon">{cmd.icon}</div>
-                      <div className="item-content">
-                        <span className="item-label">{cmd.label}</span>
-                        <span className="item-category">{cmd.category}</span>
+                      <div className={`item-icon ${item.type}`}>
+                        {item.icon}
                       </div>
-                      {cmd.shortcut && (
-                        <div className="item-shortcut">{cmd.shortcut}</div>
+                      <div className="item-content">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span className="item-label">{item.label}</span>
+                            {item.symbol && <span className="item-symbol-tag">{item.symbol}</span>}
+                        </div>
+                        <span className="item-category">{item.category}</span>
+                      </div>
+                      {item.shortcut ? (
+                        <div className="item-shortcut">{item.shortcut}</div>
+                      ) : (
+                        <ArrowRight size={14} className="item-arrow-hint" />
                       )}
                     </div>
                   ))}
@@ -117,7 +167,8 @@ const CommandPalette = ({
               ) : (
                 <div className="palette-no-results">
                   <Zap size={24} style={{ marginBottom: '12px', opacity: 0.5 }} />
-                  <p>No commands found for "{query}"</p>
+                  <p>No results found for "{query}"</p>
+                  <span style={{ fontSize: '0.7rem', opacity: 0.4, marginTop: '8px' }}>Try searching for Indian tickers or global macro indices</span>
                 </div>
               )}
             </div>
@@ -126,10 +177,10 @@ const CommandPalette = ({
               <div className="footer-tip">
                 <span><kbd>↑↓</kbd> Navigate</span>
                 <span><kbd>↵</kbd> Select</span>
-                <span><kbd>ESC</kbd> Close</span>
+                <span><kbd>/</kbd> Commands</span>
               </div>
               <div className="footer-status">
-                <ShieldCheck size={14} /> Institutional Mode
+                <ShieldCheck size={12} /> Institutional Feed v8.0
               </div>
             </div>
           </motion.div>
@@ -152,11 +203,11 @@ const CommandPalette = ({
               width: 100%;
               max-width: 640px;
               height: min-content;
-              max-height: 480px;
-              background: rgba(15, 15, 20, 0.9);
+              max-height: 520px;
+              background: rgba(10, 10, 15, 0.95);
               border: 1px solid rgba(139, 92, 246, 0.3);
-              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.1);
-              border-radius: 16px;
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(139, 92, 246, 0.1);
+              border-radius: 20px;
               overflow: hidden;
               display: flex;
               flex-direction: column;
@@ -164,7 +215,7 @@ const CommandPalette = ({
             .palette-search-container {
               display: flex;
               align-items: center;
-              padding: 16px 20px;
+              padding: 20px 24px;
               border-bottom: 1px solid rgba(255, 255, 255, 0.08);
               gap: 16px;
             }
@@ -177,46 +228,54 @@ const CommandPalette = ({
               outline: none;
             }
             .palette-badge {
-              background: rgba(255, 255, 255, 0.05);
+              background: rgba(139, 92, 246, 0.1);
               padding: 4px 8px;
               border-radius: 6px;
               font-size: 0.75rem;
-              color: rgba(255, 255, 255, 0.4);
+              color: #a78bfa;
               display: flex;
               align-items: center;
               gap: 4px;
-              border: 1px solid rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(139, 92, 246, 0.3);
             }
             .palette-results {
               overflow-y: auto;
-              padding: 8px;
+              padding: 12px;
             }
             .palette-item {
               display: flex;
               align-items: center;
               padding: 12px 16px;
-              border-radius: 10px;
+              border-radius: 12px;
               gap: 16px;
               cursor: pointer;
-              transition: all 0.2s ease;
+              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+              margin-bottom: 4px;
             }
             .palette-item.selected {
               background: rgba(139, 92, 246, 0.15);
-              transform: translateX(4px);
+              transform: translateX(6px);
+              box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.05);
             }
             .item-icon {
-              width: 36px;
-              height: 36px;
+              width: 38px;
+              height: 38px;
               display: flex;
               align-items: center;
               justify-content: center;
               background: rgba(255, 255, 255, 0.03);
-              border-radius: 8px;
-              color: rgba(255, 255, 255, 0.6);
+              border-radius: 10px;
+              color: rgba(255, 255, 255, 0.4);
+            }
+            .item-icon.ticker {
+                color: #22c55e;
+                background: rgba(34, 197, 94, 0.05);
+                border: 1px solid rgba(34, 197, 94, 0.1);
             }
             .palette-item.selected .item-icon {
               color: #a78bfa;
               background: rgba(139, 92, 246, 0.2);
+              border-color: rgba(139, 92, 246, 0.3);
             }
             .item-content {
               flex: 1;
@@ -224,21 +283,43 @@ const CommandPalette = ({
               flex-direction: column;
             }
             .item-label {
-              font-weight: 500;
+              font-weight: 600;
               color: rgba(255, 255, 255, 0.9);
+              font-size: 0.95rem;
+            }
+            .item-symbol-tag {
+                font-size: 0.7rem;
+                background: rgba(255, 255, 255, 0.05);
+                padding: 1px 6px;
+                border-radius: 4px;
+                color: rgba(255, 255, 255, 0.4);
+                font-family: monospace;
             }
             .item-category {
               font-size: 0.75rem;
-              color: rgba(255, 255, 255, 0.4);
+              color: rgba(139, 92, 246, 0.6);
+              font-weight: 500;
+              margin-top: 2px;
             }
             .item-shortcut {
               font-size: 0.75rem;
               color: rgba(255, 255, 255, 0.3);
               font-family: monospace;
+              background: rgba(255, 255, 255, 0.03);
+              padding: 2px 6px;
+              border-radius: 4px;
+            }
+            .item-arrow-hint {
+                opacity: 0;
+                color: #a78bfa;
+                transition: opacity 0.2s ease;
+            }
+            .palette-item.selected .item-arrow-hint {
+                opacity: 1;
             }
             .palette-footer {
-              padding: 12px 20px;
-              background: rgba(0, 0, 0, 0.2);
+              padding: 14px 24px;
+              background: rgba(0, 0, 0, 0.3);
               border-top: 1px solid rgba(255, 255, 255, 0.05);
               display: flex;
               justify-content: space-between;
@@ -251,10 +332,11 @@ const CommandPalette = ({
               color: rgba(255, 255, 255, 0.4);
             }
             .footer-tip kbd {
-              background: rgba(255, 255, 255, 0.08);
-              padding: 1px 4px;
-              border-radius: 3px;
+              background: rgba(255, 255, 255, 0.1);
+              padding: 1px 5px;
+              border-radius: 4px;
               margin-right: 4px;
+              color: rgba(255, 255, 255, 0.7);
             }
             .footer-status {
               display: flex;
@@ -263,8 +345,8 @@ const CommandPalette = ({
               font-size: 0.7rem;
               color: #a78bfa;
               text-transform: uppercase;
-              letter-spacing: 0.05em;
-              font-weight: 600;
+              letter-spacing: 0.1em;
+              font-weight: 700;
             }
           `}} />
         </div>

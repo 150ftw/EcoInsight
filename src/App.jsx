@@ -3116,8 +3116,18 @@ function App() {
 
     const handleCommandAction = (action) => {
         playSound('success');
+        
+        // Handle Action Objects (e.g., from OmniSearch)
+        if (typeof action === 'object' && action.type === 'SELECT_TICKER') {
+            setOmniSymbol(action.symbol);
+            setAppSection('chat');
+            setView('dashboard');
+            return;
+        }
+
         switch (action) {
             case 'dashboard':
+                setOmniSymbol(null); // Reset to default
                 setAppSection('chat');
                 setView('dashboard');
                 break;
@@ -3146,6 +3156,7 @@ function App() {
 
     // --- State Declarations (Must be at the top) ---
     const [appSection, setAppSection] = useState('landing') // 'landing', 'auth', 'chat', 'checkout'
+    const [omniSymbol, setOmniSymbol] = useState(null);
     const [showInitialization, setShowInitialization] = useState(false);
     const [initializingModule, setInitializingModule] = useState(null);
     const [isVoiceBriefingActive, setIsVoiceBriefingActive] = useState(false);
@@ -4717,6 +4728,7 @@ const FintechBadges = ({ labels }) => {
                             user={user}
                             watchlist={personalization.watchlist || []}
                             onWatchlistChange={handleWatchlistChange}
+                            omniSymbol={omniSymbol}
                         />
                     </div>
                 );
