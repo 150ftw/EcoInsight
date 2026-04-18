@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Settings, User as UserIcon, CreditCard, ChevronDown } from 'lucide-react';
@@ -9,6 +9,7 @@ const UserAccountMenu = ({
   role = "Economic Analyst", 
   side = "left", 
   align = "top",
+  children,
   onSettingsClick = () => {},
   onSubscriptionClick = () => {}
 }) => {
@@ -45,7 +46,7 @@ const UserAccountMenu = ({
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isOpen) {
       updateCoords();
       window.addEventListener('resize', updateCoords);
@@ -55,6 +56,8 @@ const UserAccountMenu = ({
       window.removeEventListener('resize', updateCoords);
       window.removeEventListener('scroll', updateCoords, true);
     };
+  }, [isOpen]);
+
   const toggleMenu = () => {
     if (!isOpen) {
       updateCoords();
@@ -66,33 +69,40 @@ const UserAccountMenu = ({
 
   return (
     <div className="user-menu-container" ref={menuRef}>
-      <button 
+      <div 
         ref={triggerRef}
         onClick={toggleMenu}
-        className={`user-menu-trigger ${isOpen ? 'active' : ''} ${hideName ? 'compact' : ''} group`}
-        aria-expanded={isOpen}
+        className={`user-menu-trigger-wrapper ${isOpen ? 'active' : ''}`}
+        style={{ cursor: 'pointer' }}
       >
-        <div className="user-menu-avatar">
-          {user.profile_image ? (
-            <img src={user.profile_image} alt={user.first_name || 'User'} />
-          ) : (
-            <UserIcon size={16} className="text-white" />
-          )}
-        </div>
-        {!hideName && (
-          <>
-            <span className="user-menu-name">
-              {user.first_name || user.email.split('@')[0]}
-            </span>
-            <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <ChevronDown size={14} className={`user-menu-chevron ${isOpen ? 'rotate-180' : ''}`} />
+        {children || (
+          <button 
+            className={`user-menu-trigger ${isOpen ? 'active' : ''} ${hideName ? 'compact' : ''} group`}
+            aria-expanded={isOpen}
+          >
+            <div className="user-menu-avatar">
+              {user.profile_image ? (
+                <img src={user.profile_image} alt={user.first_name || 'User'} />
+              ) : (
+                <UserIcon size={16} className="text-white" />
+              )}
             </div>
-          </>
+            {!hideName && (
+              <>
+                <span className="user-menu-name">
+                  {user.first_name || user.email.split('@')[0]}
+                </span>
+                <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <ChevronDown size={14} className={`user-menu-chevron ${isOpen ? 'rotate-180' : ''}`} />
+                </div>
+              </>
+            )}
+          </button>
         )}
-      </button>
+      </div>
 
       <AnimatePresence>
-        {isOpen && createPortal(
+        {(isOpen && coords.top !== 0) && createPortal(
           <motion.div
             ref={portalRef}
             initial={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}

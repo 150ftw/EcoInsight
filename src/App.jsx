@@ -5043,21 +5043,33 @@ const FintechBadges = ({ labels }) => {
                         </div>
                         <div className="sidebar-section user-section-mobile" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginBottom: '1rem' }}>
                             {user ? (
-                                <div className="user-profile-custom-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
-                                    <UserAccountMenu
-                                        hideName={true}
-                                        side="left"
-                                        align="top"
-                                        role={`${profile?.tier || 'Free'} Access`}
-                                        onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
-                                    />
-                                    <div className="user-info">
-                                        <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
-                                        <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                            {profile?.tier || 'Free'} Access
-                                        </span>
+                                <UserAccountMenu
+                                    side="left"
+                                    align="top"
+                                    role={`${profile?.tier || 'Free'} Access`}
+                                    onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
+                                >
+                                    <div className="user-profile-custom-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
+                                        <div className="user-menu-avatar">
+                                            {user.profile_image ? (
+                                                <img src={user.profile_image} alt={user.first_name || 'User'} style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
+                                            ) : (
+                                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <UserIcon size={16} className="text-white" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="user-info">
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                               <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
+                                               <ChevronDown size={12} style={{ opacity: 0.4 }} />
+                                            </div>
+                                            <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                                {profile?.tier || 'Free'} Access
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
+                                </UserAccountMenu>
                             ) : (
                                 <motion.div style={{ padding: '0 0.75rem' }}>
                                     <motion.button
