@@ -3163,6 +3163,14 @@ function App() {
     const [isExporting, setIsExporting] = useState(false);
     const [showUploadSoon, setShowUploadSoon] = useState(false);
     const [forceEntry, setForceEntry] = useState(false);
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+    const [sidebarWidth, setSidebarWidth] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('ecoinsight_sidebar_width');
+            return saved ? parseInt(saved, 10) : 260;
+        }
+        return 260;
+    });
 
     // --- 6. REFS ---
     const messagesEndRef = useRef(null);
@@ -4214,10 +4222,6 @@ function App() {
         } : c));
     };
 
-    const [sidebarWidth, setSidebarWidth] = useState(() => {
-        const saved = localStorage.getItem('ecoinsight_sidebar_width');
-        return saved ? parseInt(saved, 10) : 280;
-    });
     const [isResizing, setIsResizing] = useState(false);
 
     const startResizing = (e) => {
