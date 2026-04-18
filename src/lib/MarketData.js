@@ -737,7 +737,7 @@ export const fetchNewsTickerData = async () => {
             .slice(0, 10); // Get top 10 valid items
 
         // Fetch real-time prices for top Indian tickers using Google Finance (Unlimited, Free)
-        const topStocks = ["RELIANCE", "HDFCBANK", "INFY", "TCS", "ICICIBANK", "SBIN"];
+        const topStocks = ["RELIANCE:NSE", "HDFCBANK:NSE", "INFY:NSE", "TCS:NSE", "ICICIBANK:NSE", "SBIN:NSE"];
 
         const trending = await Promise.all(topStocks.map(async (symbol) => {
             try {

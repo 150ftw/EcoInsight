@@ -49,17 +49,32 @@ export default async function handler(req, res) {
 
   // Symbol Mapping for Better Search Queries
   const queryMap = {
-    '^NSEI': 'Nifty 50 index price',
-    '^BSESN': 'Sensex index price',
-    'NIFTYBANK': 'Nifty Bank index price',
+    // Indices
+    '^NSEI': 'Nifty 50 index price NSE',
+    '^BSESN': 'Sensex index price BSE',
+    'NIFTYBANK': 'Nifty Bank index price NSE',
+    
+    // Currencies
     'USDINR': 'USD/INR exchange rate',
     'EURINR': 'EUR/INR exchange rate',
-    'RELIANCE:NSE': 'NSE:RELIANCE stock price',
-    'TCS:NSE': 'NSE:TCS stock price',
-    'HDFCBANK:NSE': 'NSE:HDFCBANK stock price',
-    'INFY:NSE': 'NSE:INFY stock price',
-    'GC=F': 'Gold price in USD',
-    'SI=F': 'Silver price in USD'
+    
+    // Equities (Shorts & Fulls)
+    'RELIANCE': 'RELIANCE stock price NSE INR',
+    'RELIANCE:NSE': 'RELIANCE stock price NSE INR',
+    'TCS': 'TCS stock price NSE INR',
+    'TCS:NSE': 'TCS stock price NSE INR',
+    'HDFCBANK': 'HDFCBANK stock price NSE INR',
+    'HDFCBANK:NSE': 'HDFCBANK stock price NSE INR',
+    'INFY': 'INFY stock price NSE INR',
+    'INFY:NSE': 'INFY stock price NSE INR',
+    'ICICIBANK': 'ICICIBANK stock price NSE INR',
+    'ICICIBANK:NSE': 'ICICIBANK stock price NSE INR',
+    'SBIN': 'SBIN stock price NSE INR',
+    'SBIN:NSE': 'SBIN stock price NSE INR',
+    
+    // Commodities
+    'GC=F': 'Gold price per 10g INR',
+    'SI=F': 'Silver price per 1kg INR'
   };
 
   const cleanSymbol = symbol.replace('^', '');
@@ -93,12 +108,18 @@ export default async function handler(req, res) {
               const basePrices = {
                 'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
                 'USDINR': 83.35, 'EURINR': 90.15,
-                'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 'INFY:NSE': 1480
+                'RELIANCE': 2950, 'RELIANCE:NSE': 2950,
+                'TCS': 3900, 'TCS:NSE': 3900,
+                'HDFCBANK': 1550, 'HDFCBANK:NSE': 1550,
+                'INFY': 1480, 'INFY:NSE': 1480,
+                'ICICIBANK': 1080, 'ICICIBANK:NSE': 1080,
+                'SBIN': 750, 'SBIN:NSE': 750
               };
               const base = basePrices[symbol] || basePrices[cleanSymbol];
               
               if (base && Math.abs(scrapedPrice - base) / base > 0.8) {
                 console.log(`Plausibility check failed for ${symbol}: Scraped ${scrapedPrice} vs Base ${base}. Falling back.`);
+                price = '---'; // Invalidate to force Stage 2/3
               } else {
                 price = pMatch[1].replace(/,/g, '');
                 source = 'SEARCH-SYNC v6 (GOOGLE)';
@@ -167,17 +188,22 @@ export default async function handler(req, res) {
     }
 
     // --- STAGE 3: CLOUD FALLBACK ---
-    if (price === '---') {
+    if (price === '---' || isNaN(parseFloat(price))) {
       const basePrices = {
         'NSEI': 22500, 'BSESN': 74000, 'NIFTYBANK': 48000, 
         'USDINR': 83.35, 'EURINR': 90.15,
-        'RELIANCE:NSE': 2950, 'TCS:NSE': 3900, 'HDFCBANK:NSE': 1550, 'INFY:NSE': 1480,
+        'RELIANCE': 2950, 'RELIANCE:NSE': 2950,
+        'TCS': 3900, 'TCS:NSE': 3900,
+        'HDFCBANK': 1550, 'HDFCBANK:NSE': 1550,
+        'INFY': 1480, 'INFY:NSE': 1480,
+        'ICICIBANK': 1080, 'ICICIBANK:NSE': 1080,
+        'SBIN': 750, 'SBIN:NSE': 750,
         'IN10Y:INDEXINDEX': 7.12
       };
       const base = basePrices[symbol] || basePrices[cleanSymbol] || 100;
       price = (base + (Math.random() * base * 0.01) - (base * 0.005)).toFixed(2);
       changePercent = ((Math.random() * 2) - 1).toFixed(2);
-      source = 'SEARCH-SYNC v6 (SYNTHETIC)';
+      source = `SEARCH-SYNC v6 (SYNTHETIC-REF-${base})`;
     }
 
     const numericPrice = parseFloat(price) || 0;
