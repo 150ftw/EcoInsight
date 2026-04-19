@@ -14,7 +14,7 @@ const UserAccountMenu = ({
   onSubscriptionClick = () => {}
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0, height: 0 });
   const menuRef = useRef(null);
   const portalRef = useRef(null);
   const triggerRef = useRef(null);
@@ -99,10 +99,10 @@ const UserAccountMenu = ({
             )}
           </button>
         )}
-      </div>
+      </button>
 
       <AnimatePresence>
-        {(isOpen && coords.top !== 0) && createPortal(
+        {isOpen && createPortal(
           <motion.div
             ref={portalRef}
             initial={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
@@ -116,7 +116,7 @@ const UserAccountMenu = ({
                 bottom: align === 'top' ? `${window.innerHeight - coords.top + 10}px` : 'auto',
                 left: side === 'left' ? `${coords.left}px` : 'auto',
                 right: side === 'right' ? `${window.innerWidth - (coords.left + coords.width)}px` : 'auto',
-                zIndex: 9999,
+                zIndex: 30001,
                 width: 'max-content',
                 minWidth: '220px'
             }}
