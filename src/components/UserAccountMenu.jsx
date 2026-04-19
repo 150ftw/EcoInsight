@@ -8,7 +8,7 @@ const UserAccountMenu = ({
   hideName = false, 
   role = "Economic Analyst", 
   side = "left", 
-  align = "top",
+  align = "bottom",
   children,
   onSettingsClick = () => {},
   onSubscriptionClick = () => {}
@@ -22,7 +22,6 @@ const UserAccountMenu = ({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Check if click was outside the trigger AND outside the portalled dropdown
       if (
         menuRef.current && !menuRef.current.contains(event.target) &&
         portalRef.current && !portalRef.current.contains(event.target)
@@ -60,7 +59,16 @@ const UserAccountMenu = ({
 
   const toggleMenu = () => {
     if (!isOpen) {
-      updateCoords();
+      // Capture coordinates synchronously before opening to prevent flickering/misalignment
+      if (triggerRef.current) {
+        const rect = triggerRef.current.getBoundingClientRect();
+        setCoords({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height
+        });
+      }
     }
     setIsOpen(!isOpen);
   };
@@ -76,28 +84,28 @@ const UserAccountMenu = ({
         aria-expanded={isOpen}
       >
         {children || (
-          <button 
+          <div 
             className={`user-menu-trigger ${isOpen ? 'active' : ''} ${hideName ? 'compact' : ''} group`}
-            aria-expanded={isOpen}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '4px 12px 4px 5px', borderRadius: '9999px' }}
           >
-            <div className="user-menu-avatar">
+            <div className="user-menu-avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {user.profile_image ? (
-                <img src={user.profile_image} alt={user.first_name || 'User'} />
+                <img src={user.profile_image} alt={user.first_name || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <UserIcon size={16} className="text-white" />
               )}
             </div>
             {!hideName && (
               <>
-                <span className="user-menu-name">
+                <span className="user-menu-name" style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   {user.first_name || user.email.split('@')[0]}
                 </span>
                 <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <ChevronDown size={14} className={`user-menu-chevron ${isOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={14} className={`user-menu-chevron ${isOpen ? 'rotate-180' : ''}`} style={{ transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                 </div>
               </>
             )}
-          </button>
+          </div>
         )}
       </button>
 

@@ -485,7 +485,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                             {user ? (
                                 <div className="signed-in-nav">
                                     <button className="btn-signin" onClick={onLaunchEngine} disabled={!supaLoaded}>{!supaLoaded ? <><Loader2 size={14} className="animate-spin" /> Syncing...</> : "Open Engine"}</button>
-                                    <UserAccountMenu onSettingsClick={() => setIsAccountModalOpen(true)} onSubscriptionClick={() => { setAppSection('chat'); }} />
+                                    <UserAccountMenu side="right" align="bottom" onSettingsClick={() => setIsAccountModalOpen(true)} onSubscriptionClick={() => { setAppSection('chat'); }} />
                                 </div>
                             ) : (
                                 <div className="signed-out-nav">
