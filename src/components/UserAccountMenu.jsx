@@ -69,11 +69,11 @@ const UserAccountMenu = ({
 
   return (
     <div className="user-menu-container" ref={menuRef}>
-      <div 
+      <button 
         ref={triggerRef}
         onClick={toggleMenu}
         className={`user-menu-trigger-wrapper ${isOpen ? 'active' : ''}`}
-        style={{ cursor: 'pointer' }}
+        aria-expanded={isOpen}
       >
         {children || (
           <button 

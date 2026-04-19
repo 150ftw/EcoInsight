@@ -5049,22 +5049,22 @@ const FintechBadges = ({ labels }) => {
                                     role={`${profile?.tier || 'Free'} Access`}
                                     onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
                                 >
-                                    <div className="user-profile-custom-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem' }}>
+                                    <div className="user-profile-custom-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem 0.75rem' }}>
                                         <div className="user-menu-avatar">
                                             {user.profile_image ? (
-                                                <img src={user.profile_image} alt={user.first_name || 'User'} style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
+                                                <img src={user.profile_image} alt={user.first_name || 'User'} style={{ width: '30px', height: '30px', borderRadius: '50%' }} />
                                             ) : (
-                                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <UserIcon size={16} className="text-white" />
+                                                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <User size={15} className="text-white" />
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="user-info">
+                                        <div className="user-info" style={{ pointerEvents: 'none' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                               <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
-                                               <ChevronDown size={12} style={{ opacity: 0.4 }} />
+                                               <span className="user-name" style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
+                                               <ChevronDown size={11} style={{ opacity: 0.4 }} />
                                             </div>
-                                            <span className="user-status" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                            <span className="user-status" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
                                                 {profile?.tier || 'Free'} Access
                                             </span>
                                         </div>
