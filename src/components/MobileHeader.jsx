@@ -161,7 +161,7 @@ const MobileHeader = ({ onMenuClick, isOpen, activeView, user, performanceMode, 
                     </div>
                 </motion.div>
             </motion.div>
-            <div style={{ height: '60px' }} className="mobile-spacer" />
+            <div style={{ height: 'calc(60px + env(safe-area-inset-top))' }} className="mobile-spacer" />
         </div>
     );
 };

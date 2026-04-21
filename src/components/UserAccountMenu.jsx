@@ -122,8 +122,18 @@ const UserAccountMenu = ({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
               transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-              className="user-menu-dropdown portal-menu"
-              style={{ 
+              className={`user-menu-dropdown portal-menu ${window.innerWidth < 768 ? 'mobile-action-sheet' : ''}`}
+              style={window.innerWidth < 768 ? {
+                  position: 'fixed',
+                  bottom: 'calc(1.5rem + var(--safe-bottom))',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 'calc(100% - 2rem)',
+                  maxWidth: '400px',
+                  zIndex: 45000,
+                  padding: '4px',
+                  pointerEvents: 'auto'
+              } : { 
                   position: 'fixed',
                   top: align === 'top' ? 'auto' : `${(coords.top || 0) + (coords.height || 0) + 10}px`,
                   bottom: align === 'top' ? `${window.innerHeight - (coords.top || (window.innerHeight - 100)) + 10}px` : 'auto',
