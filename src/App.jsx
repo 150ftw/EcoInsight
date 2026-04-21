@@ -5026,10 +5026,10 @@ const FintechBadges = ({ labels }) => {
 
                             <button
                                 className="nav-item"
-                                onClick={() => { setView('settings'); if (isMobile) setIsSidebarOpen(false); }}
+                                onClick={() => { setModalType('development'); setShowCreditModal(true); }}
                                 style={{
                                     marginTop: '0.5rem',
-                                    opacity: profile.tier === 'Pro' ? 1 : 0.6,
+                                    opacity: 0.6,
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center'
@@ -5038,7 +5038,7 @@ const FintechBadges = ({ labels }) => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Settings size={18} /> Settings
                                 </div>
-                                {profile.tier !== 'Pro' && <Lock size={12} color="#a78bfa" />}
+                                <Lock size={12} color="#a78bfa" />
                             </button>
                         </div>
                         <div className="sidebar-section user-section-mobile" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginBottom: '1rem' }}>
