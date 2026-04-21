@@ -83,7 +83,7 @@ const UserAccountMenu = ({
         className={`user-menu-trigger-wrapper ${isOpen ? 'active' : ''}`}
         aria-expanded={isOpen}
       >
-        {children || (
+        {typeof children === 'function' ? children(isOpen) : (children || (
           <div 
             className={`user-menu-trigger ${isOpen ? 'active' : ''} ${hideName ? 'compact' : ''} group`}
             style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '4px 12px 4px 5px', borderRadius: '9999px' }}
@@ -106,7 +106,7 @@ const UserAccountMenu = ({
               </>
             )}
           </div>
-        )}
+        ))}
       </button>
 
       <AnimatePresence>
@@ -129,8 +129,23 @@ const UserAccountMenu = ({
                 minWidth: '220px'
             }}
           >
+            <div className="user-menu-profile-preview">
+              <div className="preview-avatar">
+                {user.profile_image ? (
+                  <img src={user.profile_image} alt={user.first_name || 'User'} />
+                ) : (
+                  <div className="avatar-placeholder">
+                    <UserIcon size={20} className="text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="preview-info">
+                <h3>{user.first_name || user.email.split('@')[0]}</h3>
+                <span>{role}</span>
+              </div>
+            </div>
+
             <div className="user-menu-header">
-              <p>{role}</p>
               <p title={user.email}>{user.email}</p>
             </div>
             
@@ -142,8 +157,8 @@ const UserAccountMenu = ({
                 }}
                 className="user-menu-item"
               >
-                <div className="user-menu-icon">
-                  <UserIcon size={18} />
+                <div className="user-menu-icon" style={{ color: 'var(--accent-primary)' }}>
+                  <Settings size={18} />
                 </div>
                 <span>Account Settings</span>
               </button>
