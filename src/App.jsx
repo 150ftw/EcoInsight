@@ -5013,9 +5013,9 @@ const FintechBadges = ({ labels }) => {
                                         style={{ overflow: 'hidden' }}
                                     >
                                         <div style={{ paddingLeft: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem', borderLeft: '1px solid rgba(139, 92, 246, 0.2)', marginLeft: '0.75rem' }}>
-                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoTrendsIcon size={16} /> Market Trends</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoPulseIcon size={16} /> Economic Pulse</div> <Lock size={12} color="#a78bfa" /></button>
-                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoSimplifyIcon size={16} /> ELI5 Economics</div> <Lock size={12} color="#a78bfa" /></button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: profile.tier === 'Pro' ? 1 : 0.6 }} onClick={() => { if (profile.tier === 'Pro') { setView('trends'); } else { setModalType('premium'); setShowCreditModal(true); } }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoTrendsIcon size={16} /> Market Trends</div> {profile.tier !== 'Pro' && <Lock size={12} color="#a78bfa" />}</button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: profile.tier === 'Pro' ? 1 : 0.6 }} onClick={() => { if (profile.tier === 'Pro') { setView('market-pulse'); } else { setModalType('premium'); setShowCreditModal(true); } }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoPulseIcon size={16} /> Economic Pulse</div> {profile.tier !== 'Pro' && <Lock size={12} color="#a78bfa" />}</button>
+                                            <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: profile.tier === 'Pro' ? 1 : 0.6 }} onClick={() => { if (profile.tier === 'Pro') { setView('chat'); setInput("Explain the ELI5 economics concept for India's current fiscal policy."); handleSend(); } else { setModalType('premium'); setShowCreditModal(true); } }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoSimplifyIcon size={16} /> ELI5 Economics</div> {profile.tier !== 'Pro' && <Lock size={12} color="#a78bfa" />}</button>
                                             <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoSimulatorIcon size={16} /> What-If Simulator</div> <Lock size={12} color="#a78bfa" /></button>
                                             <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoNewsIcon size={16} /> News Analyzer</div> <Lock size={12} color="#a78bfa" /></button>
                                             <button className="nav-item sub-nav-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }} onClick={() => { setModalType('premium'); setShowCreditModal(true); }}><div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><EcoPredictorIcon size={16} /> Event Predictor</div> <Lock size={12} color="#a78bfa" /></button>
@@ -5026,10 +5026,10 @@ const FintechBadges = ({ labels }) => {
 
                             <button
                                 className="nav-item"
-                                onClick={() => { setModalType('premium'); setShowCreditModal(true); }}
+                                onClick={() => { setView('settings'); if (isMobile) setIsSidebarOpen(false); }}
                                 style={{
                                     marginTop: '0.5rem',
-                                    opacity: 0.6,
+                                    opacity: profile.tier === 'Pro' ? 1 : 0.6,
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center'
@@ -5038,7 +5038,7 @@ const FintechBadges = ({ labels }) => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Settings size={18} /> Settings
                                 </div>
-                                <Lock size={12} color="#a78bfa" />
+                                {profile.tier !== 'Pro' && <Lock size={12} color="#a78bfa" />}
                             </button>
                         </div>
                         <div className="sidebar-section user-section-mobile" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginBottom: '1rem' }}>
