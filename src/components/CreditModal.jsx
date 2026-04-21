@@ -75,22 +75,22 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                                 </p>
                             </div>
                         </>
-                    ) : (
+                    ) : type === "development" ? (
                         <>
                             <div className="modal-header">
-                                <div className="alert-icon">
-                                    <ShieldAlert size={32} />
+                                <div className="alert-icon" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#fbbf24' }}>
+                                    <Zap size={32} />
                                 </div>
-                                <h2 style={{ letterSpacing: '-0.5px' }}>Pro Features: In Development</h2>
+                                <h2 style={{ letterSpacing: '-0.5px' }}>Feature in Development</h2>
                                 <p>
-                                    These institutional-grade features—including our What-If Simulator and Event Predictor—are premium modules currently undergoing final refinement.
+                                    Our neural engineering team is currently calibrating this proprietary module. We are ensuring institutional-grade accuracy and zero-latency performance before deployment.
                                 </p>
                                 <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '1rem', fontStyle: 'italic' }}>
-                                    Access will be rolled out exclusively to Pro & Sentinel subscribers in the coming months as we deploy our next-generation neural architecture.
+                                    Expect direct access in the upcoming "Bharatiya" Intelligence Patch. Thank you for participating in our elite early-access rollout.
                                 </p>
                             </div>
                         </>
-                    )}
+                    ) : (
 
                     <div className="modal-actions">
                         <button className="btn-secondary-modal" onClick={onClose}>
