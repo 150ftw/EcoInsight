@@ -965,22 +965,58 @@ body {
         width: 100% !important;
         max-width: 100% !important;
         border-radius: 24px 24px 0 0 !important;
-        padding: 0 0 calc(env(safe-area-inset-bottom) + 1rem) 0 !important;
+        padding: 0 0 calc(env(safe-area-inset-bottom) + 1.5rem) 0 !important;
         border: none !important;
         border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-        background: rgba(15, 15, 18, 0.98) !important;
+        background: rgba(12, 12, 15, 0.98) !important;
         box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5) !important;
-        z-index: 45000 !important;
-        overflow: hidden !important;
+        z-index: 50000 !important;
+        overflow-y: auto !important;
+        max-height: 85vh !important;
         transform-origin: bottom !important;
+    }
+
+    .mobile-action-sheet .user-menu-profile-preview {
+        padding: 1.5rem 1.25rem 1rem !important;
+        gap: 1rem !important;
+    }
+
+    .mobile-action-sheet .user-menu-header {
+        padding: 0.5rem 1.25rem 1.25rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mobile-action-sheet .user-menu-item {
+        padding: 1rem 1.25rem !important;
+        font-size: 1rem !important;
     }
     
     .mobile-sheet-handle {
         width: 40px;
         height: 4px;
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.15);
         border-radius: 2px;
-        margin: 12px auto 8px;
+        margin: 12px auto 4px;
+    }
+
+    /* Bug Icon in Header */
+    .header-bug-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(239, 68, 68, 0.05);
+        border: 1px solid rgba(239, 68, 68, 0.1);
+        border-radius: 50%;
+        color: rgba(239, 68, 68, 0.6);
+        transition: all 0.2s ease;
+        margin-right: 4px;
+    }
+
+    .header-bug-btn:active {
+        background: rgba(239, 68, 68, 0.15);
+        transform: scale(0.95);
     }
 }
 

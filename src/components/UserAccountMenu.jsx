@@ -9,6 +9,7 @@ const UserAccountMenu = ({
   role = "Economic Analyst", 
   side = "left", 
   align = "bottom",
+  forceMobile = false,
   children,
   onSettingsClick = () => {},
   onSubscriptionClick = () => {}
@@ -21,12 +22,25 @@ const UserAccountMenu = ({
   const triggerRef = useRef(null);
   const { user, logout } = useAuth();
 
+  const isActuallyMobile = forceMobile || isMobileView;
+
   useEffect(() => {
     const checkMobile = () => setIsMobileView(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // BACKGROUND SCROLL LOCK
+  useEffect(() => {
+    if (isOpen && isActuallyMobile) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [isOpen, isActuallyMobile]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -54,7 +68,7 @@ const UserAccountMenu = ({
   };
 
   useLayoutEffect(() => {
-    if (isOpen && !isMobileView) {
+    if (isOpen && !isActuallyMobile) {
       updateCoords();
       window.addEventListener('resize', updateCoords);
       window.addEventListener('scroll', updateCoords, true);
@@ -63,7 +77,7 @@ const UserAccountMenu = ({
       window.removeEventListener('resize', updateCoords);
       window.removeEventListener('scroll', updateCoords, true);
     };
-  }, [isOpen, isMobileView]);
+  }, [isOpen, isActuallyMobile]);
 
   const toggleMenu = (e) => {
     if (e) {
@@ -71,7 +85,7 @@ const UserAccountMenu = ({
         e.stopPropagation();
     }
     
-    if (!isOpen && !isMobileView) {
+    if (!isOpen && !isActuallyMobile) {
       updateCoords();
     }
     setIsOpen(!isOpen);
@@ -133,7 +147,7 @@ const UserAccountMenu = ({
           {isOpen && (
             <>
               {/* BACKDROP FOR MOBILE */}
-              {isMobileView && (
+              {isActuallyMobile && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -145,24 +159,26 @@ const UserAccountMenu = ({
 
               <motion.div
                 ref={portalRef}
-                variants={isMobileView ? mobileVariants : desktopVariants}
+                variants={isActuallyMobile ? mobileVariants : desktopVariants}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
                 transition={{ 
                   duration: 0.3, 
-                  ease: isMobileView ? [0.32, 0.72, 0, 1] : [0.23, 1, 0.32, 1] 
+                  ease: isActuallyMobile ? [0.32, 0.72, 0, 1] : [0.23, 1, 0.32, 1] 
                 }}
-                className={`user-menu-dropdown ${isMobileView ? 'mobile-action-sheet' : ''}`}
-                style={isMobileView ? {} : { 
+                className={`user-menu-dropdown ${isActuallyMobile ? 'mobile-action-sheet' : ''}`}
+                style={isActuallyMobile ? {} : { 
                     position: 'fixed',
                     top: align === 'top' ? 'auto' : `${(coords.top || 0) + (coords.height || 0) + 10}px`,
                     bottom: align === 'top' ? `${window.innerHeight - (coords.top || (window.innerHeight - 100)) + 10}px` : 'auto',
                     left: side === 'left' ? `${coords.left || 10}px` : 'auto',
                     right: side === 'right' ? `${window.innerWidth - ((coords.left || 0) + (coords.width || 220))}px` : 'auto',
+                    zIndex: 40000,
+                    pointerEvents: 'auto'
                 }}
               >
-                {isMobileView && <div className="mobile-sheet-handle" />}
+                {isActuallyMobile && <div className="mobile-sheet-handle" />}
 
                 <div className="user-menu-profile-preview">
                   <div className="preview-avatar">
@@ -181,7 +197,7 @@ const UserAccountMenu = ({
                 </div>
 
                 <div className="user-menu-header">
-                  <p title={user.email} style={{ margin: 0, fontSize: '0.75rem', opacity: 0.8, color: 'var(--text-secondary)' }}>
+                  <p title={user.email}>
                     {user.email}
                   </p>
                 </div>

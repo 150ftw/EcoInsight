@@ -4854,6 +4854,7 @@ const FintechBadges = ({ labels }) => {
                         user={user}
                         profile={profile}
                         setIsAccountModalOpen={setIsAccountModalOpen}
+                        setShowBugModal={setShowBugModal}
                         performanceMode={chatSettings?.performanceMode || false}
                         setPerformanceMode={(mode) => setChatSettings(prev => ({ ...prev, performanceMode: mode }))}
                     />

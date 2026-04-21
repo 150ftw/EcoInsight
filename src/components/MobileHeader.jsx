@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Zap, ShieldCheck } from 'lucide-react';
+import { Menu, X, ChevronDown, Zap, ShieldCheck, Bug } from 'lucide-react';
 import UserAccountMenu from './UserAccountMenu';
 
 const MobileHeader = ({ 
@@ -10,6 +10,7 @@ const MobileHeader = ({
     user, 
     profile, 
     setIsAccountModalOpen, 
+    setShowBugModal,
     performanceMode, 
     setPerformanceMode 
 }) => {
@@ -36,7 +37,10 @@ const MobileHeader = ({
                     backdropFilter: 'blur(25px)',
                     borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                     padding: 'env(safe-area-inset-top) 0.75rem 0',
-                    zIndex: 1000
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
                 }}
             >
                 {/* LEFT: MENU TRIGGER */}
@@ -58,7 +62,7 @@ const MobileHeader = ({
                 </motion.button>
 
                 {/* CENTER: MODEL SELECTOR */}
-                <div style={{ position: 'relative', justifySelf: 'center' }}>
+                <div style={{ position: 'relative' }}>
                     <div 
                         className="model-selector-pill"
                         onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
@@ -139,13 +143,23 @@ const MobileHeader = ({
                     </AnimatePresence>
                 </div>
 
-                {/* RIGHT: USER PROFILE */}
-                <UserAccountMenu
-                    side="bottom"
-                    align="end"
-                    role={`${profile?.tier || 'Free'} Access`}
-                    onSettingsClick={() => setIsAccountModalOpen(true)}
-                >
+                {/* RIGHT: ACTIONS */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <button 
+                        className="header-bug-btn"
+                        onClick={() => setShowBugModal(true)}
+                        title="Report Bug"
+                    >
+                        <Bug size={18} />
+                    </button>
+
+                    <UserAccountMenu
+                        side="bottom"
+                        align="end"
+                        forceMobile={true}
+                        role={`${profile?.tier || 'Free'} Access`}
+                        onSettingsClick={() => setIsAccountModalOpen(true)}
+                    >
                     {() => (
                         <motion.div
                             whileTap={{ scale: 0.95 }}
