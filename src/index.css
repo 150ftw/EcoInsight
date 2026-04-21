@@ -7248,47 +7248,43 @@ select {
     width: 100%;
     max-width: 440px;
     max-height: 90vh;
-    background: rgba(10, 10, 12, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
+    max-height: 90dvh;
+    background: rgba(10, 10, 12, 0.98);
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturate));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
     overflow-y: auto;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(139, 92, 246, 0.1);
+    box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.8), 
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
     position: relative;
     z-index: 10001;
     scrollbar-width: thin;
-    scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
-}
-
-.auth-modal-card::-webkit-scrollbar {
-    width: 4px;
-}
-
-.auth-modal-card::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.3);
-    border-radius: 10px;
 }
 
 .auth-modal-header {
     position: relative;
-    padding: 2.5rem 2rem 1.5rem;
+    padding: 3rem 2rem 1.5rem;
     text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .auth-close-btn {
     position: absolute;
     right: 1.5rem;
-    top: 1.5rem;
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    padding: 0.5rem;
+    top: calc(1rem + var(--safe-top));
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 50%;
-    transition: all 0.2s ease;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .auth-close-btn:hover {
@@ -8162,8 +8158,8 @@ select {
 
     /* --- HEADER --- */
     .landing-header {
-        height: 72px;
-        padding: 0 1rem;
+        height: calc(72px + var(--safe-top));
+        padding: var(--safe-top) 1rem 0;
     }
 
     .logo {
