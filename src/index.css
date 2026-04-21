@@ -23,7 +23,8 @@
 
 /* Ensure glassmorphism works across Safari/Webkit */
 [class*="glass"], [class*="modal"], [class*="header"], [class*="menu"], [class*="dropdown"] {
-    -webkit-backdrop-filter: blur(14px); /* Default fallback */
+    -webkit-backdrop-filter: blur(14px); /* Safari fallback */
+    backdrop-filter: blur(14px);         /* Standard property */
 }
 
 :root {
@@ -65,11 +66,6 @@
     cursor: default;
 }
 
-/* Enable hardware-accelerated smooth scrolling for high-end rendering */
-* {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
 
 /* --- TOUCH ERGONOMICS & GESTURE STABILIZATION --- */
 @media (hover: none) {
@@ -83,7 +79,9 @@
 }
 
 body {
-    /* Preserve natural scrolling */
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-body);
 }
 
 @media (max-width: 768px) {
