@@ -4852,6 +4852,8 @@ const FintechBadges = ({ labels }) => {
                         isOpen={isSidebarOpen} 
                         activeView={view}
                         user={user}
+                        profile={profile}
+                        setIsAccountModalOpen={setIsAccountModalOpen}
                         performanceMode={chatSettings.performanceMode}
                         setPerformanceMode={(mode) => setChatSettings(prev => ({ ...prev, performanceMode: mode }))}
                     />
@@ -5041,51 +5043,53 @@ const FintechBadges = ({ labels }) => {
                                 <Lock size={12} color="#a78bfa" />
                             </button>
                         </div>
-                        <div className="sidebar-section user-section-mobile" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginBottom: '1rem' }}>
-                            {user ? (
-                                <UserAccountMenu
-                                    side="left"
-                                    align="top"
-                                    role={`${profile?.tier || 'Free'} Access`}
-                                    onSettingsClick={() => { setIsAccountModalOpen(true); if (isMobile) setIsSidebarOpen(false); }}
-                                >
-                                    {(isOpen) => (
-                                        <div className="user-profile-custom-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem 0.75rem' }}>
-                                            <div className="user-menu-avatar">
-                                                {user.profile_image ? (
-                                                    <img src={user.profile_image} alt={user.first_name || 'User'} style={{ width: '30px', height: '30px', borderRadius: '50%' }} />
-                                                ) : (
-                                                    <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <User size={15} className="text-white" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="user-info" style={{ pointerEvents: 'none' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                   <span className="user-name" style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
-                                                   <ChevronDown size={11} style={{ opacity: 0.4, transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
-                                                </div>
-                                                <span className="user-status" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                                                    {profile?.tier || 'Free'} Access
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </UserAccountMenu>
-                            ) : (
-                                <motion.div style={{ padding: '0 0.75rem' }}>
-                                    <motion.button
-                                        onClick={openLogin}
-                                        className="sidebar-btn sidebar-btn-primary"
-                                        style={{ width: '100%', justifyContent: 'center' }}
-                                        whileHover={{ scale: 1.02, translateY: -2 }}
-                                        whileTap={{ scale: 0.98 }}
+                        {!isMobile && (
+                            <div className="sidebar-section user-section-mobile" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginBottom: '1rem' }}>
+                                {user ? (
+                                    <UserAccountMenu
+                                        side="left"
+                                        align="top"
+                                        role={`${profile?.tier || 'Free'} Access`}
+                                        onSettingsClick={() => { setIsAccountModalOpen(true); }}
                                     >
-                                        <Lock size={16} /> Sign In
-                                    </motion.button>
-                                </motion.div>
-                            )}
-                        </div>
+                                        {(isOpen) => (
+                                            <div className="user-profile-custom-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem 0.75rem' }}>
+                                                <div className="user-menu-avatar">
+                                                    {user.profile_image ? (
+                                                        <img src={user.profile_image} alt={user.first_name || 'User'} style={{ width: '30px', height: '30px', borderRadius: '50%' }} />
+                                                    ) : (
+                                                        <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <User size={15} className="text-white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="user-info" style={{ pointerEvents: 'none' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <span className="user-name" style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.first_name || user?.email.split('@')[0]}</span>
+                                                    <ChevronDown size={11} style={{ opacity: 0.4, transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
+                                                    </div>
+                                                    <span className="user-status" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                        {profile?.tier || 'Free'} Access
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </UserAccountMenu>
+                                ) : (
+                                    <motion.div style={{ padding: '0 0.75rem' }}>
+                                        <motion.button
+                                            onClick={openLogin}
+                                            className="sidebar-btn sidebar-btn-primary"
+                                            style={{ width: '100%', justifyContent: 'center' }}
+                                            whileHover={{ scale: 1.02, translateY: -2 }}
+                                            whileTap={{ scale: 0.98 }}
+                                        >
+                                            <Lock size={16} /> Sign In
+                                        </motion.button>
+                                    </motion.div>
+                                )}
+                            </div>
+                        )}
                     </nav>
                     <AnimatePresence>
                     </AnimatePresence>

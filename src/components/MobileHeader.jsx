@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Zap, ShieldCheck } from 'lucide-react';
+import UserAccountMenu from './UserAccountMenu';
 
-const MobileHeader = ({ onMenuClick, isOpen, activeView, user, performanceMode, setPerformanceMode }) => {
+const MobileHeader = ({ 
+    onMenuClick, 
+    isOpen, 
+    activeView, 
+    user, 
+    profile, 
+    setIsAccountModalOpen, 
+    performanceMode, 
+    setPerformanceMode 
+}) => {
     const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
     const toggleModel = () => {
@@ -130,36 +137,45 @@ const MobileHeader = ({ onMenuClick, isOpen, activeView, user, performanceMode, 
                 </div>
 
                 {/* RIGHT: USER PROFILE */}
-                <motion.div
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                        width: '44px',
-                        height: '44px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
+                <UserAccountMenu
+                    side="bottom"
+                    align="end"
+                    role={`${profile?.tier || 'Free'} Access`}
+                    onSettingsClick={() => setIsAccountModalOpen(true)}
                 >
-                    <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '10px',
-                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden'
-                    }}>
-                        {user?.profile_image ? (
-                            <img src={user.profile_image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Profile" />
-                        ) : (
-                            <span style={{ fontSize: '11px', fontWeight: 700, color: 'white' }}>
-                                {user?.first_name?.charAt(0) || 'S'}
-                            </span>
-                        )}
-                    </div>
-                </motion.div>
+                    {() => (
+                        <motion.div
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                width: '44px',
+                                height: '44px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <div style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '10px',
+                                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden'
+                            }}>
+                                {user?.profile_image ? (
+                                    <img src={user.profile_image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Profile" />
+                                ) : (
+                                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'white' }}>
+                                        {user?.first_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'S'}
+                                    </span>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+                </UserAccountMenu>
             </motion.div>
             <div style={{ height: 'calc(60px + env(safe-area-inset-top))' }} className="mobile-spacer" />
         </div>
