@@ -102,7 +102,7 @@ const UserAccountMenu = ({
             {!hideName && (
               <>
                 <span className="user-menu-name" style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {user.first_name || user.email.split('@')[0]}
+                  {user?.first_name || user?.email?.split('@')[0] || 'Analyst'}
                 </span>
                 <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <ChevronDown size={14} className={`user-menu-chevron ${isOpen ? 'rotate-180' : ''}`} style={{ transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
@@ -156,7 +156,7 @@ const UserAccountMenu = ({
                   )}
                 </div>
                 <div className="preview-info">
-                  <h3>{user.first_name || (user.email ? user.email.split('@')[0] : 'Analyst')}</h3>
+                  <h3>{user?.first_name || user?.email?.split('@')[0] || 'Analyst'}</h3>
                   <span>{role}</span>
                 </div>
               </div>
