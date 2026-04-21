@@ -110,7 +110,7 @@ const UserAccountMenu = ({
       </button>
 
       <AnimatePresence>
-        {(isOpen && coords.top !== 0) && createPortal(
+        {isOpen && createPortal(
           <motion.div
             ref={portalRef}
             initial={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
@@ -120,13 +120,14 @@ const UserAccountMenu = ({
             className="user-menu-dropdown portal-menu"
             style={{ 
                 position: 'fixed',
-                top: align === 'top' ? 'auto' : `${coords.top + coords.height + 10}px`,
-                bottom: align === 'top' ? `${window.innerHeight - coords.top + 10}px` : 'auto',
-                left: side === 'left' ? `${coords.left}px` : 'auto',
-                right: side === 'right' ? `${window.innerWidth - (coords.left + coords.width)}px` : 'auto',
-                zIndex: 30001,
+                top: align === 'top' ? 'auto' : `${(coords.top || 0) + (coords.height || 0) + 10}px`,
+                bottom: align === 'top' ? `${window.innerHeight - (coords.top || (window.innerHeight - 100)) + 10}px` : 'auto',
+                left: side === 'left' ? `${coords.left || 10}px` : 'auto',
+                right: side === 'right' ? `${window.innerWidth - ((coords.left || 0) + (coords.width || 220))}px` : 'auto',
+                zIndex: 40000,
                 width: 'max-content',
-                minWidth: '220px'
+                minWidth: '220px',
+                pointerEvents: 'auto'
             }}
           >
             <div className="user-menu-profile-preview">
