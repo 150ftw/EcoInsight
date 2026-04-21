@@ -91,6 +91,18 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                             </div>
                         </>
                     ) : (
+                        <>
+                            <div className="modal-header">
+                                <div className="alert-icon">
+                                    <Zap size={32} />
+                                </div>
+                                <h2 style={{ letterSpacing: '-0.5px' }}>Access Restricted</h2>
+                                <p>
+                                    This institutional-grade module is currently restricted. Please contact your account manager for neural clearance.
+                                </p>
+                            </div>
+                        </>
+                    )}
 
                     <div className="modal-actions">
                         <button className="btn-secondary-modal" onClick={onClose}>
