@@ -110,7 +110,7 @@ const UserAccountMenu = ({
       </button>
 
       <AnimatePresence>
-        {isOpen && createPortal(
+        {(isOpen && coords.top !== 0) && createPortal(
           <motion.div
             ref={portalRef}
             initial={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
