@@ -172,7 +172,7 @@ const MobileHeader = ({
                                     <img src={user.profile_image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Profile" />
                                 ) : (
                                     <span style={{ fontSize: '11px', fontWeight: 700, color: 'white' }}>
-                                        {user?.first_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'S'}
+                                        {user?.first_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'S'}
                                     </span>
                                 )}
                             </div>
