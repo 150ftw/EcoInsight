@@ -5133,7 +5133,7 @@ html {
 
 /* --- CHAT MOBILE OPTIMIZATION (ADVANCED LOCK) --- */
 @media (max-width: 768px) {
-    html, body, #root, .app-container {
+    .app-container {
         height: 100vh !important;
         height: 100dvh !important;
         overflow: hidden !important;
@@ -9976,7 +9976,8 @@ select {
     /* Prevent text selection and unintended scaling */
     body {
         -webkit-text-size-adjust: 100%;
-        touch-action: manipulation;
+        /* Performance optimization for iPhone Safari */
+        -webkit-overflow-scrolling: touch;
     }
 
     /* Anchor the interface to dynamic viewport height to prevent "jumpy" keyboard behavior */
@@ -10003,9 +10004,7 @@ select {
     /* Body scrolling preserved for Landing Page compatibility */
 
     /* Anchor the app to the VISUAL viewport height */
-    .app-container, 
-    .chat-container,
-    .main-content {
+    .app-container {
         height: var(--vv-height) !important;
         min-height: var(--vv-height) !important;
         max-height: var(--vv-height) !important;
