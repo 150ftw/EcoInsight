@@ -36,33 +36,35 @@ const MobileHeader = ({
                     background: 'rgba(10, 10, 12, 0.95)',
                     backdropFilter: 'blur(25px)',
                     borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                    padding: 'env(safe-area-inset-top) 0.75rem 0',
+                    padding: 'env(safe-area-inset-top) 0.5rem 0',
                     zIndex: 1000,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
+                    display: 'grid',
+                    gridTemplateColumns: '44px 1fr 100px', /* Precise layout: fixed left, flexible center, fixed right */
+                    alignItems: 'center'
                 }}
             >
                 {/* LEFT: MENU TRIGGER */}
-                <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={onMenuClick}
-                    style={{
-                        background: 'transparent',
-                        border: 'none',
-                        width: '44px',
-                        height: '44px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'rgba(255,255,255,0.7)'
-                    }}
-                >
-                    {isOpen ? <X size={24} /> : <Menu size={24} />}
-                </motion.button>
+                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={onMenuClick}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            width: '44px',
+                            height: '44px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'rgba(255,255,255,0.7)'
+                        }}
+                    >
+                        {isOpen ? <X size={24} /> : <Menu size={24} />}
+                    </motion.button>
+                </div>
 
                 {/* CENTER: MODEL SELECTOR */}
-                <div style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <div 
                         className="model-selector-pill"
                         onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
@@ -144,11 +146,12 @@ const MobileHeader = ({
                 </div>
 
                 {/* RIGHT: ACTIONS */}
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', paddingRight: '4px' }}>
                     <button 
                         className="header-bug-btn"
                         onClick={() => setShowBugModal(true)}
                         title="Report Bug"
+                        style={{ margin: 0 }} /* Reset margin from previous attempts */
                     >
                         <Bug size={18} />
                     </button>
