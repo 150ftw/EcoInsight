@@ -57,7 +57,10 @@ const UserAccountMenu = ({
     };
   }, [isOpen]);
 
-  const toggleMenu = () => {
+  const toggleMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!isOpen) {
       // Capture coordinates synchronously before opening to prevent flickering/misalignment
       if (triggerRef.current) {
@@ -78,6 +81,7 @@ const UserAccountMenu = ({
   return (
     <div className="user-menu-container" ref={menuRef}>
       <button 
+        type="button"
         ref={triggerRef}
         onClick={toggleMenu}
         className={`user-menu-trigger-wrapper ${isOpen ? 'active' : ''}`}
@@ -109,77 +113,79 @@ const UserAccountMenu = ({
         ))}
       </button>
 
-      <AnimatePresence>
-        {isOpen && createPortal(
-          <motion.div
-            ref={portalRef}
-            initial={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
-            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-            className="user-menu-dropdown portal-menu"
-            style={{ 
-                position: 'fixed',
-                top: align === 'top' ? 'auto' : `${(coords.top || 0) + (coords.height || 0) + 10}px`,
-                bottom: align === 'top' ? `${window.innerHeight - (coords.top || (window.innerHeight - 100)) + 10}px` : 'auto',
-                left: side === 'left' ? `${coords.left || 10}px` : 'auto',
-                right: side === 'right' ? `${window.innerWidth - ((coords.left || 0) + (coords.width || 220))}px` : 'auto',
-                zIndex: 40000,
-                width: 'max-content',
-                minWidth: '220px',
-                pointerEvents: 'auto'
-            }}
-          >
-            <div className="user-menu-profile-preview">
-              <div className="preview-avatar">
-                {user.profile_image ? (
-                  <img src={user.profile_image} alt={user.first_name || 'User'} />
-                ) : (
-                  <div className="avatar-placeholder">
-                    <UserIcon size={20} className="text-white" />
-                  </div>
-                )}
+      {createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              ref={portalRef}
+              initial={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: align === 'top' ? 10 : -10 }}
+              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+              className="user-menu-dropdown portal-menu"
+              style={{ 
+                  position: 'fixed',
+                  top: align === 'top' ? 'auto' : `${(coords.top || 0) + (coords.height || 0) + 10}px`,
+                  bottom: align === 'top' ? `${window.innerHeight - (coords.top || (window.innerHeight - 100)) + 10}px` : 'auto',
+                  left: side === 'left' ? `${coords.left || 10}px` : 'auto',
+                  right: side === 'right' ? `${window.innerWidth - ((coords.left || 0) + (coords.width || 220))}px` : 'auto',
+                  zIndex: 40000,
+                  width: 'max-content',
+                  minWidth: '220px',
+                  pointerEvents: 'auto'
+              }}
+            >
+              <div className="user-menu-profile-preview">
+                <div className="preview-avatar">
+                  {user.profile_image ? (
+                    <img src={user.profile_image} alt={user.first_name || 'User'} />
+                  ) : (
+                    <div className="avatar-placeholder">
+                      <UserIcon size={20} className="text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="preview-info">
+                  <h3>{user.first_name || (user.email ? user.email.split('@')[0] : 'Analyst')}</h3>
+                  <span>{role}</span>
+                </div>
               </div>
-              <div className="preview-info">
-                <h3>{user.first_name || user.email.split('@')[0]}</h3>
-                <span>{role}</span>
-              </div>
-            </div>
 
-            <div className="user-menu-header">
-              <p title={user.email}>{user.email}</p>
-            </div>
-            
-            <div className="user-menu-body">
-              <button 
-                onClick={() => { 
-                  setIsOpen(false); 
-                  onSettingsClick();
-                }}
-                className="user-menu-item"
-              >
-                <div className="user-menu-icon" style={{ color: 'var(--accent-primary)' }}>
-                  <Settings size={18} />
-                </div>
-                <span>Account Settings</span>
-              </button>
+              <div className="user-menu-header">
+                <p title={user.email}>{user.email}</p>
+              </div>
               
-              <div className="user-menu-divider" />
-              
-              <button 
-                onClick={() => { setIsOpen(false); logout(); }}
-                className="user-menu-item user-menu-logout"
-              >
-                <div className="user-menu-icon">
-                  <LogOut size={18} />
-                </div>
-                <span>Sign Out</span>
-              </button>
-            </div>
-          </motion.div>,
-          document.body
-        )}
-      </AnimatePresence>
+              <div className="user-menu-body">
+                <button 
+                  onClick={() => { 
+                    setIsOpen(false); 
+                    onSettingsClick();
+                  }}
+                  className="user-menu-item"
+                >
+                  <div className="user-menu-icon" style={{ color: 'var(--accent-primary)' }}>
+                    <Settings size={18} />
+                  </div>
+                  <span>Account Settings</span>
+                </button>
+                
+                <div className="user-menu-divider" />
+                
+                <button 
+                  onClick={() => { setIsOpen(false); logout(); }}
+                  className="user-menu-item user-menu-logout"
+                >
+                  <div className="user-menu-icon">
+                    <LogOut size={18} />
+                  </div>
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };
