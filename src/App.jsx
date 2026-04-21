@@ -5233,7 +5233,15 @@ const FintechBadges = ({ labels }) => {
                     <IntelligenceHubNotification 
                         {...(intelNotificationProps || {})}
                         onOpen={() => {
-                            if (!intelNotificationProps) {
+                            const type = intelNotificationProps?.type;
+                            if (type === 'insights') {
+                                setView('insights');
+                                setIsIntelHubExpanded(true);
+                            } else if (type === 'auth_success') {
+                                setAppSection('chat');
+                                setView('chat');
+                            } else {
+                                // Default fallback
                                 setView('insights');
                                 setIsIntelHubExpanded(true);
                             }
