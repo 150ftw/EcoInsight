@@ -192,7 +192,8 @@ const MobileHeader = ({
                             </div>
                         </motion.div>
                     )}
-                </UserAccountMenu>
+                    </UserAccountMenu>
+                </div>
             </motion.div>
             <div style={{ height: 'calc(60px + env(safe-area-inset-top))' }} className="mobile-spacer" />
         </div>
