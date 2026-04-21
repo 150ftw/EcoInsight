@@ -36,7 +36,6 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     text-rendering: optimizeLegibility;
-    overscroll-behavior: none;
     cursor: default;
 }
 
@@ -58,7 +57,7 @@
 }
 
 body {
-    overscroll-behavior-y: none; /* Prevent mobile rubber-banding */
+    /* Preserve natural scrolling */
 }
 
 @media (max-width: 768px) {
@@ -1473,11 +1472,9 @@ main {
     }
     
     body {
-        /* Prevent elastic scrolling and layout shifts on iOS */
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+        /* Natural scrolling restored for Landing Page */
+        min-height: 100vh;
+        overflow-x: hidden;
     }
 }
 
@@ -10009,14 +10006,7 @@ select {
 }
 
 @media (max-width: 768px) {
-    /* Prevent body from shifting or scrolling when keyboard is active */
-    html, body {
-        overflow: hidden !important;
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overscroll-behavior: none !important;
-    }
+    /* Body scrolling preserved for Landing Page compatibility */
 
     /* Anchor the app to the VISUAL viewport height */
     .app-container, 
