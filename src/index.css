@@ -3625,7 +3625,7 @@ input[type="range"] {
         background: rgba(10, 10, 12, 0.98) !important; /* Fully opaque to prevent bleed-through */
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
-        z-index: 200; /* Above overlay */
+        z-index: 1100; /* Above mobile header (1000) */
         border-right: 1px solid rgba(139, 92, 246, 0.2);
         box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6);
     }
@@ -3634,6 +3634,7 @@ input[type="range"] {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        position: relative;
     }
 
     .sidebar-header .logo {
@@ -3663,7 +3664,7 @@ input[type="range"] {
 
     /* --- SIDEBAR OVERLAY FIX --- */
     .sidebar-overlay {
-        z-index: 150 !important; /* Between content and sidebar */
+        z-index: 1050 !important; /* Between content and sidebar */
         background: rgba(0, 0, 0, 0.7) !important;
     }
 
@@ -9947,8 +9948,10 @@ select {
     }
 
     .sidebar-close-btn {
-        right: -50px !important;
-        top: 20px !important;
+        position: absolute !important;
+        right: 15px !important;
+        top: 15px !important;
+        z-index: 10 !important;
     }
 
     /* Optimization for Thought Tracer */
