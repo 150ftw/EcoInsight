@@ -3834,7 +3834,8 @@ function App() {
             'nifty', 'sensex', 'price', 'stock', 'share', 'market', 'index', 'crypto', 'bitcoin', 'btc', 'eth',
             'analysis', 'chart', 'trend', 'dividend', 'earning', 'profit', 'loss', 'gdp', 'inflation', 'rbi',
             'policy', 'interest', 'rate', 'mutual fund', 'sip', 'gold', 'silver', 'commodity', 'portfolio',
-            'buy', 'sell', 'invest', 'ipo', 'company', 'reliance', 'tcs', 'hdfc', 'infy', 'news'
+            'buy', 'sell', 'invest', 'ipo', 'company', 'reliance', 'tcs', 'hdfc', 'infy', 'news',
+            'pe', 'p/e', 'ratio', 'eps', 'market cap', 'mkt cap', 'valuation', '52 week', '52-week', 'fundamentals', 'target'
         ];
 
         return complexKeywords.some(keyword => lowText.includes(keyword)) || lowText.split(' ').length > 4;
