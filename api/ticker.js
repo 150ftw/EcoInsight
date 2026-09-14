@@ -154,6 +154,30 @@ async function scrapeGoogleFinance(candidateSymbol) {
     const volume = stats['Volume'] || stats['Avg. vol.'] || stats['Avg volume'] || 'N/A';
     const sharesOutstanding = stats['Shares outstanding'] || 'N/A';
 
+    // Real daily OHLC history (~1 month of trading days), embedded by Google in the
+    // page's own AF_initDataCallback data blocks for its chart widget. Matched by
+    // shape (open, close, high, low, ISO timestamp, volume) rather than a specific
+    // "ds:N" key, since Google renumbers those per-page. This is genuine historical
+    // data, not synthesized — used to power the 1W/1M chart ranges for real.
+    const history = [];
+    const ohlcRegex = /\[([0-9.]+),([0-9.]+),([0-9.]+),([0-9.]+),"(\d{4}-\d{2}-\d{2}T[\d:]+[+-][\d:]+)",(\d+)\]/g;
+    const seenDates = new Set();
+    let ohlcMatch;
+    while ((ohlcMatch = ohlcRegex.exec(html)) !== null) {
+      const [, open, close, high, low, timestamp, vol] = ohlcMatch;
+      if (seenDates.has(timestamp)) continue;
+      seenDates.add(timestamp);
+      history.push({
+        date: timestamp,
+        open: parseFloat(open),
+        close: parseFloat(close),
+        high: parseFloat(high),
+        low: parseFloat(low),
+        volume: parseInt(vol, 10)
+      });
+    }
+    history.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     return {
       name,
       price,
@@ -171,6 +195,7 @@ async function scrapeGoogleFinance(candidateSymbol) {
       prevClose,
       volume,
       sharesOutstanding,
+      history,
       fullSymbol: candidateSymbol,
       source: 'EcoInsight Real-Time Engine (Google Finance Live)'
     };
@@ -178,6 +203,84 @@ async function scrapeGoogleFinance(candidateSymbol) {
     clearTimeout(timeoutId);
     return null;
   }
+}
+
+const parseCurrencyValue = (str) => {
+  if (!str || str === 'N/A') return null;
+  const n = parseFloat(String(str).replace(/[^0-9.]/g, ''));
+  return Number.isFinite(n) ? n : null;
+};
+
+const formatDayLabel = (isoDate) => {
+  const d = new Date(isoDate);
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+};
+
+/**
+ * Builds the chart series for a given range. 1W and 1M use the real daily OHLC
+ * history scraped from Google Finance's own page (see `history` above) — actual
+ * historical closes, not synthesized. 1D and 1Y fall back to a bounded synthetic
+ * walk (we don't have real intraday or full-year data from this source), but
+ * anchored to real values — today's actual OHLC for 1D, the real 52-week
+ * high/low for 1Y — rather than a context-free curve derived from price alone.
+ */
+function buildSparkline(scrapedData, range, numPrice, isPos) {
+  const history = scrapedData.history || [];
+
+  if ((range === '1mo' || range === '5d') && history.length > 0) {
+    const slice = range === '5d' ? history.slice(-5) : history;
+    if (slice.length > 1) {
+      return slice.map(bar => ({
+        time: formatDayLabel(bar.date),
+        price: bar.close
+      }));
+    }
+  }
+
+  if (range === '1d') {
+    const today = history.length > 0 ? history[history.length - 1] : null;
+    const dayHigh = today?.high ?? parseCurrencyValue(scrapedData.dayRange?.split('-')[1]) ?? numPrice * 1.01;
+    const dayLow = today?.low ?? parseCurrencyValue(scrapedData.dayRange?.split('-')[0]) ?? numPrice * 0.99;
+    const dayOpen = today?.open ?? dayLow + (dayHigh - dayLow) / 2;
+    return Array.from({ length: 20 }, (_, i) => {
+      const progress = i / 19;
+      // Smoothly interpolate open -> low/high excursion -> current live price,
+      // bounded by today's real range so the shape is at least plausible.
+      const base = dayOpen + (numPrice - dayOpen) * progress;
+      const excursion = Math.sin(progress * Math.PI) * (dayHigh - dayLow) * 0.15;
+      const price = i === 19 ? numPrice : base + excursion;
+      return {
+        time: `${String(9 + Math.floor(progress * 6)).padStart(2, '0')}:${String(Math.floor((progress * 6 * 60) % 60)).padStart(2, '0')}`,
+        price: parseFloat(Math.max(dayLow, Math.min(dayHigh, price)).toFixed(2))
+      };
+    });
+  }
+
+  if (range === '1y') {
+    const yearHigh = parseCurrencyValue(scrapedData.high52) ?? numPrice * 1.2;
+    const yearLow = parseCurrencyValue(scrapedData.low52) ?? numPrice * 0.8;
+    return Array.from({ length: 20 }, (_, i) => {
+      const progress = i / 19;
+      const base = yearLow + (yearHigh - yearLow) * (0.3 + 0.4 * Math.sin(progress * Math.PI * 1.3));
+      const price = i === 19 ? numPrice : base + (numPrice - base) * progress;
+      return {
+        time: formatDayLabel(new Date(Date.now() - (19 - i) * 18 * 24 * 60 * 60 * 1000).toISOString()),
+        price: parseFloat(Math.max(yearLow, Math.min(yearHigh, price)).toFixed(2))
+      };
+    });
+  }
+
+  // Fallback (unrecognized range, or no history available): the original
+  // price-only synthetic curve, kept so this never returns an empty chart.
+  return Array.from({ length: 20 }, (_, i) => {
+    const progress = i / 19;
+    const trend = isPos ? (progress * 0.003) : (-progress * 0.003);
+    const noise = (Math.sin(i * 1.5) * 0.001);
+    return {
+      time: `${i}:00`,
+      price: parseFloat((numPrice * (1 + trend + noise)).toFixed(2))
+    };
+  });
 }
 
 export default async function handler(req, res) {
@@ -252,18 +355,9 @@ export default async function handler(req, res) {
     });
   }
 
-  // Generate realistic sparkline from real price and day movement
   const numPrice = parseFloat(scrapedData.price) || 0;
   const isPos = scrapedData.isPositive;
-  const sparkline = Array.from({ length: 20 }, (_, i) => {
-    const progress = i / 19;
-    const trend = isPos ? (progress * 0.003) : (-progress * 0.003);
-    const noise = (Math.sin(i * 1.5) * 0.001);
-    return {
-      time: `${i}:00`,
-      price: parseFloat((numPrice * (1 + trend + noise)).toFixed(2))
-    };
-  });
+  const sparkline = buildSparkline(scrapedData, range, numPrice, isPos);
 
   const responsePayload = {
     symbol: cleanSymbol,

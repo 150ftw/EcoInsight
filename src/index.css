@@ -9431,6 +9431,20 @@ select {
     font-family: var(--font-body);
 }
 
+.detailed-footer.minimal-footer {
+    padding: 0;
+    background: #000000;
+}
+
+.detailed-footer.minimal-footer::before {
+    display: none;
+}
+
+.detailed-footer.minimal-footer .footer-bottom-bar {
+    padding: 2rem 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .footer-glow {
     position: absolute;
     top: -100px;
