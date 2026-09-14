@@ -482,7 +482,12 @@ export const fetchVerifiedPrice = async (symbol, force = false) => {
         return null;
     } catch (e) {
         console.error('Verification engine error:', e);
-        return await fetchGoogleFinancePrice(symbol, force);
+        try {
+            return await fetchGoogleFinancePrice(symbol, force);
+        } catch (fallbackError) {
+            console.error('Verification engine fallback also failed:', fallbackError);
+            return null;
+        }
     }
 };
 

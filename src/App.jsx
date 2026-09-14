@@ -3405,8 +3405,6 @@ function App() {
     }, []);
 
     const handleAccountSave = async (updatedData) => {
-        setProfile(prev => ({ ...prev, ...updatedData }));
-
         if (user?.id && supaLoaded) {
             try {
                 // 1. Sync identity fields (name) with Auth backend if changed
@@ -3432,9 +3430,17 @@ function App() {
                 });
             } catch (err) {
                 console.error('Account save failed:', err);
+                // Don't touch local profile state — it should keep reflecting
+                // whatever was actually last saved, not a change that failed.
                 throw err;
             }
         }
+
+        // Only reflect the change locally once every backend call above has
+        // actually succeeded — updating optimistically before that point made
+        // the UI show the new name/avatar/password state even when the save
+        // silently failed underneath it.
+        setProfile(prev => ({ ...prev, ...updatedData }));
     };
 
 

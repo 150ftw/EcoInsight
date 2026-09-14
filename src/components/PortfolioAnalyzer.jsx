@@ -42,13 +42,20 @@ const PortfolioAnalyzer = ({ onAnalyze }) => {
     const addStock = async () => {
         if (!tempSymbol || !tempQty) return;
         const symbol = tempSymbol.toUpperCase();
-        // Try to get current price immediately
-        const data = await fetchVerifiedPrice(symbol);
-        const price = data && data.price ? data.price : 0;
-        
-        setStocks([...stocks, { 
-            symbol, 
-            name: symbol, 
+        // Try to get current price immediately — add the stock either way (price
+        // defaults to 0, editable later) so a bad/unsupported symbol or a network
+        // hiccup here never leaves the button looking like it did nothing.
+        let price = 0;
+        try {
+            const data = await fetchVerifiedPrice(symbol);
+            if (data && data.price) price = data.price;
+        } catch (e) {
+            console.warn(`Price lookup failed for ${symbol}:`, e);
+        }
+
+        setStocks([...stocks, {
+            symbol,
+            name: symbol,
             quantity: parseFloat(tempQty),
             price: price
         }]);

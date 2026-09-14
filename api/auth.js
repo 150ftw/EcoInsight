@@ -124,6 +124,10 @@ async function handleSignup(req, res) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
+  if (password.length < 8) {
+    return res.status(400).json({ message: 'Password must be at least 8 characters' });
+  }
+
   // 1. Check if user already exists
   const { data: existingUser } = await supabase
     .from('users')

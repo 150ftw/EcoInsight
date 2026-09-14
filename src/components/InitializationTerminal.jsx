@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const InitializationTerminal = ({ moduleName, onClose }) => {
@@ -69,7 +69,11 @@ const InitializationTerminal = ({ moduleName, onClose }) => {
         return [...baseLogs, ...specificLogs, `> PARITY CHECK COMPLETE.`, `> INTEGRATION STATUS: NOMINAL.`];
     };
 
-    const terminalLines = getCustomLogs(moduleName);
+    // Memoized so the effect below (keyed on terminalLines) doesn't see a new
+    // array reference on every render and restart the interval from scratch —
+    // that was leaving the terminal stuck repeating its first line forever,
+    // with no way to close it (the only close button only renders on completion).
+    const terminalLines = useMemo(() => getCustomLogs(moduleName), [moduleName]);
 
     useEffect(() => {
         let currentLine = 0;

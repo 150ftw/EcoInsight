@@ -7,8 +7,10 @@ const InstitutionalVoicePlayer = ({ messages, activeChat, onClose }) => {
     const [isPaused, setIsPaused] = useState(false);
     const [currentTextIndex, setCurrentTextIndex] = useState(0);
     const [voice, setVoice] = useState(null);
+    const [speechError, setSpeechError] = useState(false);
     const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
     const utteranceRef = useRef(null);
+    const pendingSpeakTimeoutRef = useRef(null);
 
     // Advanced Summary Logic: Extracts the "Bottom Line" for the user
     const summarizeIntelligence = (text) => {
@@ -105,10 +107,23 @@ const InstitutionalVoicePlayer = ({ messages, activeChat, onClose }) => {
 
         return () => {
             synth.cancel();
+            // The onend handler below schedules the next sentence via setTimeout,
+            // which isn't tied to React's lifecycle — without clearing it here,
+            // closing the player mid-sentence lets that timeout fire after
+            // unmount, starting a new utterance (audio resumes with no player
+            // visible) and calling setState on an unmounted component.
+            if (pendingSpeakTimeoutRef.current) {
+                clearTimeout(pendingSpeakTimeoutRef.current);
+                pendingSpeakTimeoutRef.current = null;
+            }
         };
     }, [synth]);
 
     const stop = () => {
+        if (pendingSpeakTimeoutRef.current) {
+            clearTimeout(pendingSpeakTimeoutRef.current);
+            pendingSpeakTimeoutRef.current = null;
+        }
         if (synth) synth.cancel();
         setIsPlaying(false);
         setIsPaused(false);
@@ -137,13 +152,14 @@ const InstitutionalVoicePlayer = ({ messages, activeChat, onClose }) => {
         utterance.onstart = () => {
             setIsPlaying(true);
             setIsPaused(false);
+            setSpeechError(false);
             setCurrentTextIndex(index);
         };
 
         utterance.onend = () => {
             if (index + 1 < speechMessages.length) {
                 // Short organic pause between sentences
-                setTimeout(() => speak(index + 1), 250);
+                pendingSpeakTimeoutRef.current = setTimeout(() => speak(index + 1), 250);
             } else {
                 stop();
             }
@@ -151,6 +167,7 @@ const InstitutionalVoicePlayer = ({ messages, activeChat, onClose }) => {
 
         utterance.onerror = (e) => {
             console.error('Speech Error:', e);
+            setSpeechError(true);
             stop();
         };
 
@@ -175,6 +192,7 @@ const InstitutionalVoicePlayer = ({ messages, activeChat, onClose }) => {
     };
 
     const hasContent = speechMessages.length > 0;
+    const canPlay = hasContent && !!synth;
 
     return (
         <motion.div 
@@ -192,7 +210,11 @@ const InstitutionalVoicePlayer = ({ messages, activeChat, onClose }) => {
                         {isPlaying ? 'SUMMARIZING INTEL' : 'NEURAL BRIEFING READY'}
                     </div>
                     <div className="brief-title">
-                        {!hasContent ? 'Awaiting Intelligence...' : (activeChat?.title || 'Intelligence Briefing')}
+                        {speechError
+                            ? 'Voice playback failed — try again'
+                            : !synth
+                                ? 'Voice briefing unsupported in this browser'
+                                : (!hasContent ? 'Awaiting Intelligence...' : (activeChat?.title || 'Intelligence Briefing'))}
                     </div>
                 </div>
 
@@ -215,10 +237,10 @@ const InstitutionalVoicePlayer = ({ messages, activeChat, onClose }) => {
                 </div>
 
                 <div className="player-controls">
-                    <button 
-                        onClick={togglePlay} 
-                        className={`control-btn main ${!hasContent ? 'disabled' : ''}`}
-                        disabled={!hasContent}
+                    <button
+                        onClick={togglePlay}
+                        className={`control-btn main ${!canPlay ? 'disabled' : ''}`}
+                        disabled={!canPlay}
                     >
                         {isPlaying && !isPaused ? <Pause size={20} /> : <Play size={20} />}
                     </button>

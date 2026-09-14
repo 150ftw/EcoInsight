@@ -18,12 +18,17 @@ const MarketPulseDashboard = () => {
     const loadPulseData = async () => {
         try {
             const registry = await fetchPulseRegistry();
+            // fetchPulseRegistry() catches its own errors and resolves null on
+            // failure rather than throwing — data intentionally stays whatever
+            // it was before (last-known-good on a periodic refresh failure, or
+            // null on the very first load, handled by the !data state below).
             if (registry) {
                 setData(registry);
             }
-            setLoading(false);
         } catch (e) {
             console.error("Pulse Dashboard load failed:", e);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -48,28 +53,65 @@ const MarketPulseDashboard = () => {
         visible: { y: 0, opacity: 1 }
     };
 
-    if (loading || !data) {
+    if (loading) {
         return (
-            <div style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                minHeight: '80vh', 
-                width: '100%', 
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '80vh',
+                width: '100%',
                 gap: '1rem',
                 color: '#c084fc'
             }}>
                 <RefreshCw className="animate-spin" size={32} />
-                <span style={{ 
-                    fontFamily: 'monospace', 
-                    fontSize: '0.875rem', 
-                    letterSpacing: '0.1em', 
+                <span style={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.875rem',
+                    letterSpacing: '0.1em',
                     textTransform: 'uppercase',
                     textAlign: 'center'
                 }}>
                     Initializing Neural Market Flux...
                 </span>
+            </div>
+        );
+    }
+
+    if (!data) {
+        return (
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '80vh',
+                width: '100%',
+                gap: '1rem',
+                color: 'rgba(255,255,255,0.5)'
+            }}>
+                <Info size={32} />
+                <span style={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.875rem',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    textAlign: 'center'
+                }}>
+                    Unable to reach live market data
+                </span>
+                <button
+                    onClick={() => { setLoading(true); loadPulseData(); }}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)',
+                        color: '#c084fc', padding: '0.6rem 1.2rem', borderRadius: '10px',
+                        fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer'
+                    }}
+                >
+                    <RefreshCw size={14} /> Retry
+                </button>
             </div>
         );
     }
@@ -199,7 +241,7 @@ const MarketPulseDashboard = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
                             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '12px' }}>
                                 <span style={{ display: 'block', fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>A/D Ratio</span>
-                                <span style={{ fontSize: '1.25rem', fontWeight: 700 }}>{(breadth.advances / breadth.declines).toFixed(2)}</span>
+                                <span style={{ fontSize: '1.25rem', fontWeight: 700 }}>{breadth.declines > 0 ? (breadth.advances / breadth.declines).toFixed(2) : breadth.advances.toFixed(2)}</span>
                             </div>
                             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '12px' }}>
                                 <span style={{ display: 'block', fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Strength</span>

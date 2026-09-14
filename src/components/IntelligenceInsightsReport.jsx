@@ -24,9 +24,10 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
             ]);
             if (registry) setData(registry);
             if (sectorData) setSectors(sectorData);
-            setLoading(false);
         } catch (e) {
             console.error("Insight Registry load failed:", e);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -69,6 +70,43 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
                 }}>
                     Synthesizing Market Intelligence...
                 </span>
+            </div>
+        );
+    }
+
+    if (!data) {
+        return (
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '80vh',
+                width: '100%',
+                gap: '1rem',
+                color: 'rgba(255,255,255,0.5)'
+            }}>
+                <Sparkles size={32} />
+                <span style={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.875rem',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    textAlign: 'center'
+                }}>
+                    Unable to synthesize market intelligence
+                </span>
+                <button
+                    onClick={() => { setLoading(true); loadInsightData(); }}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)',
+                        color: '#c084fc', padding: '0.6rem 1.2rem', borderRadius: '10px',
+                        fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer'
+                    }}
+                >
+                    Retry
+                </button>
             </div>
         );
     }

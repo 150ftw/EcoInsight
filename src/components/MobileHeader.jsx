@@ -16,8 +16,8 @@ const MobileHeader = ({
 }) => {
     const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
-    const toggleModel = () => {
-        setPerformanceMode(!performanceMode);
+    const selectModel = (nextPerformanceMode) => {
+        setPerformanceMode(nextPerformanceMode);
         setIsModelDropdownOpen(false);
     };
 
@@ -100,9 +100,9 @@ const MobileHeader = ({
                                         zIndex: 11
                                     }}
                                 >
-                                    <div 
+                                    <div
                                         className={`dropdown-item ${performanceMode ? 'active' : ''}`}
-                                        onClick={() => toggleModel()}
+                                        onClick={() => selectModel(true)}
                                         style={{
                                             padding: '12px',
                                             borderRadius: '12px',
@@ -119,9 +119,9 @@ const MobileHeader = ({
                                             <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>Optimized for speed & mobile data.</div>
                                         </div>
                                     </div>
-                                    <div 
+                                    <div
                                         className={`dropdown-item ${!performanceMode ? 'active' : ''}`}
-                                        onClick={() => toggleModel()}
+                                        onClick={() => selectModel(false)}
                                         style={{
                                             padding: '12px',
                                             borderRadius: '12px',

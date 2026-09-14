@@ -309,16 +309,17 @@ const AuthModal = ({ isOpen, onClose, initialView = 'login', subtitleOverride = 
                 </div>
                 <div className="auth-input-group">
                   <label className="auth-label">Password</label>
-                  <input 
+                  <input
                     type="password"
                     required
+                    minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min 8 characters"
                     className="auth-input with-icon"
                   />
                 </div>
-                <button 
+                <button
                   type="submit"
                   disabled={isLoading}
                   className="auth-primary-btn"

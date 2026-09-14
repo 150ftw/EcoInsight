@@ -36,6 +36,7 @@ const AccountSettingsModal = ({ isOpen, onClose, profile, onSave }) => {
   ];
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('idle'); // 'idle', 'success', 'error'
+  const [saveError, setSaveError] = useState('');
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [passwords, setPasswords] = useState({
     newPassword: '',
@@ -45,10 +46,14 @@ const AccountSettingsModal = ({ isOpen, onClose, profile, onSave }) => {
   const handleSave = async (e) => {
     e.preventDefault();
     setIsSaving(true);
+    setSaveError('');
     try {
       if (showPasswordChange) {
         if (!passwords.newPassword || passwords.newPassword !== passwords.confirmPassword) {
            throw new Error('Passwords do not match or are empty');
+        }
+        if (passwords.newPassword.length < 8) {
+           throw new Error('Password must be at least 8 characters');
         }
         await onSave({ ...formData, newPassword: passwords.newPassword });
       } else {
@@ -61,6 +66,7 @@ const AccountSettingsModal = ({ isOpen, onClose, profile, onSave }) => {
       }, 1500);
     } catch (err) {
       setSaveStatus('error');
+      setSaveError(err?.message || 'Failed to save changes. Please try again.');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
       setIsSaving(false);
@@ -204,21 +210,30 @@ const AccountSettingsModal = ({ isOpen, onClose, profile, onSave }) => {
                     />
                   </div>
                 </div>
-                {passwords.newPassword && passwords.confirmPassword && passwords.newPassword !== passwords.confirmPassword && (
-                  <p style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.5rem' }}>Passwords do not match</p>
+                {passwords.newPassword && passwords.confirmPassword !== passwords.newPassword && (
+                  <p style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+                    {passwords.confirmPassword ? 'Passwords do not match' : 'Confirm your new password'}
+                  </p>
                 )}
                 <button type="button" className="auth-back-link" onClick={() => { setShowPasswordChange(false); setPasswords({newPassword: '', confirmPassword: ''}); }}>Cancel change</button>
               </motion.div>
             )}
 
+            {saveStatus === 'error' && saveError && (
+              <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <AlertCircle size={14} /> {saveError}
+              </p>
+            )}
+
             <div className="auth-modal-footer-actions" style={{ marginTop: '2rem' }}>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isSaving}
-                className={`auth-primary-btn ${saveStatus === 'success' ? 'success' : ''}`}
+                className={`auth-primary-btn ${saveStatus === 'success' ? 'success' : ''} ${saveStatus === 'error' ? 'error' : ''}`}
               >
-                {isSaving ? <Loader2 size={18} className="animate-spin" /> : 
-                 saveStatus === 'success' ? <><Check size={18} /> Identity Updated</> : 
+                {isSaving ? <Loader2 size={18} className="animate-spin" /> :
+                 saveStatus === 'success' ? <><Check size={18} /> Identity Updated</> :
+                 saveStatus === 'error' ? <><AlertCircle size={18} /> Save Failed</> :
                  'Save Changes'}
               </button>
             </div>

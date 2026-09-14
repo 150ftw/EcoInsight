@@ -42,9 +42,10 @@ const MarketTicker = () => {
             ];
 
             setStats(allStats);
-            setLoading(false);
         } catch (e) {
             console.error("Ticker data load failed:", e);
+        } finally {
+            setLoading(false);
         }
     };
 
