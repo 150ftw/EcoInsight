@@ -284,97 +284,6 @@ const EcoAreaChart = ({ data, title, dataKeys }) => {
     );
 };
 
-// Premium Institutional Table Component
-const EcoTable = ({ rows, headers }) => {
-    if (!rows || !rows.length) return null;
-
-    return (
-        <div 
-            className="institutional-table-wrapper"
-            style={{
-                margin: '1.5rem 0',
-                width: '100%',
-                overflowX: 'auto',
-                borderRadius: '16px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                background: 'rgba(0, 0, 0, 0.2)',
-                backdropFilter: 'blur(10px)',
-                position: 'relative',
-                /* Standardize scrollbar for Windows/macOS */
-                scrollbarWidth: 'thin',
-                scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent'
-            }}
-        >
-            <table style={{
-                width: '100%',
-                minWidth: '550px', /* Prevent squashing on mobile */
-                borderCollapse: 'separate', /* Necessary for sticky borders */
-                borderSpacing: 0,
-                fontSize: '0.85rem',
-                color: '#d1d5db',
-                textAlign: 'left'
-            }}>
-                <thead>
-                    <tr style={{ background: 'rgba(139, 92, 246, 0.15)' }}>
-                        {headers.map((header, idx) => (
-                            <th 
-                                key={idx} 
-                                style={{
-                                    padding: '14px 16px',
-                                    fontWeight: 700,
-                                    color: '#fff',
-                                    textTransform: 'uppercase',
-                                    fontSize: '0.7rem',
-                                    letterSpacing: '0.8px',
-                                    borderBottom: '1px solid rgba(255,255,255,0.1)',
-                                    position: idx === 0 ? 'sticky' : 'static',
-                                    left: 0,
-                                    zIndex: idx === 0 ? 2 : 1,
-                                    background: idx === 0 ? 'rgba(20, 20, 25, 0.95)' : 'transparent',
-                                    backdropFilter: idx === 0 ? 'blur(10px)' : 'none',
-                                    boxShadow: idx === 0 ? '4px 0 8px rgba(0,0,0,0.3)' : 'none'
-                                }}
-                            >
-                                {header}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows.map((row, rIdx) => (
-                        <tr key={rIdx} style={{ 
-                            background: rIdx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)',
-                            transition: 'background 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139, 92, 246, 0.05)'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = rIdx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)'}
-                        >
-                            {row.map((cell, cIdx) => (
-                                <td 
-                                    key={cIdx} 
-                                    style={{
-                                        padding: '12px 16px',
-                                        borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                        fontWeight: cIdx === 0 ? 700 : 400,
-                                        color: cIdx === 0 ? '#fff' : 'inherit',
-                                        position: cIdx === 0 ? 'sticky' : 'static',
-                                        left: 0,
-                                        zIndex: cIdx === 0 ? 1 : 0,
-                                        background: cIdx === 0 ? (rIdx % 2 === 0 ? 'rgba(15, 15, 20, 0.98)' : 'rgba(20, 20, 25, 0.98)') : 'transparent',
-                                        boxShadow: cIdx === 0 ? '4px 0 8px rgba(0,0,0,0.3)' : 'none'
-                                    }}
-                                >
-                                    {cell}
-                                </td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-};
-
 /**
  * Sanitizes a raw JSON string from the AI to be more parser-friendly.
  * Removes units like %, M, B, Cr, L and fixes minor syntax errors.
@@ -415,8 +324,11 @@ export const parseChartBlocks = (text) => {
     if (!text) return [{ type: 'text', content: text }];
 
     const parts = [];
-    // Enhanced regex: 1. Matches ```chart blocks (tag captured separately) 2. Matches raw {type:chart} JSON 3. Matches markdown tables (| cell | cell |)
-    const combinedRegex = /```(chart|json|sentinel)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap|sentinel_extrapolation)"\s*,[\s\S]*?(?:"data"|"score"|"sectors"|"extrapolations")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})|((?:\n|^)\s*\|.*\|.*\n\s*\|[\s\-\| :]*\|\s*(?:\n\s*\|.*\|.*)*)/gi;
+    // Matches ```chart blocks (tag captured separately) and raw {type:chart} JSON.
+    // Markdown tables are intentionally left untouched here — they're left inside
+    // 'text' blocks and rendered by ReactMarkdown + remark-gfm, which parses GFM
+    // table syntax far more reliably than a hand-rolled regex can.
+    const combinedRegex = /```(chart|json|sentinel)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap|sentinel_extrapolation)"\s*,[\s\S]*?(?:"data"|"score"|"sectors"|"extrapolations")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})/gi;
 
     let lastIndex = 0;
     let match;
@@ -434,79 +346,59 @@ export const parseChartBlocks = (text) => {
         // into the chat. An untagged ``` fence (ordinary code block) still falls back to text.
         const isStructuredBlock = !!match[1] || !!match[3];
 
-        if (match[4]) {
-            // Markdown Table Detected
-            const rawTable = match[4].trim();
-            const lines = rawTable.split('\n');
-            if (lines.length >= 2) {
-                const parseRow = (line) => line.trim().split('|').filter(s => s.trim() !== '' || line.indexOf('|') !== line.lastIndexOf('|')).map(s => s.trim());
-                const headers = parseRow(lines[0]);
-                const rows = lines.slice(2).map(line => parseRow(line)).filter(r => r.length > 0);
+        try {
+            const blockContent = (match[2] || match[3]).trim();
+            const sanitizedContent = sanitizeChartJson(blockContent);
+            const json = JSON.parse(sanitizedContent);
 
-                if (headers.length > 0 && rows.length > 0) {
-                    parts.push({ type: 'table', content: { headers, rows } });
-                } else {
-                    parts.push({ type: 'text', content: match[0] });
-                }
-            } else {
-                parts.push({ type: 'text', content: match[0] });
-            }
-        } else {
-            // Parse existing chart/JSON logic
-            try {
-                const blockContent = (match[2] || match[3]).trim();
-                const sanitizedContent = sanitizeChartJson(blockContent);
-                const json = JSON.parse(sanitizedContent);
+            // Validate it looks like our visual intelligence schema
+            if (json && json.type) {
+                const type = json.type.toLowerCase();
 
-                // Validate it looks like our visual intelligence schema
-                if (json && json.type) {
-                    const type = json.type.toLowerCase();
-
-                    // Standard Charts
-                    if (['line', 'bar', 'pie', 'area'].includes(type) && json.data && Array.isArray(json.data)) {
-                        const cleanData = json.data.map(item => {
-                            const newItem = { ...item };
-                            Object.keys(newItem).forEach(k => {
-                                if (k !== 'name' && k !== 'label') {
-                                    const val = newItem[k];
-                                    if (typeof val === 'string') {
-                                        const cleanVal = val.replace(/[%,MBK₹$]/gi, '');
-                                        newItem[k] = parseFloat(cleanVal);
-                                    }
+                // Standard Charts
+                if (['line', 'bar', 'pie', 'area'].includes(type) && json.data && Array.isArray(json.data)) {
+                    const cleanData = json.data.map(item => {
+                        const newItem = { ...item };
+                        Object.keys(newItem).forEach(k => {
+                            if (k !== 'name' && k !== 'label') {
+                                const val = newItem[k];
+                                if (typeof val === 'string') {
+                                    const cleanVal = val.replace(/[%,MBK₹$]/gi, '');
+                                    newItem[k] = parseFloat(cleanVal);
                                 }
-                            });
-                            return newItem;
+                            }
                         });
-                        parts.push({ type: 'chart', content: { ...json, data: cleanData } });
-                    } 
-                    // Sentinel Extrapolation
-                    else if (type === 'sentinel_extrapolation' && json.extrapolations && Array.isArray(json.extrapolations)) {
-                        parts.push({ type: 'chart', content: json });
-                    }
-                    // Sentiment Gauge
-                    else if (type === 'sentiment_gauge' && json.score !== undefined) {
-                      parts.push({ type: 'chart', content: json });
-                    }
-                    else if (!isStructuredBlock) {
-                        // Not a recognized visual block and not explicitly tagged — fallback to text
-                        parts.push({ type: 'text', content: match[0] });
-                    }
-                    // else: tagged as chart/json/sentinel but an unrecognized shape — drop silently
-                } else if (!isStructuredBlock) {
+                        return newItem;
+                    });
+                    parts.push({ type: 'chart', content: { ...json, data: cleanData } });
+                }
+                // Sentinel Extrapolation
+                else if (type === 'sentinel_extrapolation' && json.extrapolations && Array.isArray(json.extrapolations)) {
+                    parts.push({ type: 'chart', content: json });
+                }
+                // Sentiment Gauge
+                else if (type === 'sentiment_gauge' && json.score !== undefined) {
+                  parts.push({ type: 'chart', content: json });
+                }
+                else if (!isStructuredBlock) {
+                    // Not a recognized visual block and not explicitly tagged — fallback to text
                     parts.push({ type: 'text', content: match[0] });
                 }
-            } catch (e) {
-                console.warn('Chart parsing failed after sanitation:', e);
-                if (isStructuredBlock) {
-                    // Explicitly tagged as chart/json/sentinel but failed to parse — most likely
-                    // the response was cut off mid-JSON by a token limit. Drop it silently rather
-                    // than showing the broken fragment in the chat.
-                    lastIndex = combinedRegex.lastIndex;
-                    continue;
-                }
-                // Untagged fence that isn't valid JSON (e.g. a genuine code block) — fallback to text
+                // else: tagged as chart/json/sentinel but an unrecognized shape — drop silently
+            } else if (!isStructuredBlock) {
                 parts.push({ type: 'text', content: match[0] });
             }
+        } catch (e) {
+            console.warn('Chart parsing failed after sanitation:', e);
+            if (isStructuredBlock) {
+                // Explicitly tagged as chart/json/sentinel but failed to parse — most likely
+                // the response was cut off mid-JSON by a token limit. Drop it silently rather
+                // than showing the broken fragment in the chat.
+                lastIndex = combinedRegex.lastIndex;
+                continue;
+            }
+            // Untagged fence that isn't valid JSON (e.g. a genuine code block) — fallback to text
+            parts.push({ type: 'text', content: match[0] });
         }
 
         lastIndex = combinedRegex.lastIndex;
@@ -526,10 +418,6 @@ import SentinelMatrix from './SentinelMatrix';
  * Renders a chart or visual intelligence component based on the parsed config
  */
 export const EcoChartRenderer = ({ config, type }) => {
-    if (type === 'table') {
-        return <EcoTable rows={config.rows} headers={config.headers} />;
-    }
-
     if (!config || (!config.data && !config.score && !config.sectors && !config.extrapolations)) return null;
 
     const chartType = (config.type || 'line').toLowerCase();

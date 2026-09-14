@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { Send, Sparkles, User, Bot, History, Settings, LogOut, Loader2, Copy, RefreshCw, BarChart3, TrendingUp, Globe, Lightbulb, Camera, Trash2, Key, ChevronDown, ChevronUp, Database, CheckCircle2, Monitor, Laptop, Smartphone, Moon, Sun, Palette, Type, Maximize2, ShieldCheck, Lock, Zap, BookOpen, LifeBuoy, Terminal, Cpu, Layers, HardDrive, Activity, FilePlus, Info, Download, Menu, X, Star, Check, AlertCircle, AlertTriangle, Save, MessageCircle, ExternalLink, PieChart, ArrowLeft, Headphones, Plus, Mic } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { streamMessage, groundMessageWithData } from './lib/KimiClient'
 import { fetchMarketContext, fetchOnDemandContext } from './lib/MarketData'
 import { fetchWebSearchContext } from './lib/WebSearch'
@@ -4514,9 +4515,23 @@ const FintechBadges = ({ labels }) => {
                                                     <div className="message-content">
                                                         <FintechBadges labels={parseResponseWithProbes(msg.content).labels} />
                                                         {parseChartBlocks(parseResponseWithProbes(msg.content).text).map((block, bIdx) => (
-                                                            block.type === 'chart' || block.type === 'table'
+                                                            block.type === 'chart'
                                                                 ? <EcoChartRenderer key={bIdx} config={block.content} type={block.type} />
-                                                                : <ReactMarkdown key={bIdx}>{block.content}</ReactMarkdown>
+                                                                : (
+                                                                    <ReactMarkdown
+                                                                        key={bIdx}
+                                                                        remarkPlugins={[remarkGfm]}
+                                                                        components={{
+                                                                            table: ({ children }) => (
+                                                                                <div className="md-table-wrapper">
+                                                                                    <table className="md-table">{children}</table>
+                                                                                </div>
+                                                                            )
+                                                                        }}
+                                                                    >
+                                                                        {block.content}
+                                                                    </ReactMarkdown>
+                                                                )
                                                         ))}
                                                         
                                                         {msg.role === 'assistant' && !isLoading && parseResponseWithProbes(msg.content).probes.length > 0 && (
