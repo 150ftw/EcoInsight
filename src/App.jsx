@@ -3806,20 +3806,33 @@ function App() {
 
 
     const getGenerationOptions = () => {
-        // These need enough headroom for the full structured response the system prompt
-        // mandates (numbered sections, a chart block, a sentinel matrix, disclaimer, and
-        // follow-up questions) plus the model's own hidden reasoning tokens, which count
-        // against the same budget. Too tight and responses get cut off mid-JSON.
-        const lengthMap = { 'Short': 768, 'Medium': 2048, 'Long': 4096 };
-        const baseLimit = lengthMap[aiSettings.maxLength] || 2048;
-        
-        // Eco Mode Optimization: Cap tokens and slightly lower temperature for speed/precision
-        const ecoModifier = chatSettings.performanceMode ? 0.6 : 1.0;
-        const finalMaxTokens = Math.floor(baseLimit * ecoModifier);
+        // Eco and High are genuinely different response shapes (see SystemPrompt.js),
+        // not the same target scaled by a multiplier — Eco ignores the maxLength
+        // setting entirely and always gets a small, fixed budget sized for a
+        // 5-6 line answer (with headroom for the model's own hidden reasoning
+        // tokens, which come out of the same budget before any visible content).
+        // reasoning_effort stays 'low' for both: higher settings on this model
+        // (openai/gpt-oss-20b) let reasoning consume the entire token budget
+        // before any visible content is generated — verified directly against
+        // the API, 'high' effort produced zero content even at max_tokens=3000.
+        // High mode's thoroughness comes from a generous max_tokens ceiling and
+        // the prompt itself, not from a higher reasoning effort.
+        if (chatSettings.performanceMode) {
+            return {
+                temperature: Math.min(aiSettings.creativity, 0.7),
+                max_tokens: 500,
+                reasoning_effort: 'low'
+                // Model intentionally not overridden — see High-mode branch below.
+            };
+        }
+
+        const lengthMap = { 'Short': 1536, 'Medium': 3072, 'Long': 6144 };
+        const baseLimit = lengthMap[aiSettings.maxLength] || 3072;
 
         return {
-            temperature: chatSettings.performanceMode ? Math.min(aiSettings.creativity, 0.7) : aiSettings.creativity,
-            max_tokens: finalMaxTokens
+            temperature: aiSettings.creativity,
+            max_tokens: baseLimit,
+            reasoning_effort: 'low'
             // Model is intentionally not overridden here — there is no UI for users to pick a
             // model, and letting a stale per-user aiSettings.model value (persisted in Supabase)
             // control the request means every user gets stuck on a retired model when NVIDIA
