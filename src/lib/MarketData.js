@@ -671,7 +671,7 @@ export const fetchOnDemandContext = async (userMessage, force = false) => {
 
 export const fetchNewsTickerData = async () => {
     try {
-        const rssUrl = encodeURIComponent('https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2145690.cms');
+        const rssUrl = encodeURIComponent('https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms');
         const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
         if (!res.ok) throw new Error('Failed to fetch news');
 

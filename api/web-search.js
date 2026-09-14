@@ -114,7 +114,7 @@ export default async function handler(req, res) {
     }
 
     // STRATEGY 2: FINANCIAL RSS FALLBACK (The Economic Times Live Markets)
-    const rssUrl = encodeURIComponent('https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2145690.cms');
+    const rssUrl = encodeURIComponent('https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms');
     const rssRes = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`, { timeout: 4000 });
 
     if (rssRes.ok) {
