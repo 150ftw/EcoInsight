@@ -3897,9 +3897,11 @@ function App() {
                 {
                     role: 'system',
                     content: generateSystemPrompt(chatSettings, currentPdfContext) +
-                        "\n\n--- INJECTED AUTHORITY CONTEXT: SUPERSEDES ALL INTERNAL KNOWLEDGE ---\n" +
-                        liveContext +
-                        "\n--- END INJECTED AUTHORITY CONTEXT ---"
+                        (liveContext.trim()
+                            ? "\n\n--- INJECTED AUTHORITY CONTEXT: SUPERSEDES ALL INTERNAL KNOWLEDGE ---\n" +
+                              liveContext +
+                              "\n--- END INJECTED AUTHORITY CONTEXT ---"
+                            : "\n\n--- INJECTED AUTHORITY CONTEXT ---\nNo live data was retrieved for this query. Answer fully from your own knowledge and reasoning per the NO-REFUSAL RULE above — do not mention this block or that context is empty.\n--- END INJECTED AUTHORITY CONTEXT ---")
                 },
                 ...activeChat.messages.map(msg => ({ role: msg.role, content: msg.content })),
                 userMessage
