@@ -415,8 +415,8 @@ export const parseChartBlocks = (text) => {
     if (!text) return [{ type: 'text', content: text }];
 
     const parts = [];
-    // Enhanced regex: 1. Matches ```chart blocks 2. Matches raw {type:chart} JSON 3. Matches markdown tables (| cell | cell |)
-    const combinedRegex = /```(?:chart|json|sentinel)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap|sentinel_extrapolation)"\s*,[\s\S]*?(?:"data"|"score"|"sectors"|"extrapolations")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})|((?:\n|^)\s*\|.*\|.*\n\s*\|[\s\-\| :]*\|\s*(?:\n\s*\|.*\|.*)*)/gi;
+    // Enhanced regex: 1. Matches ```chart blocks (tag captured separately) 2. Matches raw {type:chart} JSON 3. Matches markdown tables (| cell | cell |)
+    const combinedRegex = /```(chart|json|sentinel)?\s*([\s\S]*?)```|(\{\s*"type"\s*:\s*"(?:line|bar|pie|area|sentiment_gauge|risk_heatmap|sentinel_extrapolation)"\s*,[\s\S]*?(?:"data"|"score"|"sectors"|"extrapolations")\s*:\s*(?:\[|\d+|\[)[\s\S]*?\}?[\s\S]*?\})|((?:\n|^)\s*\|.*\|.*\n\s*\|[\s\-\| :]*\|\s*(?:\n\s*\|.*\|.*)*)/gi;
 
     let lastIndex = 0;
     let match;
@@ -427,16 +427,22 @@ export const parseChartBlocks = (text) => {
             parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
         }
 
-        // Parse the block content (match[1] is backticks, match[2] is raw json)
-        if (match[3]) {
+        // A block is "structured" (explicitly meant to be a chart/sentinel, not prose) when it
+        // was fenced with a known tag (```chart/json/sentinel) or matched the raw {"type":...}
+        // JSON pattern directly. If parsing one of these fails — e.g. the response was cut off
+        // mid-JSON by a token limit — we drop it silently instead of leaking the raw fragment
+        // into the chat. An untagged ``` fence (ordinary code block) still falls back to text.
+        const isStructuredBlock = !!match[1] || !!match[3];
+
+        if (match[4]) {
             // Markdown Table Detected
-            const rawTable = match[3].trim();
+            const rawTable = match[4].trim();
             const lines = rawTable.split('\n');
             if (lines.length >= 2) {
                 const parseRow = (line) => line.trim().split('|').filter(s => s.trim() !== '' || line.indexOf('|') !== line.lastIndexOf('|')).map(s => s.trim());
                 const headers = parseRow(lines[0]);
                 const rows = lines.slice(2).map(line => parseRow(line)).filter(r => r.length > 0);
-                
+
                 if (headers.length > 0 && rows.length > 0) {
                     parts.push({ type: 'table', content: { headers, rows } });
                 } else {
@@ -448,7 +454,7 @@ export const parseChartBlocks = (text) => {
         } else {
             // Parse existing chart/JSON logic
             try {
-                const blockContent = (match[1] || match[2]).trim();
+                const blockContent = (match[2] || match[3]).trim();
                 const sanitizedContent = sanitizeChartJson(blockContent);
                 const json = JSON.parse(sanitizedContent);
 
@@ -481,16 +487,24 @@ export const parseChartBlocks = (text) => {
                     else if (type === 'sentiment_gauge' && json.score !== undefined) {
                       parts.push({ type: 'chart', content: json });
                     }
-                    else {
-                        // Not a recognized visual block, fallback to text
+                    else if (!isStructuredBlock) {
+                        // Not a recognized visual block and not explicitly tagged — fallback to text
                         parts.push({ type: 'text', content: match[0] });
                     }
-                } else {
+                    // else: tagged as chart/json/sentinel but an unrecognized shape — drop silently
+                } else if (!isStructuredBlock) {
                     parts.push({ type: 'text', content: match[0] });
                 }
             } catch (e) {
                 console.warn('Chart parsing failed after sanitation:', e);
-                // Parsing failed (not valid JSON), fallback to text
+                if (isStructuredBlock) {
+                    // Explicitly tagged as chart/json/sentinel but failed to parse — most likely
+                    // the response was cut off mid-JSON by a token limit. Drop it silently rather
+                    // than showing the broken fragment in the chat.
+                    lastIndex = combinedRegex.lastIndex;
+                    continue;
+                }
+                // Untagged fence that isn't valid JSON (e.g. a genuine code block) — fallback to text
                 parts.push({ type: 'text', content: match[0] });
             }
         }

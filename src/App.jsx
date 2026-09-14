@@ -3800,8 +3800,12 @@ function App() {
 
 
     const getGenerationOptions = () => {
-        const lengthMap = { 'Short': 256, 'Medium': 1024, 'Long': 2048 };
-        const baseLimit = lengthMap[aiSettings.maxLength] || 1024;
+        // These need enough headroom for the full structured response the system prompt
+        // mandates (numbered sections, a chart block, a sentinel matrix, disclaimer, and
+        // follow-up questions) plus the model's own hidden reasoning tokens, which count
+        // against the same budget. Too tight and responses get cut off mid-JSON.
+        const lengthMap = { 'Short': 768, 'Medium': 2048, 'Long': 4096 };
+        const baseLimit = lengthMap[aiSettings.maxLength] || 2048;
         
         // Eco Mode Optimization: Cap tokens and slightly lower temperature for speed/precision
         const ecoModifier = chatSettings.performanceMode ? 0.6 : 1.0;
