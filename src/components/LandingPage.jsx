@@ -444,9 +444,8 @@ const DetailedFooter = ({ setAppSection }) => {
     );
 };
 
-const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine, supaLoaded, openLogin, openSignup, setIsAccountModalOpen }) => {
+const LandingPage = ({ setAppSection, setAuthType, onLaunchEngine, supaLoaded, openLogin, openSignup, setIsAccountModalOpen }) => {
     const { user, isLoaded, isSignedIn } = useUser();
-    const [hoveredPlanIndex, setHoveredPlanIndex] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [authTimeout, setAuthTimeout] = useState(false);
 
@@ -474,7 +473,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                 <div className={`landing-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
                     <Magnetic distance={0.3}><button className="nav-link" onClick={() => { scrollToSection('features'); setIsMobileMenuOpen(false); }}>Features</button></Magnetic>
                     <Magnetic distance={0.3}><button className="nav-link" onClick={() => { scrollToSection('solutions'); setIsMobileMenuOpen(false); }}>Solutions</button></Magnetic>
-                    <Magnetic distance={0.3}><button className="nav-link" onClick={() => { scrollToSection('pricing'); setIsMobileMenuOpen(false); }}>Pricing</button></Magnetic>
+                    <Magnetic distance={0.3}><button className="nav-link" onClick={() => { scrollToSection('comparison'); setIsMobileMenuOpen(false); }}>Why EcoInsight</button></Magnetic>
                     {!isLoaded ? (
                         <div className="auth-loading-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6, fontSize: '0.9rem' }}>
                             <Loader2 size={14} className="animate-spin" /> 
@@ -485,7 +484,7 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
                             {user ? (
                                 <div className="signed-in-nav">
                                     <button className="btn-signin" onClick={onLaunchEngine} disabled={!supaLoaded}>{!supaLoaded ? <><Loader2 size={14} className="animate-spin" /> Syncing...</> : "Open Engine"}</button>
-                                    <UserAccountMenu side="right" align="bottom" onSettingsClick={() => setIsAccountModalOpen(true)} onSubscriptionClick={() => { setAppSection('chat'); }} />
+                                    <UserAccountMenu side="right" align="bottom" onSettingsClick={() => setIsAccountModalOpen(true)} />
                                 </div>
                             ) : (
                                 <div className="signed-out-nav">
@@ -558,32 +557,33 @@ const LandingPage = ({ setAppSection, setAuthType, onSelectPlan, onLaunchEngine,
 
             <ReviewsSection />
 
-            <section id="pricing" className="pricing-section">
-                <div className="section-title"><h2>The Elite Member Club</h2><p>Transparency at the speed of light</p></div>
-                <motion.div className="pricing-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={containerVariants}>
+            <PerspectiveSection id="comparison" className="comparison-section">
+                <motion.div className="section-title" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+                    <h2>The Old Way vs. The Bharat Way</h2>
+                    <p>See why analysts are replacing spreadsheets and legacy terminals with a neural-native workflow.</p>
+                </motion.div>
+                <motion.div className="comparison-table" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+                    <div className="comparison-header-row">
+                        <span className="col-label">Capability</span>
+                        <span className="col-old">Traditional Research</span>
+                        <span className="col-eco"><EcoInsightLogo size={16} /> EcoInsight</span>
+                    </div>
                     {[
-                        { plan: "Sentinel", price: "Coming Soon", feat: ["Full Simulation Suite", "Daily Insight Reports", "Priority Neural Compute"], priceValue: 19.99, isComingSoon: true },
-                        { plan: "Observer", price: "Free", feat: ["Daily Market Pulse", "Unlimited Simulations", "Standard Data Feed"], featured: true, priceValue: 0 },
-                        { plan: "Strategist", price: "Coming Soon", feat: ["Quantum Trend Modeling", "Real-time Fiscal Alerts", "Unlimited Deep Analysis"], priceValue: 24.99, isComingSoon: true }
-                    ].map((p, i) => (
-                        <TiltCard key={i} className={`pricing-card ${p.featured ? 'featured' : ''} ${hoveredPlanIndex === i ? 'active' : ''} ${hoveredPlanIndex !== null && hoveredPlanIndex !== i ? 'dimmed' : ''} ${p.isComingSoon ? 'coming-soon' : ''}`} onMouseEnter={() => setHoveredPlanIndex(i)} onMouseLeave={() => setHoveredPlanIndex(null)} style={p.isComingSoon ? { opacity: 0.8, cursor: 'not-allowed' } : {}}>
-                            <motion.div variants={itemVariants}>
-                                <h3>{p.plan}</h3><div className="price">{p.price}{!p.isComingSoon && <span>/mo</span>}</div>
-                                <ul>{p.feat.map((f, j) => <li key={j}><Sparkles size={16} /> {f}</li>)}</ul>
-                                <Magnetic distance={0.3}>
-                                    <button 
-                                        className={p.isComingSoon ? "btn-secondary" : "btn-shine-primary"} 
-                                        onClick={() => !p.isComingSoon && onSelectPlan(p)} 
-                                        disabled={p.isComingSoon || (isSignedIn && p.plan === 'Observer')}
-                                    >
-                                        {p.isComingSoon ? "Coming Soon" : (isSignedIn && p.plan === 'Observer' ? "Selected Plan" : "Select Plan")}
-                                    </button>
-                                </Magnetic>
-                            </motion.div>
-                        </TiltCard>
+                        { label: "Cost", old: "₹Lakhs/year in terminal fees", eco: "Free to use" },
+                        { label: "Time to First Insight", old: "Weeks of onboarding", eco: "Under a minute" },
+                        { label: "Data Freshness", old: "Manual refresh, stale snapshots", eco: "Live, sub-minute updates" },
+                        { label: "Analysis Speed", old: "Hours per report", eco: "Seconds per query" },
+                        { label: "Language", old: "English-only, jargon-heavy", eco: "Hindi, English & Hinglish" },
+                        { label: "Access", old: "Institutional desks only", eco: "Any device, anywhere" }
+                    ].map((row, i) => (
+                        <motion.div key={i} className="comparison-row" initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
+                            <span className="row-label">{row.label}</span>
+                            <span className="comparison-cell old"><X size={14} /> {row.old}</span>
+                            <span className="comparison-cell eco"><Check size={14} /> {row.eco}</span>
+                        </motion.div>
                     ))}
                 </motion.div>
-            </section>
+            </PerspectiveSection>
 
             <section className="cta-section">
                 <motion.div className="cta-card" whileHover={{ scale: 1.02 }}>

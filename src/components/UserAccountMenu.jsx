@@ -1,18 +1,17 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Settings, User as UserIcon, CreditCard, ChevronDown } from 'lucide-react';
+import { LogOut, Settings, User as UserIcon, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const UserAccountMenu = ({ 
-  hideName = false, 
-  role = "Economic Analyst", 
-  side = "left", 
+const UserAccountMenu = ({
+  hideName = false,
+  role = "Economic Analyst",
+  side = "left",
   align = "bottom",
   forceMobile = false,
   children,
-  onSettingsClick = () => {},
-  onSubscriptionClick = () => {}
+  onSettingsClick = () => {}
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0, height: 0 });

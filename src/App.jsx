@@ -3247,8 +3247,7 @@ function App() {
     const [authLoadingTimeout, setAuthLoadingTimeout] = useState(false)
     const [showCreditModal, setShowCreditModal] = useState(false);
     const [showBugModal, setShowBugModal] = useState(false);
-    const [modalType, setModalType] = useState('credits');
-    const [pendingScrollToPricing, setPendingScrollToPricing] = useState(false);
+    const [modalType, setModalType] = useState('development');
 
 
     // Premium Feature State
@@ -3768,19 +3767,6 @@ function App() {
 
 
 
-    // Handle pending scroll to pricing
-    useEffect(() => {
-        if (appSection === 'landing' && pendingScrollToPricing) {
-            const timer = setTimeout(() => {
-                const pricingSection = document.getElementById('pricing');
-                if (pricingSection) {
-                    pricingSection.scrollIntoView({ behavior: 'smooth' });
-                    setPendingScrollToPricing(false);
-                }
-            }, 500); // Give enough time for content to mount
-            return () => clearTimeout(timer);
-        }
-    }, [appSection, pendingScrollToPricing]);
 
     const scrollToBottom = () => {
         if (view === 'chat' && !userScrolledUp.current) {
@@ -3946,25 +3932,6 @@ function App() {
         } : c));
 
         if (!customText) setInput('')
-
-        // Credit Enforcement (Removed for Unlimited Launch Era)
-        /*
-        if (isSignedIn && profile.tier === 'Free') {
-            if (profile.credits <= 0) {
-                setModalType('credits');
-                setShowCreditModal(true);
-                return;
-            }
-            // Decrement credits on server
-            try {
-                const creditRes = await axios.post('/api/auth?action=decrement-credits');
-                setProfile(prev => ({ ...prev, credits: creditRes.data.credits }));
-            } catch (err) {
-                console.error("Failed to decrement credits:", err);
-            }
-        }
-        */
-
 
         try {
             let liveContext = '';
@@ -5199,12 +5166,6 @@ const FintechBadges = ({ labels }) => {
                 isOpen={showCreditModal}
                 type={modalType}
                 onClose={() => setShowCreditModal(false)}
-                lastRechargeDate={profile?.lastRechargeDate}
-                onUpgrade={() => {
-                    setShowCreditModal(false);
-                    setAppSection('landing');
-                    setPendingScrollToPricing(true);
-                }}
             />
 
 

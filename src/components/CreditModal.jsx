@@ -1,14 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ArrowRight, Clock, ShieldAlert, Zap } from 'lucide-react';
+import { Sparkles, ShieldAlert, Zap } from 'lucide-react';
 
-const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "credits" }) => {
+const CreditModal = ({ isOpen, onClose, type = "development" }) => {
     if (!isOpen) return null;
-
-    const nextRechargeDate = new Date(lastRechargeDate || new Date());
-    if (lastRechargeDate) {
-        nextRechargeDate.setDate(nextRechargeDate.getDate() + 7);
-    }
 
     return (
         <AnimatePresence>
@@ -20,32 +15,8 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
                 >
                     <div className="modal-glow" />
-                    
-                    {type === "credits" ? (
-                        <>
-                            <div className="modal-header">
-                                <div className="alert-icon">
-                                    <Clock size={32} />
-                                </div>
-                                <h2>Capacity reached. Let's take a breather.</h2>
-                                <p>
-                                    Your analytical credits for this week are fully utilized. 
-                                    To ensure high-quality, real-time compute for all users, we recharge free credits every 7 days.
-                                </p>
-                                <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '1rem', fontStyle: 'italic' }}>
-                                    Quality AI models require significant compute resources to run. We appreciate your patience as we scale our infrastructure.
-                                </p>
-                            </div>
 
-                            <div className="recharge-info">
-                                <div className="info-item">
-                                    <Clock size={16} />
-                                    <span>Next Auto-Recharge</span>
-                                    <span className="date-value">{nextRechargeDate.toLocaleDateString()}</span>
-                                </div>
-                            </div>
-                        </>
-                    ) : type === "intelligence_hub" ? (
+                    {type === "intelligence_hub" ? (
                         <>
                             <div className="modal-header">
                                 <div className="alert-icon" style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--accent-primary)' }}>
@@ -53,10 +24,10 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                                 </div>
                                 <h2 style={{ letterSpacing: '-0.5px' }}>Neural Intelligence Node Locked</h2>
                                 <p>
-                                    This proprietary intelligence hub is currently undergoing synchronization with institutional data pipelines. Advanced sector sentiment and neural portfolio analysis are restricted to Sentinel tier analysts.
+                                    This intelligence hub is currently undergoing synchronization with institutional data pipelines. Advanced sector sentiment and neural portfolio analysis are still being calibrated.
                                 </p>
                                 <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '1rem', fontStyle: 'italic' }}>
-                                    Your credential level is currently being validated across our decentralized node network. Retail access windows open quarterly.
+                                    We're rolling this out gradually as we validate accuracy at scale.
                                 </p>
                             </div>
                         </>
@@ -66,12 +37,12 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                                 <div className="alert-icon" style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--accent-primary)' }}>
                                     <ShieldAlert size={32} />
                                 </div>
-                                <h2 style={{ letterSpacing: '-0.5px' }}>Institutional Access Restricted</h2>
+                                <h2 style={{ letterSpacing: '-0.5px' }}>Live Market Dashboard Locked</h2>
                                 <p>
-                                    The Live Market Dashboard is currently restricted to our Institutional & Enterprise partners while we calibrate our high-frequency data streams.
+                                    This dashboard is still being calibrated against our high-frequency data streams before we open it up.
                                 </p>
                                 <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '1rem', fontStyle: 'italic' }}>
-                                    Retail access for Sentinel members is scheduled for Q3 2026. Join the priority waitlist to get notified of our next roll-out.
+                                    Check back soon — we're rolling this out in phases.
                                 </p>
                             </div>
                         </>
@@ -83,10 +54,10 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                                 </div>
                                 <h2 style={{ letterSpacing: '-0.5px' }}>Feature in Development</h2>
                                 <p>
-                                    Our neural engineering team is currently calibrating this proprietary module. We are ensuring institutional-grade accuracy and zero-latency performance before deployment.
+                                    Our team is currently building out this module. We're ensuring institutional-grade accuracy before it ships.
                                 </p>
                                 <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '1rem', fontStyle: 'italic' }}>
-                                    Expect direct access in the upcoming "Bharatiya" Intelligence Patch. Thank you for participating in our elite early-access rollout.
+                                    Thanks for your patience while we get it right.
                                 </p>
                             </div>
                         </>
@@ -98,7 +69,7 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                                 </div>
                                 <h2 style={{ letterSpacing: '-0.5px' }}>Access Restricted</h2>
                                 <p>
-                                    This institutional-grade module is currently restricted. Please contact your account manager for neural clearance.
+                                    This module is currently restricted.
                                 </p>
                             </div>
                         </>
@@ -108,10 +79,6 @@ const CreditModal = ({ isOpen, onClose, lastRechargeDate, onUpgrade, type = "cre
                         <button className="btn-secondary-modal" onClick={onClose}>
                             I understand
                         </button>
-                    </div>
-
-                    <div className="modal-footer">
-                        <Sparkles size={14} /> Sentinel members get unlimited neural compute
                     </div>
                 </motion.div>
             </div>
