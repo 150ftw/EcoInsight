@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    LineChart, Line, AreaChart, Area, 
-    XAxis, YAxis, CartesianGrid, Tooltip, 
-    ResponsiveContainer 
+import {
+    LineChart, Line, AreaChart, Area,
+    XAxis, YAxis, CartesianGrid, Tooltip,
+    ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import { 
     Activity, TrendingUp, TrendingDown, 
@@ -33,7 +33,6 @@ import FiiDiiAnalyzer from './FiiDiiAnalyzer';
 import EconomicCalendar from './EconomicCalendar';
 import TechnicalPulse from './TechnicalPulse';
 import EarningsWatch from './EarningsWatch';
-import { formatInstitutionalValue } from './EcoCharts';
 
 
 
@@ -186,18 +185,27 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
 
     // Handle timeframe changes (Optimistic Loading)
     useEffect(() => {
-        if (selectedAsset) {
-            const fetchAssetHistory = async () => {
-                setIsChartLoading(true);
-                const { range, interval } = getTimeframeParams(chartTimeframe);
-                const updated = await fetchHistory(selectedAsset.fullSymbol, range, interval, syncState.force);
-                if (updated) {
-                    setSelectedAsset(updated);
-                }
-                setIsChartLoading(false);
-            };
-            fetchAssetHistory();
-        }
+        if (!selectedAsset) return;
+        // Guards against a race: this effect also fires on mount with the
+        // default '1D' timeframe, so a quick tab click (e.g. to '1M') starts a
+        // second fetch while the first is still in flight. Without this flag,
+        // whichever request resolves last wins — if the mount's 1D fetch
+        // happens to resolve after the click's 1M fetch, it silently overwrites
+        // the correct data with stale 1D data while the "1M" tab still shows
+        // as selected.
+        let cancelled = false;
+        const fetchAssetHistory = async () => {
+            setIsChartLoading(true);
+            const { range, interval } = getTimeframeParams(chartTimeframe);
+            const updated = await fetchHistory(selectedAsset.fullSymbol, range, interval, syncState.force);
+            if (cancelled) return;
+            if (updated) {
+                setSelectedAsset(updated);
+            }
+            setIsChartLoading(false);
+        };
+        fetchAssetHistory();
+        return () => { cancelled = true; };
     }, [chartTimeframe]);
 
     const handleSearch = async (e) => {
@@ -441,7 +449,7 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                         <div style={{ height: 500, position: 'relative' }}>
                             <AnimatePresence>
                                 {isChartLoading && (
-                                    <motion.div 
+                                    <motion.div
                                         className="chart-loading-overlay"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
@@ -458,34 +466,76 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                             </AnimatePresence>
 
                             <div className={`chart-container-inner ${isChartLoading ? 'chart-blur-active' : ''}`} style={{ height: '100%' }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={selectedAsset?.sparkline || []}>
-                                        <defs>
-                                            <linearGradient id="chartG" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} stopOpacity={0.2}/>
-                                                <stop offset="95%" stopColor={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} stopOpacity={0}/>
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                                        <XAxis dataKey="time" hide />
-                                        <YAxis hide domain={['auto', 'auto']} />
-                                        <Tooltip 
-                                            contentStyle={{ background: '#111114', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                                            labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}
-                                            itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
-                                            formatter={(value) => [formatInstitutionalValue(value), "Value"]}
-                                        />
-                                        <Area 
-                                            type="monotone" 
-                                            dataKey="price" 
-                                            stroke={selectedAsset?.isPositive ? '#22c55e' : '#ef4444'} 
-                                            fill="url(#chartG)" 
-                                            strokeWidth={3}
-                                            animationDuration={1000}
-                                            isAnimationActive={!isChartLoading}
-                                        />
-                                    </AreaChart>
-                                </ResponsiveContainer>
+                                {(() => {
+                                    const sparkline = selectedAsset?.sparkline || [];
+                                    const lineColor = selectedAsset?.isPositive ? '#22c55e' : '#ef4444';
+                                    const prevCloseNum = parseFloat(String(selectedAsset?.prevClose || '').replace(/[^0-9.]/g, '')) || null;
+                                    const prices = sparkline.map(p => p.price).filter(p => typeof p === 'number');
+                                    // Sparse X-axis ticks so labels don't collide — roughly 6 across the chart
+                                    // regardless of range (5 points for 1W vs 20 for 1D/1M/1Y).
+                                    const tickInterval = Math.max(0, Math.ceil(sparkline.length / 6) - 1);
+                                    return (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={sparkline} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
+                                                <defs>
+                                                    <linearGradient id="chartG" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor={lineColor} stopOpacity={0.25}/>
+                                                        <stop offset="95%" stopColor={lineColor} stopOpacity={0}/>
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                                <XAxis
+                                                    dataKey="time"
+                                                    interval={tickInterval}
+                                                    tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }}
+                                                    axisLine={{ stroke: 'rgba(255,255,255,0.08)' }}
+                                                    tickLine={false}
+                                                />
+                                                <YAxis
+                                                    orientation="right"
+                                                    domain={prevCloseNum
+                                                        ? [(min) => Math.min(min, prevCloseNum) * 0.997, (max) => Math.max(max, prevCloseNum) * 1.003]
+                                                        : ['auto', 'auto']}
+                                                    tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                    tickFormatter={(v) => v.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                                                    width={56}
+                                                />
+                                                {prevCloseNum && (
+                                                    <ReferenceLine
+                                                        y={prevCloseNum}
+                                                        stroke="rgba(255,255,255,0.3)"
+                                                        strokeDasharray="4 4"
+                                                        label={{
+                                                            value: `Prev Close ${prevCloseNum.toLocaleString('en-IN')}`,
+                                                            position: 'insideTopLeft',
+                                                            fill: 'rgba(255,255,255,0.45)',
+                                                            fontSize: 11
+                                                        }}
+                                                    />
+                                                )}
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111114', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
+                                                    labelStyle={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', marginBottom: '4px' }}
+                                                    itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
+                                                    formatter={(value) => [value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), 'Price']}
+                                                />
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="price"
+                                                    stroke={lineColor}
+                                                    fill="url(#chartG)"
+                                                    strokeWidth={3}
+                                                    dot={sparkline.length <= 20 ? { r: 3, stroke: lineColor, strokeWidth: 2, fill: '#0a0a0c' } : false}
+                                                    activeDot={{ r: 5, stroke: lineColor, strokeWidth: 2, fill: '#fff' }}
+                                                    animationDuration={1000}
+                                                    isAnimationActive={!isChartLoading}
+                                                />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </section>

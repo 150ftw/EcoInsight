@@ -292,8 +292,13 @@ export default async function handler(req, res) {
   }
 
   const cleanSymbol = symbol.toUpperCase().replace(/\^/g, '').trim();
-  // Versioned cache key to completely isolate from stale v6/v7 synthetic database caches
-  const cacheKey = `v8_ticker_${cleanSymbol}_${range}_${interval}`;
+  // Versioned cache key to completely isolate from stale caches after a format
+  // change — bumped to v9 when the sparkline generator changed from a single
+  // price-only formula (ignoring range/interval entirely) to real OHLC history
+  // for 1W/1M. Ranges with long TTLs (1y = 24h, 1mo/1w = 1h) would otherwise
+  // keep serving the old synthetic shape under the old key for that whole
+  // window regardless of the code change.
+  const cacheKey = `v9_ticker_${cleanSymbol}_${range}_${interval}`;
 
   // --- STAGE 0: SERVER-SIDE CACHE CHECK ---
   if (supabase && !isForceMatch) {
