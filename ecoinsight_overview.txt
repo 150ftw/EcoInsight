@@ -1,0 +1,58 @@
+# PROJECT OVERVIEW: ECOINSIGHT
+============================
+
+EcoInsight is a high-end, institutional-grade Economic Intelligence engine designed for professional analysts, investors, and economic researchers. It combines cutting-edge AI logic with real-time market telemetry to provide deep, actionable insights into global and Indian (Bharat) markets.
+
+CORE FEATURES:
+--------------
+1.  NEURAL INFERENCE ENGINE:
+    - Powered by dynamic micro-clusters optimized for high-volatility financial modeling.
+    - Scalable architecture that provides ultra-fast response times for complex economic queries.
+
+2.  SEARCH-SYNC V7 (REAL-TIME GROUNDING):
+    - Direct integration with real-time market data feeds (NSE, BSE, Global Markets).
+    - "Neural Grounding" logic ensures the AI uses the most recent prices and volumes, eliminating hallucinations common in general-purpose models.
+
+3.  INTELLIGENCE PROVENANCE:
+    - Every insight is backed by citations and source cards.
+    - High-fidelity data extraction from PDFs, news tickers, and institutional reports.
+
+4.  MACRO & POLICY SIMULATIONS:
+    - Interactive simulators to model the impact of policy shifts or macroeconomic events on specific sectors.
+    - Asymmetric risk-weighted outcome modeling.
+
+5.  PREMIUM ANALYST UI:
+    - "Elite Analyst" aesthetic using Glassmorphism and Neon Brutalism.
+    - Interactive 3D visuals (Three.js) for data representation.
+    - Integrated Command Palette, Initialization Terminal, and Portfolio Analyzer.
+
+
+ADVANTAGES OVER CHATGPT:
+========================
+
+While ChatGPT is a powerful general-purpose assistant, EcoInsight is built specifically for the financial and economic domain.
+
+1.  REAL-TIME MARKET SYNC (Zero Cutoff):
+    - ChatGPT relies on a training cutoff or slower, generalized web browsing. 
+    - EcoInsight uses Search-Sync v7 for millisecond-latency access to Nifty 50, Sensex, and global tickers.
+
+2.  NEURAL GROUNDING (No Hallucinations):
+    - General LLMs often "hallucinate" stock prices or financial figures. 
+    - EcoInsight grounds every response in verified market data, ensuring precision that institutional users require.
+
+3.  SPECIALIZED DOMAIN EXPERTISE:
+    - Fine-tuned for economic intelligence with a deep focus on the Indian economy (Bharat-centric insights).
+    - Understands complex Indian tax contexts, FII/DII flows, and sectoral dynamics better than a general model.
+
+4.  INTEGRATED ANALYTICAL TOOLS:
+    - EcoInsight isn't just a chat box; it's a workspace. It includes built-in charts, option chain analysis tools, and portfolio stress-testing that ChatGPT lacks.
+
+5.  DATA PROVENANCE & TRANSPARENCY:
+    - EcoInsight provides "Intelligence Provenance" carousels, showing exactly where the data came from. This audit trail is critical for professional accountability.
+
+6.  HIGH-FIDELITY VISUALIZATION:
+    - Integrated Three.js and Framer Motion visuals allow for complex data relationships to be seen, not just read, providing a much higher bandwidth of information than text-only replies.
+
+--------------------------------------------------
+Developed by Shivam Sharma
+EcoInsight: Decoding the Pulse of the Global Economy.
