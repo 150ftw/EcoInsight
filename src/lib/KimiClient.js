@@ -1,7 +1,8 @@
-const API_URL = '/v1/chat/completions';
-const DEFAULT_MODEL = 'meta/llama-3.1-8b-instruct';
+const API_URL = '/api/chat';
+const DEFAULT_MODEL = 'openai/gpt-oss-20b';
+const DEFAULT_REASONING_EFFORT = 'low';
 
-export const streamMessage = async (messages, apiKey, onChunk, options = {}) => {
+export const streamMessage = async (messages, onChunk, options = {}) => {
     const maxRetries = 2;
     let attempt = 0;
 
@@ -10,8 +11,7 @@ export const streamMessage = async (messages, apiKey, onChunk, options = {}) => 
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     model: options.model || DEFAULT_MODEL,
@@ -19,6 +19,7 @@ export const streamMessage = async (messages, apiKey, onChunk, options = {}) => 
                     temperature: options.temperature ?? 0.5,
                     top_p: 1,
                     max_tokens: options.max_tokens || 1024,
+                    reasoning_effort: options.reasoning_effort || DEFAULT_REASONING_EFFORT,
                     stream: true
                 })
             });
@@ -126,13 +127,12 @@ export const groundMessageWithData = (messages, marketDataArr) => {
 };
 
 // Deprecated or for non-streaming usage if needed
-export const sendMessage = async (messages, apiKey, options = {}) => {
+export const sendMessage = async (messages, options = {}) => {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 model: options.model || DEFAULT_MODEL,
@@ -140,6 +140,7 @@ export const sendMessage = async (messages, apiKey, options = {}) => {
                 temperature: options.temperature ?? 0.5,
                 top_p: 1,
                 max_tokens: options.max_tokens || 1024,
+                reasoning_effort: options.reasoning_effort || DEFAULT_REASONING_EFFORT,
                 stream: false
             })
         });

@@ -2233,8 +2233,6 @@ const PlaceholderPage = ({ title, type, onBack }) => (
     </PageWrapper>
 );
 
-const API_KEY = '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';
-
 const SYSTEM_PROMPT = "You are Eko by EcoInsight, the world's most aggressive and accurate Economic Intelligence engine. You specialize in identifying Asymmetric Risk/Reward opportunities that others miss. Your goal is to provide high-conviction, data-driven solutions that include both institutional safe-havens and high-risk 'Beneficial or Bust' decisions. CORE DIRECTIVES: 1. BOLDNESS: Do not hide behind excessive neutrality. Provide sharp, prescriptive insights. 2. ASYMMETRY: When analyzing a query, categorize your solutions into 'Institutional Tier' (Low risk, steady growth) and 'Aggressive Alpha' (High risk, potential for exponential gains or total capital loss). 3. TRANSPARENCY: For high-risk decisions, explicitly detail the 'Total Loss' scenario (what causes it to fail completely) alongside the 'Beneficial' scenario. 4. VISUAL INTELLIGENCE: You MUST use visual components (Gauges, Heatmaps) when appropriate. 5. NEURAL BRIEFING: Users can now activate a 'Neural Voice Briefing' (Headphones icon) to hear a high-impact audio summary of your analysis. 6. MARKET PATTERNS: You are a 'Market Pattern Extrapolation Engine'. For stock/crypto tickers, provide a technical 12-month projection based on historical patterns. 7. RELATED PROBES: At the very end of EVERY response, you MUST provide 3 follow-up questions formatted exactly as: '---QUESTIONS--- Question 1 | Question 2 | Question 3'. 8. MANDATORY DISCLAIMER: Always conclude with 'NOTICE: This intelligence includes high-risk asymmetric projections. Potential for total loss exists. Mathematical extrapolation of historical data. Consult an advisor.' 9. FORMATTING: Use professional, high-density analytical formatting. No AI refusal boilerplate.";
 
 const FAQS = [
@@ -3331,7 +3329,7 @@ function App() {
     })
 
     const [aiSettings, setAiSettings] = useState({
-        model: 'meta/llama-3.1-8b-instruct',
+        model: 'openai/gpt-oss-20b',
         style: 'Balanced',
         tone: 'Professional',
         creativity: 0.5,
@@ -3811,8 +3809,11 @@ function App() {
 
         return {
             temperature: chatSettings.performanceMode ? Math.min(aiSettings.creativity, 0.7) : aiSettings.creativity,
-            max_tokens: finalMaxTokens,
-            model: aiSettings.model === 'Custom Model' ? null : aiSettings.model
+            max_tokens: finalMaxTokens
+            // Model is intentionally not overridden here — there is no UI for users to pick a
+            // model, and letting a stale per-user aiSettings.model value (persisted in Supabase)
+            // control the request means every user gets stuck on a retired model when NVIDIA
+            // sunsets one. The server (api/chat.js) always decides the model.
         };
     };
 
@@ -4027,7 +4028,7 @@ function App() {
             const groundedMessages = groundMessageWithData(chatMessages, []); // We pass empty array for now as context is already in chatMessages[0] system prompt via generateSystemPrompt + liveContext
 
             let assistantContent = '';
-            await streamMessage(groundedMessages, API_KEY, (chunk) => {
+            await streamMessage(groundedMessages, (chunk) => {
                 assistantContent += chunk;
                 setChats(prev => prev.map(c => c.id === activeChatId ? {
                     ...c,

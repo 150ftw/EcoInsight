@@ -6,10 +6,9 @@ import fetch from 'node-fetch';
 const parseDDGResults = (html) => {
   const results = [];
   // Regex to find each result block in html.duckduckgo.com
-  const resultBlockRegex = /<div class=\"(?:result\s+results_links|result__body)[\s\S]*?<\/div>\s*<\/div>/g;
-  const titleLinkRegex = /<a class=\"result__url\"[^>]*href=\"([^\"]+)\"|<a class=\"result__a\"[^>]*href=\"([^\"]+)\">([\s\S]*?)<\/a>/;
-  const titleRegex = /<a class=\"result__a\"[^>]*>([\s\S]*?)<\/a>/;
-  const snippetRegex = /<a class=\"result__snippet\"[^>]*>([\s\S]*?)<\/a>|<div class=\"result__snippet\"[^>]*>([\s\S]*?)<\/div>/;
+  const resultBlockRegex = /<div class=\"(?:result\s+results_links|result__body)[\s\S]*?<div class=\"clear\"><\/div>/g;
+  const titleRegex = /<a[^>]*class=\"result__a\"[^>]*>([\s\S]*?)<\/a>/;
+  const snippetRegex = /<a[^>]*class=\"result__snippet\"[^>]*>([\s\S]*?)<\/a>|<div[^>]*class=\"result__snippet\"[^>]*>([\s\S]*?)<\/div>/;
 
   let match;
   while ((match = resultBlockRegex.exec(html)) !== null) {
@@ -51,8 +50,8 @@ const parseDDGResults = (html) => {
 
   // Fallback: if block regex missed, try global snippet matches
   if (results.length === 0) {
-    const generalSnippetRegex = /<a class=\"result__snippet\"[^>]*>([\s\S]*?)<\/a>/g;
-    const generalTitleRegex = /<a class=\"result__a\"[^>]*>([\s\S]*?)<\/a>/g;
+    const generalSnippetRegex = /<a[^>]*class=\"result__snippet\"[^>]*>([\s\S]*?)<\/a>/g;
+    const generalTitleRegex = /<a[^>]*class=\"result__a\"[^>]*>([\s\S]*?)<\/a>/g;
     let sM, tM;
     const titles = [];
     const snippets = [];

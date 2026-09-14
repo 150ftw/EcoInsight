@@ -108,7 +108,7 @@ export const deleteAllChats = async (userId) => {
 
 const DEFAULT_SETTINGS = {
     ai_settings: {
-        model: 'meta/llama-3.1-8b-instruct',
+        model: 'openai/gpt-oss-20b',
         style: 'Balanced',
         tone: 'Professional',
         creativity: 0.5,
