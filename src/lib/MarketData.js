@@ -32,10 +32,14 @@ const fetchIndianIndices = async () => {
         { symbol: '^NSEBANK', name: 'Nifty Bank' }
     ];
 
-    for (const target of targets) {
+    // Fetched in parallel — this was a sequential for-of/await loop, so the 3
+    // index lookups (each a live scrape on a cache miss) added up one after
+    // another instead of overlapping, on the critical path of both the Market
+    // Pulse dashboard and Today's Insight (both call this via fetchPulseRegistry).
+    await Promise.all(targets.map(async (target) => {
         try {
             const res = await fetch(`/api/ticker?symbol=${encodeURIComponent(target.symbol)}`);
-            if (!res.ok) continue;
+            if (!res.ok) return;
             const data = await res.json();
             if (data && data.price && data.price !== '---') {
                 const rawPct = String(data.changePercent || '0.00').replace(/[%+]/g, '').trim();
@@ -53,7 +57,7 @@ const fetchIndianIndices = async () => {
         } catch (e) {
             console.warn(`Failed to fetch ${target.name}:`, e);
         }
-    }
+    }));
     return Object.keys(indices).length > 0 ? indices : null;
 };
 
@@ -399,24 +403,31 @@ const STOCK_SYMBOL_MAP = {
     'bitcoin': 'BTC', 'ethereum': 'ETH', 'solana': 'SOL'
 };
 
+// In-flight request de-duplication: fetchPulseRegistry, fetchInstitutionalPulse,
+// and fetchNewsTickerData's trending list all draw from heavily overlapping
+// stock symbols (RELIANCE, HDFCBANK, TCS...) and are routinely called together
+// (e.g. fetchInsightRegistry runs fetchNewsTickerData and fetchPulseRegistry in
+// parallel) — without this, the same symbol gets scraped multiple times
+// concurrently within a single page load.
+const gfPriceInFlight = new Map();
+
 /**
  * Fetch live stock price and full fundamentals from Search-Sync v8 API
  */
 const fetchGoogleFinancePrice = async (nseSymbol, force = false) => {
     const cleanSym = nseSymbol.toUpperCase().replace(/\^/g, '').trim();
-    // Isolated v8 cache key
+    // Isolated v8 cache key — still written below (fetchMarketContext reads it
+    // directly for chat grounding), but no longer read here first. api/ticker.js
+    // already does the equivalent server-side cache check with the same TTL, so
+    // pre-checking it again client-side was just an extra Supabase round trip
+    // before making the exact same determination the server was about to make.
     const cacheKey = `v8_gf_price_${cleanSym}`;
 
-    if (!force) {
-        try {
-            const cached = await getCachedMarketData(cacheKey);
-            // Strictly reject any cached entry with synthetic / outdated marker
-            if (cached && cached.price && cached.source && !cached.source.includes('SYNTHETIC') && !cached.source.includes('v6')) {
-                return cached;
-            }
-        } catch (e) { }
+    if (!force && gfPriceInFlight.has(cacheKey)) {
+        return gfPriceInFlight.get(cacheKey);
     }
 
+    const requestPromise = (async () => {
     try {
         const res = await fetch(`/api/ticker?symbol=${encodeURIComponent(cleanSym)}${force ? '&force=true' : ''}`);
         if (!res.ok) return null;
@@ -449,8 +460,10 @@ const fetchGoogleFinancePrice = async (nseSymbol, force = false) => {
                 sparkline: tickerData.sparkline
             };
             
-            // Client cache for 3 mins
-            await setCachedMarketData(cacheKey, result, 3 * 60 * 1000);
+            // Written for fetchMarketContext, which reads this cache key directly
+            // for chat grounding — not awaited, since the caller here doesn't need
+            // to wait for the write to land to get its own already-fetched result.
+            setCachedMarketData(cacheKey, result, 3 * 60 * 1000).catch(() => {});
             return result;
         }
         return null;
@@ -459,6 +472,13 @@ const fetchGoogleFinancePrice = async (nseSymbol, force = false) => {
     }
 
     return null;
+    })();
+
+    if (!force) {
+        gfPriceInFlight.set(cacheKey, requestPromise);
+        requestPromise.finally(() => gfPriceInFlight.delete(cacheKey));
+    }
+    return requestPromise;
 };
 
 
@@ -675,7 +695,18 @@ export const fetchOnDemandContext = async (userMessage, force = false) => {
 };
 
 export const fetchNewsTickerData = async () => {
-    try {
+    const decodeEntities = (text) => {
+        if (!text) return '';
+        return text
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&nbsp;/g, ' ');
+    };
+
+    const fetchHeadlines = async () => {
         const rssUrl = encodeURIComponent('https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms');
         const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
         if (!res.ok) throw new Error('Failed to fetch news');
@@ -684,18 +715,7 @@ export const fetchNewsTickerData = async () => {
         const indianKeywords = ['india', 'nse', 'bse', 'sebi', 'nifty', 'sensex', 'inr', 'rs.', 'crore', 'lakh', 'it stocks', 'bank', 'tata', 'reliance', 'hdfc', 'infosys', 'adani', 'dalal street', 'mumbai', 'domestic', 'rbi', 'pvt', 'ltd'];
         const globalFilters = ['us stocks', 'nasdaq', 'wall street', 's&p 500', 'london', 'uk stocks', 'trump', 'medicare', 'eu stocks'];
 
-        const decodeEntities = (text) => {
-            if (!text) return '';
-            return text
-                .replace(/&amp;/g, '&')
-                .replace(/&lt;/g, '<')
-                .replace(/&gt;/g, '>')
-                .replace(/&quot;/g, '"')
-                .replace(/&#39;/g, "'")
-                .replace(/&nbsp;/g, ' ');
-        };
-
-        const newsItems = (newsData.items || [])
+        return (newsData.items || [])
             .filter(item => {
                 const title = decodeEntities(item.title).toLowerCase();
                 const hasIndianContext = indianKeywords.some(key => title.includes(key));
@@ -707,10 +727,11 @@ export const fetchNewsTickerData = async () => {
                 link: item.link || '#'
             }))
             .slice(0, 10);
+    };
 
+    const fetchTrending = async () => {
         const topStocks = ["RELIANCE", "HDFCBANK", "INFY", "TCS", "ICICIBANK", "SBIN"];
-
-        const trending = await Promise.all(topStocks.map(async (symbol) => {
+        return Promise.all(topStocks.map(async (symbol) => {
             try {
                 const quote = await fetchGoogleFinancePrice(symbol);
                 if (quote) {
@@ -726,27 +747,34 @@ export const fetchNewsTickerData = async () => {
             }
             return symbol;
         }));
+    };
 
-        return {
-            trending,
-            headlines: newsItems.length > 0 ? newsItems : [
-                { title: "Nifty 50 extends gains as domestic institutional buying surges.", link: "https://economictimes.indiatimes.com/markets/stocks" },
-                { title: "Sensex scales new heights led by banking and IT blue-chips.", link: "https://economictimes.indiatimes.com/markets/stocks" },
-                { title: "RBI highlights resilient Indian macroeconomic fundamentals.", link: "https://economictimes.indiatimes.com/markets/stocks" }
-            ]
-        };
-    } catch (e) {
-        console.warn('News ticker fetch failed:', e);
-        return {
-            trending: ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK"],
-            headlines: [
-                { title: "RBI maintains repo rate at 6.5%, focus on inflation target.", link: "https://economictimes.indiatimes.com/markets/stocks" },
-                { title: "Nifty 50 hits record high as FII inflows surge.", link: "https://economictimes.indiatimes.com/markets/stocks" },
-                { title: "Digital Rupee adoption grows across retail segment.", link: "https://economictimes.indiatimes.com/markets/stocks" },
-                { title: "Sensex gains on strong domestic cues.", link: "https://economictimes.indiatimes.com/markets/stocks" }
-            ]
-        };
+    // Headlines and trending stocks are independent — fetched in parallel (this
+    // used to await the RSS fetch before even starting the stock quotes, and a
+    // single RSS hiccup discarded real stock data along with it since both sat
+    // in one try block). allSettled means one failing doesn't take the other down.
+    const [headlinesResult, trendingResult] = await Promise.allSettled([
+        fetchHeadlines(),
+        fetchTrending()
+    ]);
+
+    const newsItems = headlinesResult.status === 'fulfilled' ? headlinesResult.value : [];
+    if (headlinesResult.status === 'rejected') {
+        console.warn('News ticker fetch failed:', headlinesResult.reason);
     }
+    const trending = trendingResult.status === 'fulfilled'
+        ? trendingResult.value
+        : ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK"];
+
+    return {
+        trending,
+        headlines: newsItems.length > 0 ? newsItems : [
+            { title: "RBI maintains repo rate at 6.5%, focus on inflation target.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+            { title: "Nifty 50 hits record high as FII inflows surge.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+            { title: "Digital Rupee adoption grows across retail segment.", link: "https://economictimes.indiatimes.com/markets/stocks" },
+            { title: "Sensex gains on strong domestic cues.", link: "https://economictimes.indiatimes.com/markets/stocks" }
+        ]
+    };
 };
 
 // Helper utilities for market breadth and sentiment

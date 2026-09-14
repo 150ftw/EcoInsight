@@ -6,6 +6,12 @@ const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
 
 // In-memory Session Cache for High-Speed Timeframe Switching
 const sessionCache = new Map();
+// In-flight request de-duplication: the dashboard fires off many fetchers in
+// parallel (indices, bluechips, top movers, sectors...) that frequently
+// request the same symbol at the same instant, before any of them has had a
+// chance to populate sessionCache above. Without this, each one independently
+// triggers its own live scrape for the identical symbol/range/interval.
+const inFlightRequests = new Map();
 
 /**
  * Fetch market data for a symbol (Search-Sync v7 Engine)
@@ -18,6 +24,13 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m', force 
         return sessionCache.get(cacheKey);
     }
 
+    // 2. Join an already-in-flight request for the same key instead of firing
+    // a redundant duplicate one.
+    if (!force && inFlightRequests.has(cacheKey)) {
+        return inFlightRequests.get(cacheKey);
+    }
+
+    const requestPromise = (async () => {
     try {
         const queryParams = new URLSearchParams({
             symbol,
@@ -56,7 +69,15 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m', force 
     } catch (e) {
         console.warn(`Ticker fetch failed for ${symbol}:`, e);
         return null;
+    } finally {
+        inFlightRequests.delete(cacheKey);
     }
+    })();
+
+    if (!force) {
+        inFlightRequests.set(cacheKey, requestPromise);
+    }
+    return requestPromise;
 };
 
 /**
