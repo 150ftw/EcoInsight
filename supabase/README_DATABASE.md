@@ -32,10 +32,10 @@ SUPABASE_SERVICE_ROLE_KEY="your-service-role-key" # CRITICAL for Search-Sync v7
 
 ## Security Note (RLS)
 
-The `schema.sql` script enables **Row Level Security (RLS)** by default. 
+The `schema.sql` script enables **Row Level Security (RLS)** on `users`, `user_settings`, and `chats`, with **no policies granted to the `anon` or `authenticated` roles**. This is deliberate: this app does not use Supabase's own Auth system, so `auth.uid()` is always `NULL` here — a policy like `USING (auth.uid() = user_id)` would never scope access to a real user, which is exactly the bug that led to every user's chats and settings being readable via the public anon key (fixed in `security_fix_rls.sql`).
 
-- **Frontend Access**: When users log in via the app, they use the `Anon Key`. RLS ensures they can only see their own chats and settings.
-- **Backend Access**: Our serverless functions (like `api/ticker.js` and `api/auth/[action].js`) use the `Service Role Key`. This key **bypasses RLS**, allowing the backend to manage user records and the global market cache efficiently.
+- **Frontend Access**: The browser never talks to `users`, `user_settings`, or `chats` directly. All access goes through server-side API routes (`api/auth.js`, `api/chats.js`, `api/settings.js`), which verify the app's own JWT cookie and scope every query to that authenticated `user_id` in application code.
+- **Backend Access**: Our serverless functions use the `Service Role Key`, which **bypasses RLS**, allowing the backend to manage user records, chats, settings, and the global market cache. This key must never be exposed to the frontend.
 
 > [!CAUTION]
 > NEVER expose the `SUPABASE_SERVICE_ROLE_KEY` in your frontend code (e.g., in a `.env` file that gets bundled with Vite without the `VITE_` prefix). Our architecture keeps it strictly in the `api/` layer for security.

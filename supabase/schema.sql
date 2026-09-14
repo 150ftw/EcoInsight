@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 CREATE TABLE IF NOT EXISTS public.user_settings (
     user_id UUID PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
     ai_settings JSONB DEFAULT '{
-        "model": "meta/llama-3.1-8b-instruct",
+        "model": "openai/gpt-oss-20b",
         "style": "Balanced",
         "tone": "Professional",
         "creativity": 0.5,
@@ -103,20 +103,19 @@ ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.market_cache ENABLE ROW LEVEL SECURITY;
 
--- USERS: Users can only see and update their own record
-CREATE POLICY "Users can view own record" ON public.users FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own record" ON public.users FOR UPDATE USING (auth.uid() = id);
-
--- USER_SETTINGS: Users can only see and update their own settings
-CREATE POLICY "Users can view own settings" ON public.user_settings FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update own settings" ON public.user_settings FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own settings" ON public.user_settings FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- CHATS: Users can manage their own conversations
-CREATE POLICY "Users can view own chats" ON public.chats FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own chats" ON public.chats FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own chats" ON public.chats FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own chats" ON public.chats FOR DELETE USING (auth.uid() = user_id);
+-- USERS, USER_SETTINGS, CHATS: no anon/authenticated-facing policies.
+-- This app does NOT use Supabase's own Auth system — it has its own JWT
+-- cookie auth (see api/auth.js) — so auth.uid() is always NULL here and a
+-- policy like `USING (auth.uid() = user_id)` would never actually scope
+-- anything to a real user. All access to these three tables goes through
+-- server-side API routes (api/auth.js, api/chats.js, api/settings.js)
+-- using the service-role key, which bypasses RLS and scopes every query to
+-- the authenticated user_id in application code instead. With RLS enabled
+-- and no policies defined, PostgREST denies all anon/authenticated access
+-- by default, which is exactly what we want.
+REVOKE ALL ON public.users FROM anon, authenticated;
+REVOKE ALL ON public.user_settings FROM anon, authenticated;
+REVOKE ALL ON public.chats FROM anon, authenticated;
 
 -- MARKET_CACHE: Publicly readable for speed, but only writable by authenticated service roles
 CREATE POLICY "Anyone can view market cache" ON public.market_cache FOR SELECT USING (true);

@@ -9,39 +9,35 @@ const DEFAULT_CHAT = {
 };
 
 // ============================================================
-// CHATS
+// CHATS & USER SETTINGS
 // ============================================================
+// These go through /api/chats and /api/settings (server-side, using the
+// authenticated user's JWT cookie) rather than talking to Supabase directly
+// from the browser. The RLS policies on these tables were written assuming
+// Supabase's own Auth (auth.uid()), which this app doesn't use — it has its
+// own JWT cookie auth — so auth.uid() was always null and those policies
+// never actually matched anything, leaving the public anon key able to read
+// every user's chats and settings. userId is still accepted here to keep the
+// existing call sites in App.jsx unchanged, but the server derives the real
+// authenticated user from the cookie and ignores it for authorization.
 
 /**
  * Load all chats for a given user. Returns { chats, activeChatId }.
  */
 export const loadChats = async (userId) => {
     try {
-        const { data, error } = await supabase
-            .from('chats')
-            .select('*')
-            .eq('user_id', userId)
-            .order('updated_at', { ascending: false });
+        const res = await fetch('/api/chats?action=list');
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        const { chats, activeChatId } = await res.json();
 
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
+        if (!chats || chats.length === 0) {
             // No chats found — return defaults
             return { chats: [DEFAULT_CHAT], activeChatId: 'default' };
         }
 
-        const chats = data.map(row => ({
-            id: row.id,
-            title: row.title,
-            messages: row.messages || []
-        }));
-
-        const activeRow = data.find(row => row.is_active);
-        const activeChatId = activeRow ? activeRow.id : chats[0].id;
-
         return { chats, activeChatId };
     } catch (err) {
-        console.error('Failed to load chats from Supabase:', err);
+        console.error('Failed to load chats:', err);
         return { chats: [DEFAULT_CHAT], activeChatId: 'default' };
     }
 };
@@ -51,21 +47,14 @@ export const loadChats = async (userId) => {
  */
 export const saveChats = async (userId, chats, activeChatId) => {
     try {
-        const rows = chats.map(chat => ({
-            id: chat.id,
-            user_id: userId,
-            title: chat.title,
-            messages: chat.messages,
-            is_active: chat.id === activeChatId
-        }));
-
-        const { error } = await supabase
-            .from('chats')
-            .upsert(rows, { onConflict: 'id,user_id' });
-
-        if (error) throw error;
+        const res = await fetch('/api/chats?action=save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chats, activeChatId })
+        });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
     } catch (err) {
-        console.error('Failed to save chats to Supabase:', err);
+        console.error('Failed to save chats:', err);
     }
 };
 
@@ -74,15 +63,14 @@ export const saveChats = async (userId, chats, activeChatId) => {
  */
 export const deleteChat = async (userId, chatId) => {
     try {
-        const { error } = await supabase
-            .from('chats')
-            .delete()
-            .eq('id', chatId)
-            .eq('user_id', userId);
-
-        if (error) throw error;
+        const res = await fetch('/api/chats?action=delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chatId })
+        });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
     } catch (err) {
-        console.error('Failed to delete chat from Supabase:', err);
+        console.error('Failed to delete chat:', err);
     }
 };
 
@@ -91,14 +79,10 @@ export const deleteChat = async (userId, chatId) => {
  */
 export const deleteAllChats = async (userId) => {
     try {
-        const { error } = await supabase
-            .from('chats')
-            .delete()
-            .eq('user_id', userId);
-
-        if (error) throw error;
+        const res = await fetch('/api/chats?action=delete-all', { method: 'POST' });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
     } catch (err) {
-        console.error('Failed to clear all chats from Supabase:', err);
+        console.error('Failed to clear all chats:', err);
     }
 };
 
@@ -149,13 +133,9 @@ const DEFAULT_SETTINGS = {
  */
 export const loadSettings = async (userId) => {
     try {
-        const { data, error } = await supabase
-            .from('user_settings')
-            .select('*')
-            .eq('user_id', userId)
-            .maybeSingle();
-
-        if (error) throw error;
+        const res = await fetch('/api/settings?action=get');
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        const { settings: data } = await res.json();
 
         if (!data) return { ...DEFAULT_SETTINGS };
 
@@ -167,7 +147,7 @@ export const loadSettings = async (userId) => {
             profile: { ...DEFAULT_SETTINGS.profile, ...(data.profile || {}) },
         };
     } catch (err) {
-        console.error('Failed to load settings from Supabase:', err);
+        console.error('Failed to load settings:', err);
         return { ...DEFAULT_SETTINGS };
     }
 };
@@ -177,20 +157,20 @@ export const loadSettings = async (userId) => {
  */
 export const saveSettings = async (userId, settings) => {
     try {
-        const { error } = await supabase
-            .from('user_settings')
-            .upsert({
-                user_id: userId,
+        const res = await fetch('/api/settings?action=save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 ai_settings: settings.ai_settings,
                 chat_settings: settings.chat_settings,
                 personalization: settings.personalization,
                 appearance: settings.appearance,
-                profile: settings.profile,
-            }, { onConflict: 'user_id' });
-
-        if (error) throw error;
+                profile: settings.profile
+            })
+        });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
     } catch (err) {
-        console.error('Failed to save settings to Supabase:', err);
+        console.error('Failed to save settings:', err);
     }
 };
 
