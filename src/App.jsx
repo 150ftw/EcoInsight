@@ -4898,7 +4898,7 @@ const FintechBadges = ({ labels }) => {
                                                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                                                 onClick={() => setView('insights')}
                                             >
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={16} /> Today's Insight</div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Sparkles size={16} /> Today's Insights</div>
                                             </button>
                                             <button
                                                 className={`nav-item sub-nav-item ${view === 'market-pulse' ? 'active' : ''}`}
@@ -5040,7 +5040,7 @@ const FintechBadges = ({ labels }) => {
                                         view === 'heatmap' ? 'Sector Sentiment' :
                                             view === 'portfolio' ? 'Neural Portfolio' :
                                                 view === 'market-pulse' ? 'Quick Market Pulse' :
-                                                    view === 'insights' ? 'Elite AI Insights' :
+                                                    view === 'insights' ? "Today's Insights" :
                                                         view === 'trends' ? 'Market Intelligence' : 'Account Settings'
                                 }</h2>
                                 {view !== 'chat' && <div className="badge">Beta</div>}
@@ -5081,7 +5081,7 @@ const FintechBadges = ({ labels }) => {
                         />
                     )}
                 </AnimatePresence>
-                {!isMobile && <NewsTicker />}
+                {!isMobile && view === 'insights' && <NewsTicker />}
             </div>
         );
     };

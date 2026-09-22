@@ -292,72 +292,91 @@ export default async function handler(req, res) {
   }
 
   const cleanSymbol = symbol.toUpperCase().replace(/\^/g, '').trim();
-  // Versioned cache key to completely isolate from stale caches after a format
-  // change — bumped to v9 when the sparkline generator changed from a single
-  // price-only formula (ignoring range/interval entirely) to real OHLC history
-  // for 1W/1M. Ranges with long TTLs (1y = 24h, 1mo/1w = 1h) would otherwise
-  // keep serving the old synthetic shape under the old key for that whole
-  // window regardless of the code change.
-  const cacheKey = `v9_ticker_${cleanSymbol}_${range}_${interval}`;
+  // Quote data (price, change%, fundamentals, raw OHLC history) is cached
+  // once per SYMBOL with a fixed 3-min TTL, independent of which chart range
+  // is requested. The sparkline for a given range is then derived fresh from
+  // that quote on EVERY request (buildSparkline is pure/synchronous, no extra
+  // network call) instead of being cached per-range with its own longer TTL.
+  // The old per-range cache (v9_ticker_*) let the 1Y tab's cache live for 24h
+  // and 1W/1M's for 1h, so switching to those tabs could silently replace a
+  // fresh price with one up to a day old — while the app still labeled it
+  // "current price". Caching the quote itself at a uniform 3-min TTL, and
+  // computing the range-specific sparkline fresh every time, removes that
+  // gap entirely: every range now shows the same live price.
+  const quoteCacheKey = `v10_quote_${cleanSymbol}`;
+  const QUOTE_TTL_MS = 3 * 60 * 1000;
 
-  // --- STAGE 0: SERVER-SIDE CACHE CHECK ---
+  let scrapedData = null;
+
+  // --- STAGE 0: SERVER-SIDE QUOTE CACHE CHECK ---
   if (supabase && !isForceMatch) {
     try {
       const { data: cached, error: cacheErr } = await supabase
         .from('market_cache')
         .select('data, expires_at')
-        .eq('cache_key', cacheKey)
+        .eq('cache_key', quoteCacheKey)
         .maybeSingle();
 
-      if (!cacheErr && cached && cached.data && new Date(cached.expires_at) > new Date()) {
-        const isSynthetic = String(cached.data.source || '').includes('SYNTHETIC') || String(cached.data.source || '').includes('v6');
-        if (!isSynthetic) {
-          return res.status(200).json({
-            ...cached.data,
-            cachedAt: cached.expires_at
-          });
-        }
+      if (!cacheErr && cached && cached.data && cached.data.price && new Date(cached.expires_at) > new Date()) {
+        scrapedData = cached.data;
       }
     } catch (e) {
       console.warn('[Ticker API] Cache lookup failed:', e.message);
     }
   }
 
-  // --- STAGE 1: CANDIDATE SYMBOL RESOLUTION ---
-  const candidates = [];
-  if (SYMBOL_ALIASES[cleanSymbol]) {
-    candidates.push(SYMBOL_ALIASES[cleanSymbol]);
-  } else if (SYMBOL_ALIASES[symbol]) {
-    candidates.push(SYMBOL_ALIASES[symbol]);
-  } else if (symbol.includes(':') || symbol.includes('-')) {
-    candidates.push(symbol);
-  } else {
-    // Default Indian priority: NSE -> BSE -> NASDAQ
-    candidates.push(`${cleanSymbol}:NSE`);
-    candidates.push(`${cleanSymbol}:BOM`);
-    candidates.push(`${cleanSymbol}:NASDAQ`);
-  }
+  // --- STAGE 1: CANDIDATE SYMBOL RESOLUTION (only on a quote cache miss) ---
+  if (!scrapedData) {
+    const candidates = [];
+    if (SYMBOL_ALIASES[cleanSymbol]) {
+      candidates.push(SYMBOL_ALIASES[cleanSymbol]);
+    } else if (SYMBOL_ALIASES[symbol]) {
+      candidates.push(SYMBOL_ALIASES[symbol]);
+    } else if (symbol.includes(':') || symbol.includes('-')) {
+      candidates.push(symbol);
+    } else {
+      // Default Indian priority: NSE -> BSE -> NASDAQ
+      candidates.push(`${cleanSymbol}:NSE`);
+      candidates.push(`${cleanSymbol}:BOM`);
+      candidates.push(`${cleanSymbol}:NASDAQ`);
+    }
 
-  let scrapedData = null;
-  for (const candidate of candidates) {
-    scrapedData = await scrapeGoogleFinance(candidate);
-    if (scrapedData && scrapedData.price) break;
-  }
-
-  // If still not found and symbol has no colon, try other exchanges
-  if (!scrapedData && !symbol.includes(':')) {
-    const fallbacks = [`${cleanSymbol}:INDEXNSE`, `${cleanSymbol}:INDEXBOM`, `${cleanSymbol}:NYSE`];
-    for (const fb of fallbacks) {
-      scrapedData = await scrapeGoogleFinance(fb);
+    for (const candidate of candidates) {
+      scrapedData = await scrapeGoogleFinance(candidate);
       if (scrapedData && scrapedData.price) break;
     }
-  }
 
-  if (!scrapedData) {
-    return res.status(404).json({
-      error: `Live market quote not found for symbol: ${symbol}`,
-      symbol: cleanSymbol
-    });
+    // If still not found and symbol has no colon, try other exchanges
+    if (!scrapedData && !symbol.includes(':')) {
+      const fallbacks = [`${cleanSymbol}:INDEXNSE`, `${cleanSymbol}:INDEXBOM`, `${cleanSymbol}:NYSE`];
+      for (const fb of fallbacks) {
+        scrapedData = await scrapeGoogleFinance(fb);
+        if (scrapedData && scrapedData.price) break;
+      }
+    }
+
+    if (!scrapedData) {
+      return res.status(404).json({
+        error: `Live market quote not found for symbol: ${symbol}`,
+        symbol: cleanSymbol
+      });
+    }
+
+    // --- STAGE 2: SAVE FRESH QUOTE TO CACHE ---
+    if (supabase) {
+      try {
+        const expiresAt = new Date(Date.now() + QUOTE_TTL_MS).toISOString();
+        await supabase
+          .from('market_cache')
+          .upsert({
+            cache_key: quoteCacheKey,
+            data: scrapedData,
+            expires_at: expiresAt
+          }, { onConflict: 'cache_key' });
+      } catch (e) {
+        console.warn('[Ticker API] Cache save failed:', e.message);
+      }
+    }
   }
 
   const numPrice = parseFloat(scrapedData.price) || 0;
@@ -389,26 +408,6 @@ export default async function handler(req, res) {
     interval,
     timestamp: new Date().toISOString()
   };
-
-  // --- STAGE 2: SAVE TO SUPABASE CACHE ---
-  if (supabase) {
-    try {
-      let ttlMs = 3 * 60 * 1000; // 3 mins for 1d real-time
-      if (range === '1w' || range === '1mo') ttlMs = 60 * 60 * 1000;
-      if (range === '1y') ttlMs = 24 * 60 * 60 * 1000;
-
-      const expiresAt = new Date(Date.now() + ttlMs).toISOString();
-      await supabase
-        .from('market_cache')
-        .upsert({
-          cache_key: cacheKey,
-          data: responsePayload,
-          expires_at: expiresAt
-        }, { onConflict: 'cache_key' });
-    } catch (e) {
-      console.warn('[Ticker API] Cache save failed:', e.message);
-    }
-  }
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
