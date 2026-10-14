@@ -10,6 +10,22 @@ import { fetchWebSearchContext } from './lib/WebSearch'
 import { loadChats, saveChats, deleteChat as supaDeleteChat, deleteAllChats, loadSettings, saveSettings } from './lib/SupabaseStorage'
 import { sendWelcomeEmail } from './lib/EmailService';
 import { parseChartBlocks, EcoChartRenderer } from './components/EcoCharts'
+
+// The model often uses <br> for line breaks inside markdown table cells (GFM
+// cells can't contain real newlines). react-markdown escapes all raw HTML, so
+// those showed up as literal "<br>" text. This turns only bare <br> tags into
+// real line breaks — every other raw HTML node stays escaped.
+const rehypeBreakTags = () => (tree) => {
+    const walk = (node) => {
+        if (!node.children) return;
+        node.children = node.children.map(child =>
+            child.type === 'raw' && /^<br\s*\/?>$/i.test(child.value.trim())
+                ? { type: 'element', tagName: 'br', properties: {}, children: [] }
+                : (walk(child), child)
+        );
+    };
+    walk(tree);
+};
 import { useAuth, useUser } from './context/AuthContext'
 import AuthModal from './components/AuthModal'
 import AccountSettingsModal from './components/AccountSettingsModal'
@@ -4521,6 +4537,7 @@ const FintechBadges = ({ labels }) => {
                                                                     <ReactMarkdown
                                                                         key={bIdx}
                                                                         remarkPlugins={[remarkGfm]}
+                                                                        rehypePlugins={[rehypeBreakTags]}
                                                                         components={{
                                                                             table: ({ children }) => (
                                                                                 <div className="md-table-wrapper">

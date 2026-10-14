@@ -1410,12 +1410,19 @@ main {
     padding: 12px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     vertical-align: top;
+    /* .message-content's overflow-wrap: anywhere makes every character a break
+       point, which lets the table's auto layout squeeze a column down to a few
+       letters wide ("sentim / ent"). Cells wrap at spaces only; the wrapper
+       scrolls horizontally if the table genuinely doesn't fit. */
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 .message-content .md-table th:first-child,
 .message-content .md-table td:first-child {
     font-weight: 700;
     color: #fff;
+    min-width: 140px;
 }
 
 .message-content .md-table tbody tr:nth-child(even) {
