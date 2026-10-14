@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LineChart, Line, AreaChart, Area,
@@ -26,7 +26,9 @@ import {
     fetchNiftySectors,
     fetchTopMovers,
     fetchFiiDiiFlows,
-    fetchMarketSentiment
+    fetchMarketSentiment,
+    fetchTechnicalSignals,
+    fetchEarningsWatch
 } from '../lib/DashboardData';
 import MarketPulse from './MarketPulse';
 import FiiDiiAnalyzer from './FiiDiiAnalyzer';
@@ -101,7 +103,11 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
     const [isChartLoading, setIsChartLoading] = useState(false);
     const [lastUpdated, setLastUpdated] = useState(new Date());
     const [selectedAsset, setSelectedAsset] = useState(null);
+    const selectedAssetRef = useRef(null);
+    selectedAssetRef.current = selectedAsset;
     const [chartTimeframe, setChartTimeframe] = useState('1D');
+    const chartTimeframeRef = useRef('1D');
+    chartTimeframeRef.current = chartTimeframe;
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -128,17 +134,12 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
                 fetchCommodities(force),
                 fetchIndianEquities(force),
                 fetchEconomicCalendar(),
-                fetchNiftySectors(),
-                fetchTopMovers(),
+                fetchNiftySectors(force),
+                fetchTopMovers(force),
                 fetchFiiDiiFlows(),
-                fetchMarketSentiment(),
-                // Simulated technical signals and earnings for now to ensure stability
-                Promise.resolve({ rsi: 68, macd: 'Bullish', trend: 'Strong Buy' }),
-                Promise.resolve([
-                    { name: 'TCS', date: 'APR 12', time: 'Post-market', target: '₹4,200', consensus: 'Neutral' },
-                    { name: 'INFY', date: 'APR 18', time: 'Post-market', target: '₹1,550', consensus: 'Positive' },
-                    { name: 'HDFCBANK', date: 'APR 24', time: 'Pre-market', target: '₹1,750', consensus: 'Critical' }
-                ])
+                fetchMarketSentiment(force),
+                fetchTechnicalSignals(force),
+                fetchEarningsWatch(force)
             ]);
 
             setIndices(idx || []);
@@ -152,21 +153,33 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
             setFiiDiiFlows(fii || []);
             setMarketSentiment(snt || { score: 50, label: 'NEUTRAL', reason: 'Error syncing signals' });
             setTechnicalSignals(tech);
-            setEarningsWatch(earn);
+            setEarningsWatch(earn || []);
 
+            let defaultAsset = glo && glo.length > 0 ? glo[0] : null;
             if (watchlistSymbols.length > 0) {
                 const { range, interval } = getTimeframeParams(chartTimeframe);
                 const watchData = await Promise.all(watchlistSymbols.map(s => fetchHistory(s, range, interval, force)));
                 const validWatchData = watchData.filter(d => d !== null);
                 setUserWatchlist(validWatchData);
-                
-                // Auto-select first watchlist item if nothing is selected
-                if (validWatchData.length > 0 && !selectedAsset) {
-                    handleAssetChange(validWatchData[0]);
+                if (validWatchData.length > 0) defaultAsset = validWatchData[0];
+            }
+
+            // Read the selection through a ref: this callback is memoized on
+            // chartTimeframe only, so a plain `selectedAsset` here is the value
+            // from whenever it was created (usually null), which made every
+            // sync reset the user's selection back to the first card.
+            const current = selectedAssetRef.current;
+            if (!current) {
+                // Auto-select first watchlist item, else the first Indian Bluechip
+                if (defaultAsset) handleAssetChange(defaultAsset);
+            } else {
+                // Re-quote the selected asset too, so the big headline price
+                // doesn't lag behind the cards around it.
+                const { range, interval } = getTimeframeParams(chartTimeframe);
+                const fresh = await fetchHistory(current.fullSymbol, range, interval, force);
+                if (fresh && selectedAssetRef.current?.fullSymbol === current.fullSymbol && chartTimeframeRef.current === chartTimeframe) {
+                    setSelectedAsset(fresh);
                 }
-            } else if (glo && glo.length > 0 && !selectedAsset) {
-                // Fallback to first Indian Bluechip if no watchlist
-                handleAssetChange(glo[0]);
             }
 
             setLastUpdated(new Date());
@@ -182,6 +195,16 @@ const LiveMarketDashboard = ({ user, watchlist, onWatchlistChange }) => {
     useEffect(() => {
         loadAllData(watchlist, true, syncState.force);
     }, [syncState, watchlist]);
+
+    // Silent auto-refresh on the same 3-min cadence as the quote caches, so the
+    // dashboard keeps matching what the chatbot quotes. Skipped while the tab
+    // is hidden to avoid scraping for nobody.
+    useEffect(() => {
+        const id = setInterval(() => {
+            if (!document.hidden) loadAllData(watchlist, false, false);
+        }, 3 * 60 * 1000);
+        return () => clearInterval(id);
+    }, [loadAllData, watchlist]);
 
     // Handle timeframe changes (Optimistic Loading)
     useEffect(() => {

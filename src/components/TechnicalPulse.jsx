@@ -5,11 +5,15 @@ import { Cpu, Zap, Activity } from 'lucide-react';
 const TechnicalPulse = ({ signals }) => {
     if (!signals) return null;
 
+    const above = parseFloat(signals.smaDistance) >= 0;
+    const trendColor = signals.trend === 'Bullish' ? '#22c55e' : signals.trend === 'Bearish' ? '#ef4444' : 'var(--accent-primary)';
+    const monthUp = parseFloat(signals.monthChange) >= 0;
+
     return (
         <section className="panel-card" style={{ marginTop: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.2rem' }}>
                 <h3 style={{ margin: 0, fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', letterSpacing: '1px' }}>
-                    <Cpu size={16} /> NEURAL TECHNICAL ANALYSIS
+                    <Cpu size={16} /> NEURAL TECHNICAL ANALYSIS · {signals.symbol}
                 </h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div className="pulse-dot" />
@@ -27,22 +31,22 @@ const TechnicalPulse = ({ signals }) => {
                 </div>
 
                 <div className="fundamental-item" style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
-                    <span className="label" style={{ display: 'block', marginBottom: '0.5rem' }}>MACD Histogram</span>
-                    <span className="value" style={{ fontSize: '1.4rem', color: '#22c55e' }}>{signals.macd}</span>
-                    <span style={{ fontSize: '0.6rem', opacity: 0.4, display: 'block' }}>BULLISH DIVERGENCE</span>
+                    <span className="label" style={{ display: 'block', marginBottom: '0.5rem' }}>vs 20-Day SMA</span>
+                    <span className="value terminal-num" style={{ fontSize: '1.4rem', color: above ? '#22c55e' : '#ef4444' }}>{above ? '+' : ''}{signals.smaDistance}%</span>
+                    <span style={{ fontSize: '0.6rem', opacity: 0.4, display: 'block' }}>SMA {signals.sma20.toLocaleString('en-IN')}</span>
                 </div>
 
                 <div className="fundamental-item" style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
                     <span className="label" style={{ display: 'block', marginBottom: '0.5rem' }}>Aggregated Outlook</span>
-                    <span className="value" style={{ fontSize: '1.4rem', color: 'var(--accent-primary)' }}>{signals.trend}</span>
-                    <span style={{ fontSize: '0.6rem', opacity: 0.4, display: 'block' }}>HIGH CONFIDENCE</span>
+                    <span className="value" style={{ fontSize: '1.4rem', color: trendColor }}>{signals.trend}</span>
+                    <span style={{ fontSize: '0.6rem', opacity: 0.4, display: 'block' }}>RSI + SMA CONFLUENCE</span>
                 </div>
             </div>
 
             <div style={{ marginTop: '1rem', padding: '0.8rem', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
                 <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
                     <Zap size={12} style={{ display: 'inline', marginRight: '5px', verticalAlign: 'middle' }} />
-                    <strong>Neural Insight:</strong> Current momentum indicates a sustained breakout above the 50-day EMA. Recommend monitoring volume for confirmation.
+                    <strong>Neural Insight:</strong> {signals.symbol} is trading {Math.abs(parseFloat(signals.smaDistance)).toFixed(2)}% {above ? 'above' : 'below'} its 20-day average with RSI at {signals.rsi}, and is {monthUp ? 'up' : 'down'} {Math.abs(parseFloat(signals.monthChange)).toFixed(2)}% over the last {signals.sessions} sessions. Computed from daily closes.
                 </p>
             </div>
         </section>

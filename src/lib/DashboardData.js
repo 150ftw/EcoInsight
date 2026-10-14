@@ -4,8 +4,12 @@
 const TICKER_API = '/api/ticker?symbol=';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3/simple/price';
 
-// In-memory Session Cache for High-Speed Timeframe Switching
+// In-memory Session Cache for High-Speed Timeframe Switching. Entries expire
+// after the same 3 minutes as api/ticker.js's server-side quote cache — without
+// an expiry, the first price fetched was served for the entire browser session,
+// so the dashboard drifted away from the chatbot (which always hits the API).
 const sessionCache = new Map();
+const SESSION_TTL_MS = 3 * 60 * 1000;
 // In-flight request de-duplication: the dashboard fires off many fetchers in
 // parallel (indices, bluechips, top movers, sectors...) that frequently
 // request the same symbol at the same instant, before any of them has had a
@@ -19,9 +23,10 @@ const inFlightRequests = new Map();
 export const fetchHistory = async (symbol, range = '1d', interval = '5m', force = false) => {
     // 1. Session Cache Check (Instant Hit)
     const cacheKey = `${symbol}_${range}_${interval}`;
-    if (!force && sessionCache.has(cacheKey)) {
+    const cached = sessionCache.get(cacheKey);
+    if (!force && cached && Date.now() - cached.cachedAt < SESSION_TTL_MS) {
         console.log(`[Cache] Instant Session Hit: ${cacheKey}`);
-        return sessionCache.get(cacheKey);
+        return cached.result;
     }
 
     // 2. Join an already-in-flight request for the same key instead of firing
@@ -60,10 +65,9 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m', force 
             isPositive: parseFloat(data.changePercent || 0) >= 0
         };
 
-        // 2. Save to Session Cache
-        if (result && !force) {
-            sessionCache.set(cacheKey, result);
-        }
+        // 2. Save to Session Cache — forced fetches too, otherwise the next
+        // non-forced read after a FORCE SYNC would get the pre-sync price back.
+        sessionCache.set(cacheKey, { result, cachedAt: Date.now() });
 
         return result;
     } catch (e) {
@@ -86,7 +90,7 @@ export const fetchHistory = async (symbol, range = '1d', interval = '5m', force 
  */
 export const prefetchAssetTimeframes = (symbol) => {
     const timeframes = [
-        { range: '1w', interval: '15m' },
+        { range: '5d', interval: '15m' },
         { range: '1mo', interval: '1d' }
     ];
     
@@ -192,7 +196,7 @@ export const fetchCryptoData = async (force = false) => {
 /**
  * Sector Performance (Heatmap)
  */
-export const fetchNiftySectors = async () => {
+export const fetchNiftySectors = async (force = false) => {
     const targets = [
         { symbol: '^CNXIT', name: 'IT' },
         { symbol: '^NSEBANK', name: 'Bank' },
@@ -204,7 +208,7 @@ export const fetchNiftySectors = async () => {
         { symbol: '^CNXMEDIA', name: 'Media' }
     ];
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '5m', force)));
     return results.filter(r => r !== null).map(r => ({
         name: r.name,
         changePercent: r.changePercent,
@@ -216,7 +220,7 @@ export const fetchNiftySectors = async () => {
 /**
  * Top Movers (Gainers/Losers)
  */
-export const fetchTopMovers = async () => {
+export const fetchTopMovers = async (force = false) => {
     const targets = [
         { symbol: 'RELIANCE:NSE', name: 'Reliance' },
         { symbol: 'TCS:NSE', name: 'TCS' },
@@ -226,7 +230,7 @@ export const fetchTopMovers = async () => {
         { symbol: 'ADANIENT:NSE', name: 'Adani Ent' }
     ];
 
-    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol)));
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '5m', force)));
     return results.filter(r => r !== null).map(r => ({
         symbol: r.symbol,
         name: r.name,
@@ -289,39 +293,202 @@ export const fetchMarketNews = async (query) => {
 
 /**
  * Fetch FII/DII Institutional Flows (Net Buying/Selling)
+ * Real provisional cash-market figures published by NSE each evening, via
+ * api/fii-dii.js. Returns [] if NSE is unreachable — the panel shows an
+ * "unavailable" state rather than invented numbers.
  */
 export const fetchFiiDiiFlows = async () => {
-    // In a production app, we would scrape or use an API
-    // Here we'll simulate based on recent volatility or static high-quality mocks
-    // for absolute UI stability
-    return [
-        { name: 'FII Net Buy/Sell', value: '+1,245.80 Cr', sentiment: 'Positive', isPositive: true },
-        { name: 'DII Net Buy/Sell', value: '-432.10 Cr', sentiment: 'Neutral', isPositive: false },
-        { name: 'FII Index Longs', value: '42%', sentiment: 'Neutral', isPositive: true },
-        { name: 'Pro Capital', value: '+560.00 Cr', sentiment: 'Positive', isPositive: true }
-    ];
+    try {
+        const res = await fetch('/api/fii-dii');
+        if (!res.ok) return [];
+        const { fii, dii, date } = await res.json();
+
+        const crore = (n) => `${n >= 0 ? '+' : '-'}${Math.abs(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Cr`;
+        const combined = fii.net + dii.net;
+
+        return [
+            { name: 'FII/FPI Net', value: crore(fii.net), sentiment: fii.net >= 0 ? 'Net Buyers' : 'Net Sellers', isPositive: fii.net >= 0, date },
+            { name: 'DII Net', value: crore(dii.net), sentiment: dii.net >= 0 ? 'Net Buyers' : 'Net Sellers', isPositive: dii.net >= 0, date },
+            { name: 'FII Gross Buy', value: crore(fii.buy).replace('+', ''), sentiment: `Sell ${crore(fii.sell).replace('+', '')}`, isPositive: fii.buy >= fii.sell, date },
+            { name: 'Combined Net', value: crore(combined), sentiment: combined >= 0 ? 'Net Inflow' : 'Net Outflow', isPositive: combined >= 0, date }
+        ];
+    } catch (e) {
+        console.warn('FII/DII fetch failed:', e);
+        return [];
+    }
+};
+
+// RBI MPC policy announcement days (last day of each meeting) for FY 2026-27,
+// per RBI's published schedule. Extend this list when RBI publishes FY28's.
+const RBI_POLICY_DATES = ['2026-04-08', '2026-06-05', '2026-08-05', '2026-10-07', '2026-12-04', '2027-02-05'];
+
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// Builds a Date for a wall-clock time in IST (UTC+5:30).
+const istDate = (y, m, d, hh, mm) => new Date(Date.UTC(y, m, d, hh - 5, mm - 30));
+
+// MoSPI releases on the next working day when the scheduled date is a weekend.
+const nextWeekday = (y, m, d) => {
+    const dt = new Date(Date.UTC(y, m, d));
+    while (dt.getUTCDay() === 0 || dt.getUTCDay() === 6) dt.setUTCDate(dt.getUTCDate() + 1);
+    return [dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate()];
+};
+
+const lastWeekdayOfMonth = (y, m) => {
+    const dt = new Date(Date.UTC(y, m + 1, 0));
+    while (dt.getUTCDay() === 0 || dt.getUTCDay() === 6) dt.setUTCDate(dt.getUTCDate() - 1);
+    return [dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate()];
 };
 
 /**
  * Enhanced Economic Calendar (India Focused)
+ * Generated from the official release schedules rather than a fixed list, so
+ * it never goes stale: CPI on the 12th and WPI on the 14th (MoSPI/DPIIT,
+ * shifted past weekends), quarterly GDP on the last working day of
+ * Feb/May/Aug/Nov, and RBI MPC decisions from RBI_POLICY_DATES.
  */
 export const fetchEconomicCalendar = async () => {
-    return [
-        { date: 'APR 12', time: '17:30', event: 'India CPI Inflation (Mar)', impact: 'High', status: 'Upcoming' },
-        { date: 'APR 15', time: '17:30', event: 'India WPI Inflation (Mar)', impact: 'Medium', status: 'Upcoming' },
-        { date: 'APR 18', time: '09:00', event: 'RBI MPC Meeting Minutes', impact: 'High', status: 'Pending' },
-        { date: 'APR 24', time: '11:00', event: 'HDFC Bank Q4 Earnings', impact: 'Critical', status: 'Expected' }
-    ];
+    const now = new Date();
+    const events = [];
+
+    for (let offset = 0; offset < 3; offset++) {
+        const base = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + offset, 1));
+        const y = base.getUTCFullYear();
+        const m = base.getUTCMonth();
+        const refMonth = MONTH_NAMES[(m + 11) % 12];
+
+        events.push({ at: istDate(...nextWeekday(y, m, 12), 16, 0), event: `India CPI Inflation (${refMonth})`, impact: 'High' });
+        events.push({ at: istDate(...nextWeekday(y, m, 14), 12, 0), event: `India WPI Inflation (${refMonth})`, impact: 'Medium' });
+
+        // Feb -> Q3 (Oct-Dec), May -> Q4, Aug -> Q1, Nov -> Q2
+        const gdpQuarter = { 1: 'Q3', 4: 'Q4', 7: 'Q1', 10: 'Q2' }[m];
+        if (gdpQuarter) {
+            events.push({ at: istDate(...lastWeekdayOfMonth(y, m), 16, 0), event: `India GDP Growth (${gdpQuarter})`, impact: 'High' });
+        }
+    }
+
+    RBI_POLICY_DATES.forEach(d => {
+        const [y, m, day] = d.split('-').map(Number);
+        events.push({ at: istDate(y, m - 1, day, 10, 0), event: 'RBI MPC Policy Decision', impact: 'Critical' });
+    });
+
+    // Keep events from the start of today (IST) onwards so today's releases stay visible after they print
+    const todayIst = new Date(now.getTime() + 5.5 * 3600 * 1000);
+    const startOfTodayIst = istDate(todayIst.getUTCFullYear(), todayIst.getUTCMonth(), todayIst.getUTCDate(), 0, 0);
+
+    return events
+        .filter(e => e.at >= startOfTodayIst)
+        .sort((a, b) => a.at - b.at)
+        .slice(0, 4)
+        .map(e => {
+            const ist = new Date(e.at.getTime() + 5.5 * 3600 * 1000);
+            const isToday = ist.toISOString().slice(0, 10) === todayIst.toISOString().slice(0, 10);
+            return {
+                date: `${MONTHS[ist.getUTCMonth()]} ${ist.getUTCDate()}`,
+                time: `${String(ist.getUTCHours()).padStart(2, '0')}:${String(ist.getUTCMinutes()).padStart(2, '0')}`,
+                event: e.event,
+                impact: e.impact,
+                status: isToday ? (e.at <= now ? 'Released' : 'Today') : 'Upcoming'
+            };
+        });
 };
+
+/**
+ * Nifty 50 technicals computed from real daily closes (Google Finance OHLC
+ * history via api/ticker.js): Wilder RSI-14, position vs the 20-day SMA, and
+ * the 1-month move. Returns null if there isn't enough history.
+ */
+export const fetchTechnicalSignals = async (force = false) => {
+    const data = await fetchHistory('^NSEI', '1mo', '1d', force);
+    if (!data || !Array.isArray(data.sparkline)) return null;
+
+    // History can carry two bars for today (intraday + latest) — keep the last per day
+    const byDay = new Map();
+    data.sparkline.forEach(p => { if (typeof p.price === 'number') byDay.set(p.time, p.price); });
+    const closes = [...byDay.values()];
+    if (data.rawPrice) closes[closes.length - 1] = data.rawPrice;
+    if (closes.length < 20) return null;
+
+    let gain = 0, loss = 0;
+    for (let i = 1; i <= 14; i++) {
+        const d = closes[i] - closes[i - 1];
+        if (d >= 0) gain += d; else loss -= d;
+    }
+    let avgGain = gain / 14, avgLoss = loss / 14;
+    for (let i = 15; i < closes.length; i++) {
+        const d = closes[i] - closes[i - 1];
+        avgGain = (avgGain * 13 + Math.max(d, 0)) / 14;
+        avgLoss = (avgLoss * 13 + Math.max(-d, 0)) / 14;
+    }
+    const rsi = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
+
+    const last = closes[closes.length - 1];
+    const sma20 = closes.slice(-20).reduce((a, b) => a + b, 0) / 20;
+    const smaDistance = ((last - sma20) / sma20) * 100;
+    const monthChange = ((last - closes[0]) / closes[0]) * 100;
+
+    let trend = 'Neutral';
+    if (last > sma20 && rsi > 50) trend = 'Bullish';
+    else if (last < sma20 && rsi < 50) trend = 'Bearish';
+
+    return {
+        symbol: 'NIFTY 50',
+        rsi: Math.round(rsi * 10) / 10,
+        sma20: Math.round(sma20 * 100) / 100,
+        smaDistance: smaDistance.toFixed(2),
+        monthChange: monthChange.toFixed(2),
+        sessions: closes.length,
+        trend
+    };
+};
+
+/**
+ * Current Indian results season, e.g. "Q2 FY27" during Oct-Dec 2026
+ * (companies report the quarter that just ended).
+ */
+export const getResultsSeason = (date = new Date()) => {
+    const y = date.getFullYear();
+    const m = date.getMonth();
+    if (m <= 2) return `Q3 FY${String(y).slice(-2)}`;
+    if (m <= 5) return `Q4 FY${String(y).slice(-2)}`;
+    if (m <= 8) return `Q1 FY${String(y + 1).slice(-2)}`;
+    return `Q2 FY${String(y + 1).slice(-2)}`;
+};
+
+/**
+ * Earnings Watch: live quotes for the large-caps that lead each results
+ * season. Uses the same /api/ticker quotes as the rest of the dashboard and
+ * the chatbot, so prices always agree.
+ */
+export const fetchEarningsWatch = async (force = false) => {
+    const targets = [
+        { symbol: 'TCS:NSE', name: 'TCS' },
+        { symbol: 'INFY:NSE', name: 'INFY' },
+        { symbol: 'HDFCBANK:NSE', name: 'HDFCBANK' }
+    ];
+
+    const results = await Promise.all(targets.map(t => fetchHistory(t.symbol, '1d', '5m', force)));
+    return results
+        .map((r, i) => r && {
+            name: targets[i].name,
+            price: r.price,
+            changePercent: r.changePercent,
+            isPositive: r.isPositive,
+            peRatio: r.peRatio
+        })
+        .filter(Boolean);
+};
+
 /**
  * Fetch Market Sentiment Score (Fear & Greed Index)
  * Derived from India VIX, Nifty Momentum, and Institutional flows
  */
-export const fetchMarketSentiment = async () => {
+export const fetchMarketSentiment = async (force = false) => {
     try {
         const [vixData, niftyData] = await Promise.all([
-            fetchHistory('^INDIAVIX'),
-            fetchHistory('^NSEI')
+            fetchHistory('^INDIAVIX', '1d', '5m', force),
+            fetchHistory('^NSEI', '1d', '5m', force)
         ]);
 
         if (!vixData || !niftyData) return { score: 50, label: 'NEUTRAL', reason: 'Analyzing market signals...' };

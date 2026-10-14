@@ -9,8 +9,16 @@ const FiiDiiAnalyzer = ({ flows }) => {
                 <h3 style={{ margin: 0, fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', letterSpacing: '1px' }}>
                     <Users size={16} /> INSTITUTIONAL FLOWS
                 </h3>
-                <span style={{ fontSize: '0.65rem', color: 'var(--accent-primary)', opacity: 0.8 }}>DAILY SETTLEMENT</span>
+                <span style={{ fontSize: '0.65rem', color: 'var(--accent-primary)', opacity: 0.8 }}>
+                    {flows[0]?.date ? `NSE · ${flows[0].date.toUpperCase()}` : 'NSE PROVISIONAL'}
+                </span>
             </div>
+
+            {flows.length === 0 && (
+                <p style={{ fontSize: '0.75rem', opacity: 0.4, textAlign: 'center', padding: '1.5rem', margin: 0 }}>
+                    NSE flow data is unavailable right now.
+                </p>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: '0.75rem' }}>
                 {flows.map((flow, idx) => (
