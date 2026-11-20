@@ -92,7 +92,7 @@ export const deleteAllChats = async (userId) => {
 
 const DEFAULT_SETTINGS = {
     ai_settings: {
-        model: 'openai/gpt-oss-20b',
+        model: 'nvidia/nemotron-3.5-bolt-e4b',
         style: 'Balanced',
         tone: 'Professional',
         creativity: 0.5,
@@ -139,8 +139,13 @@ export const loadSettings = async (userId) => {
 
         if (!data) return { ...DEFAULT_SETTINGS };
 
+        const ai = { ...DEFAULT_SETTINGS.ai_settings, ...(data.ai_settings || {}) };
+        if (ai.model === 'openai/gpt-oss-20b' || !ai.model) {
+            ai.model = DEFAULT_SETTINGS.ai_settings.model;
+        }
+
         return {
-            ai_settings: data.ai_settings || DEFAULT_SETTINGS.ai_settings,
+            ai_settings: ai,
             chat_settings: data.chat_settings || DEFAULT_SETTINGS.chat_settings,
             personalization: data.personalization || DEFAULT_SETTINGS.personalization,
             appearance: data.appearance || DEFAULT_SETTINGS.appearance,

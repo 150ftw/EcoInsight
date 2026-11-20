@@ -42,8 +42,8 @@ const AIEconomicPulse = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', position: 'relative', zIndex: 10 }}>
                 {[
-                    { label: 'Inflation Trajectory', value: '2.4%', target: 'Target: 2.0%', icon: <TrendingUp size={20} />, color: '#f59e0b', desc: 'Core PCE stabilizing. Services inflation remains sticky but clear disinflationary trend intact.', chart: [40, 60, 45, 70, 50, 80, 65] },
-                    { label: 'Repo Rate (RBI)', value: '6.50%', target: 'Pause maintained', icon: <BarChart3 size={20} />, color: '#3b82f6', desc: 'RBI remains watchful. Markets pricing in 1-2 rate cuts by end of fiscal year amid cooling CPI.', chart: [20, 30, 50, 80, 100, 100, 100] },
+                    { label: 'Inflation Trajectory', value: '3.6%', target: 'Target: 4.0% (Band 2-6%)', icon: <TrendingUp size={20} />, color: '#f59e0b', desc: 'Domestic CPI tracking within RBI tolerance band. Core inflation remains stable as supply chains normalize.', chart: [40, 60, 45, 70, 50, 80, 65] },
+                    { label: 'Repo Rate (RBI)', value: '6.50%', target: 'Neutral Stance', icon: <BarChart3 size={20} />, color: '#3b82f6', desc: 'RBI MPC monitoring liquidity balance. Markets pricing in gradual rate normalization amid cooling food and core CPI.', chart: [20, 30, 50, 80, 100, 100, 100] },
                     { label: 'India GDP Est.', value: '+6.8%', target: 'YoY Projection', icon: <Globe size={20} />, color: '#10b981', desc: 'India remains fastest growing major economy. Domestic consumption and capex driving momentum.', chart: [30, 40, 35, 55, 50, 75, 80] },
                     { label: 'Market Sentiment', value: 'Bullish', target: 'Fear & Greed: 72', icon: <Sparkles size={20} />, color: '#d946ef', desc: 'FII inflows positive. Nifty sector rotation into financials and infra driving broad index higher.', chart: [50, 40, 60, 55, 70, 85, 90] }
                 ].map((stat, i) => (

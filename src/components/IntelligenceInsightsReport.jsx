@@ -152,7 +152,9 @@ const IntelligenceInsightsReport = ({ onDeepDive }) => {
                         >
                             ELITE INSIGHT
                         </div>
-                        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>ISSUE #284 • {new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
+                        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>
+                            ISSUE #{Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24))} • {new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
                     </div>
                     
                     <h2 

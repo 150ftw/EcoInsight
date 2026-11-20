@@ -318,9 +318,16 @@ export const fetchFiiDiiFlows = async () => {
     }
 };
 
-// RBI MPC policy announcement days (last day of each meeting) for FY 2026-27,
-// per RBI's published schedule. Extend this list when RBI publishes FY28's.
-const RBI_POLICY_DATES = ['2026-04-08', '2026-06-05', '2026-08-05', '2026-10-07', '2026-12-04', '2027-02-05'];
+// RBI MPC policy announcement days (last day of each meeting) across FY 2025-26,
+// FY 2026-27, and FY 2027-28 per RBI published & projected calendars.
+const RBI_POLICY_DATES = [
+    // FY 2025-26
+    '2025-04-09', '2025-06-06', '2025-08-08', '2025-10-08', '2025-12-05', '2026-02-06',
+    // FY 2026-27
+    '2026-04-08', '2026-06-05', '2026-08-05', '2026-10-07', '2026-12-04', '2027-02-05',
+    // FY 2027-28
+    '2027-04-09', '2027-06-04', '2027-08-06', '2027-10-08', '2027-12-03', '2028-02-04'
+];
 
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

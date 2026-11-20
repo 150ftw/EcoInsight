@@ -21,9 +21,10 @@ const buildSearchQuery = (userMessage) => {
         query += ' India';
     }
 
-    // Refreshness boost for current year
-    if (!query.includes('2026') && !query.includes('2025')) {
-        query += ' 2026';
+    // Freshness boost for current year
+    const curYear = new Date().getFullYear();
+    if (!query.includes(String(curYear)) && !query.includes(String(curYear - 1))) {
+        query += ` ${curYear}`;
     }
 
     return query;

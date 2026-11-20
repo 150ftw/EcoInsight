@@ -3265,7 +3265,7 @@ function App() {
     })
 
     const [aiSettings, setAiSettings] = useState({
-        model: 'openai/gpt-oss-20b',
+        model: 'nvidia/nemotron-3.5-bolt-e4b',
         style: 'Balanced',
         tone: 'Professional',
         creativity: 0.5,
@@ -4688,18 +4688,18 @@ const FintechBadges = ({ labels }) => {
                         <div className="trends-grid">
                             <div className="trend-card">
                                 <div className="trend-icon"><TrendingUp size={24} /></div>
-                                <h3>Inflation Forecast</h3>
-                                <p>CPI projected to stabilize at 2.4% by Q4 2026.</p>
+                                <h3>Inflation Trajectory</h3>
+                                <p>CPI tracking within RBI tolerance band (4.0% ±2%), supporting domestic purchasing power.</p>
                             </div>
                             <div className="trend-card">
                                 <div className="trend-icon"><Globe size={24} /></div>
                                 <h3>India GDP Growth</h3>
-                                <p>India projected to grow at 6.8% — fastest among major economies in 2026.</p>
+                                <p>India projected to grow at 6.8%–7.0% — sustaining its lead as the fastest-growing major economy.</p>
                             </div>
                             <div className="trend-card">
                                 <div className="trend-icon"><BarChart3 size={24} /></div>
                                 <h3>Interest Rate Trajectory</h3>
-                                <p>RBI likely to initiate gradual cuts as CPI cools toward the 4% target.</p>
+                                <p>RBI maintaining balanced liquidity with gradual normalization as headline inflation anchors near 4%.</p>
                             </div>
                         </div>
                     </div>

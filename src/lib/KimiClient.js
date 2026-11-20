@@ -1,5 +1,5 @@
 const API_URL = '/api/chat';
-const DEFAULT_MODEL = 'openai/gpt-oss-20b';
+const DEFAULT_MODEL = 'nvidia/nemotron-3.5-bolt-e4b';
 const DEFAULT_REASONING_EFFORT = 'low';
 
 export const streamMessage = async (messages, onChunk, options = {}) => {
@@ -8,13 +8,14 @@ export const streamMessage = async (messages, onChunk, options = {}) => {
 
     const executeStream = async () => {
         try {
+            const requestedModel = (options.model && options.model !== 'openai/gpt-oss-20b') ? options.model : DEFAULT_MODEL;
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: options.model || DEFAULT_MODEL,
+                    model: requestedModel,
                     messages: messages,
                     temperature: options.temperature ?? 0.5,
                     top_p: 1,

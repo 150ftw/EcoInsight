@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     PieChart as PieIcon, TrendingUp, Shield, BarChart2, Plus, Trash2, 
@@ -13,9 +13,9 @@ import { fetchVerifiedPrice } from '../lib/MarketData';
 
 const PortfolioAnalyzer = ({ onAnalyze }) => {
     const [stocks, setStocks] = useState([
-        { symbol: 'RELIANCE', name: 'Reliance Industries', quantity: 10, price: 2900, manualValue: null },
+        { symbol: 'RELIANCE', name: 'Reliance Industries', quantity: 10, price: 1360, manualValue: null },
         { symbol: 'TCS', name: 'TCS Ltd', quantity: 5, price: 4000, manualValue: null },
-        { symbol: 'HDFCBANK', name: 'HDFC Bank', quantity: 15, price: 1500, manualValue: null }
+        { symbol: 'HDFCBANK', name: 'HDFC Bank', quantity: 15, price: 1750, manualValue: null }
     ]);
     const [tempSymbol, setTempSymbol] = useState('');
     const [tempQty, setTempQty] = useState('');
@@ -27,7 +27,8 @@ const PortfolioAnalyzer = ({ onAnalyze }) => {
             const updated = await Promise.all(stocks.map(async (s) => {
                 const data = await fetchVerifiedPrice(s.symbol);
                 if (data && data.price) {
-                    return { ...s, price: data.price };
+                    const cleanNum = parseFloat(String(data.price).replace(/,/g, ''));
+                    return { ...s, price: Number.isFinite(cleanNum) ? cleanNum : data.price };
                 }
                 return s;
             }));
@@ -38,6 +39,11 @@ const PortfolioAnalyzer = ({ onAnalyze }) => {
             setIsSyncing(false);
         }
     };
+
+    // Auto-sync real-time prices on mount
+    useEffect(() => {
+        syncPrices();
+    }, []);
 
     const addStock = async () => {
         if (!tempSymbol || !tempQty) return;

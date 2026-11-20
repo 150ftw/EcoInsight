@@ -3,19 +3,58 @@
  * Synchronized for Indian Standard Time (IST) - Asia/Kolkata
  */
 
-const NSE_HOLIDAYS_2025 = [
+export const NSE_HOLIDAYS = [
+    // 2025 Trading Holidays
     '2025-01-26', // Republic Day
     '2025-02-26', // Mahashivratri
     '2025-03-14', // Holi
-    '2025-03-31', // Eid-ul-Fitr
+    '2025-03-31', // Id-ul-Fitr
     '2025-04-10', // Mahavir Jayanti
+    '2025-04-14', // Dr. Ambedkar Jayanti
     '2025-04-18', // Good Friday
     '2025-05-01', // Maharashtra Day
     '2025-08-15', // Independence Day
     '2025-08-27', // Ganesh Chaturthi
     '2025-10-02', // Gandhi Jayanti
-    '2025-10-21', // Diwali (Market hours might vary for Muhurat)
+    '2025-10-21', // Diwali Laxmi Pujan (Muhurat Trading in evening)
+    '2025-10-22', // Diwali Balipratipada
+    '2025-11-05', // Guru Nanak Jayanti
+    '2025-12-25', // Christmas
+
+    // 2026 Trading Holidays
+    '2026-01-26', // Republic Day
+    '2026-02-16', // Mahashivratri
+    '2026-03-03', // Holi
+    '2026-03-20', // Id-ul-Fitr
+    '2026-03-31', // Mahavir Jayanti
+    '2026-04-03', // Good Friday
+    '2026-04-14', // Dr. Ambedkar Jayanti
+    '2026-05-01', // Maharashtra Day
+    '2026-05-27', // Bakri Id / Eid ul-Adha
+    '2026-08-15', // Independence Day
+    '2026-09-15', // Ganesh Chaturthi
+    '2026-10-02', // Gandhi Jayanti
+    '2026-10-20', // Dussehra
+    '2026-11-09', // Diwali Balipratipada
+    '2026-11-24', // Guru Nanak Jayanti
+    '2026-12-25', // Christmas
+
+    // 2027 Trading Holidays
+    '2027-01-26', // Republic Day
+    '2027-03-07', // Mahashivratri
+    '2027-03-23', // Holi
+    '2027-03-26', // Good Friday
+    '2027-04-09', // Id-ul-Fitr
+    '2027-04-14', // Dr. Ambedkar Jayanti
+    '2027-04-20', // Mahavir Jayanti
+    '2027-05-01', // Maharashtra Day
+    '2027-08-15', // Independence Day
+    '2027-10-02', // Gandhi Jayanti
+    '2027-11-08', // Diwali Balipratipada
+    '2027-12-25', // Christmas
 ];
+
+export const NSE_HOLIDAYS_2025 = NSE_HOLIDAYS;
 
 /**
  * Derives current Indian market session status.
@@ -36,7 +75,7 @@ export const getIndianMarketStatus = () => {
     const dateStr = `${getPart('year')}-${getPart('month')}-${getPart('day')}`;
     
     const isWeekend = day === 'Saturday' || day === 'Sunday';
-    const isHoliday = NSE_HOLIDAYS_2025.includes(dateStr);
+    const isHoliday = NSE_HOLIDAYS.includes(dateStr);
     
     if (isHoliday) return { state: 'HOLIDAY', msg: 'NATIONAL HOLIDAY (MARKETS CLOSED)' };
     if (isWeekend) return { state: 'WEEKEND', msg: 'MARKETS CLOSED (WEEKEND)' };
@@ -52,15 +91,17 @@ export const getIndianMarketStatus = () => {
 };
 
 /**
- * Returns basic Indian taxation metadata for AI grounding.
+ * Returns Indian taxation metadata for AI grounding (Finance Act 2024 / Current Law).
  */
 export const getTaxContext = () => {
     return {
-        stcg: '15% for Equity (Soon to be 20% proposed)',
-        ltcg: '10% above ₹1.25L profit (Now 12.5% proposed)',
-        fd: 'Slab rate + Cess',
-        intraday: 'Speculative business income (Slab rate)',
-        fno: 'Non-speculative business income (Slab rate)'
+        stcg: '20% on listed equity & equity-oriented mutual funds (Section 111A, effective Budget 2024)',
+        ltcg: '12.5% on gains exceeding ₹1.25 Lakh per financial year (Section 112A, effective Budget 2024)',
+        unlisted_ltcg: '12.5% for unlisted equity and real estate (indexation benefit removed for transfers post July 23, 2024)',
+        fd: 'Taxed at applicable slab rate + 4% Health & Education Cess',
+        intraday: 'Speculative business income (Taxed at applicable slab rate)',
+        fno: 'Non-speculative business income (Taxed at applicable slab rate; STT 0.02% on futures, 0.1% on option premium)',
+        buybacks: 'Taxed as dividend income in shareholder hands under Section 2(22)(f) (effective Oct 1, 2024)'
     };
 };
 

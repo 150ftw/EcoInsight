@@ -1,6 +1,8 @@
 import fetch from 'node-fetch';
 
 const NVIDIA_API_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
+const DEFAULT_MODEL = 'nvidia/nemotron-3.5-bolt-e4b';
+const RETIRED_MODELS = new Set(['openai/gpt-oss-20b']);
 const SKIP_RESPONSE_HEADERS = new Set(['content-encoding', 'content-length', 'connection']);
 
 /**
@@ -24,15 +26,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: { message: 'messages is required' } });
   }
 
-  try {
-    const upstream = await fetch(NVIDIA_API_URL, {
+  // Sanitize model: replace deprecated/retired models with current active production model
+  const requestedModel = (!model || RETIRED_MODELS.has(model)) ? DEFAULT_MODEL : model;
+
+  const sendUpstreamRequest = async (targetModel) => {
+    return await fetch(NVIDIA_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: model || 'openai/gpt-oss-20b',
+        model: targetModel,
         messages,
         temperature: temperature ?? 0.5,
         top_p: top_p ?? 1,
@@ -41,6 +46,16 @@ export default async function handler(req, res) {
         stream: stream !== false
       })
     });
+  };
+
+  try {
+    let upstream = await sendUpstreamRequest(requestedModel);
+
+    // If a non-default requested model returns 410 Gone or 404 Not Found, retry with DEFAULT_MODEL
+    if ((upstream.status === 410 || upstream.status === 404) && requestedModel !== DEFAULT_MODEL) {
+      console.warn(`[Chat Proxy] Model ${requestedModel} returned ${upstream.status}. Falling back to ${DEFAULT_MODEL}`);
+      upstream = await sendUpstreamRequest(DEFAULT_MODEL);
+    }
 
     res.status(upstream.status);
     upstream.headers.forEach((value, key) => {

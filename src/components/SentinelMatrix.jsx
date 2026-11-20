@@ -206,7 +206,7 @@ const SentinelMatrix = ({ scenario, confidence, extrapolations }) => {
         }}>
           <Zap size={14} color="#8b5cf6" className="animate-pulse" />
           <p style={{ margin: 0, fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-            <span style={{ color: '#8b5cf6', fontWeight: 700 }}>SOVEREIGN INTELLIGENCE:</span> Extrapolated analysis based on 2025 catalyst dynamics and second-order institutional flow modeling.
+            <span style={{ color: '#8b5cf6', fontWeight: 700 }}>SOVEREIGN INTELLIGENCE:</span> Extrapolated analysis based on {new Date().getFullYear()} catalyst dynamics and second-order institutional flow modeling.
           </p>
         </div>
       </div>

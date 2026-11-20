@@ -23,7 +23,7 @@ const MarketTicker = () => {
                 {
                     name: "INSTITUTIONAL PULSE",
                     price: `${pulse}/100`,
-                    change: pulse > 70 ? 'Extreme Bulish' : (pulse < 30 ? 'High Risk' : 'Neutral'),
+                    change: pulse > 70 ? 'Extreme Bullish' : (pulse < 30 ? 'High Risk' : 'Neutral'),
                     isPositive: pulse >= 50,
                     isPulse: true
                 },
